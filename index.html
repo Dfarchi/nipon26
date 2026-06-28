@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יפן 2026 — המסע שלנו</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0a0a;
+      color: #f0ebe3;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 60px 20px;
+      text-align: center;
+      border-bottom: 2px solid #e94560;
+    }
+    header h1 {
+      font-size: 3rem;
+      letter-spacing: 4px;
+      color: #e94560;
+      text-shadow: 0 0 20px rgba(233,69,96,0.5);
+      margin-bottom: 10px;
+    }
+    header p {
+      font-size: 1.2rem;
+      color: #a8dadc;
+      letter-spacing: 2px;
+    }
+    .sakura { font-size: 2rem; margin: 10px 0; }
+    nav {
+      background: #111;
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+    }
+    nav a {
+      color: #a8dadc;
+      text-decoration: none;
+      margin: 0 20px;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: #e94560; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+    .intro {
+      text-align: center;
+      padding: 40px 20px;
+      background: #111827;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      border: 1px solid #1f2937;
+    }
+    .intro h2 { font-size: 1.8rem; color: #e94560; margin-bottom: 15px; }
+    .intro p { font-size: 1.1rem; line-height: 1.8; color: #d1d5db; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+    .card {
+      background: #111827;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .card:hover { transform: translateY(-5px); border-color: #e94560; }
+    .card-header {
+      padding: 25px;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      text-align: center;
+    }
+    .card-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .card-header h3 { font-size: 1.3rem; color: #e94560; margin-bottom: 5px; }
+    .card-header .dates { font-size: 0.9rem; color: #6b7280; letter-spacing: 1px; }
+    .card-body { padding: 20px; }
+    .card-body ul { list-style: none; }
+    .card-body ul li {
+      padding: 6px 0;
+      color: #9ca3af;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #1f2937;
+    }
+    .card-body ul li:last-child { border-bottom: none; }
+    .card-body ul li::before { content: '→ '; color: #e94560; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin: 40px 0;
+    }
+    .stat {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat .number { font-size: 2rem; color: #e94560; font-weight: bold; }
+    .stat .label { font-size: 0.85rem; color: #6b7280; margin-top: 5px; }
+    footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid #1f2937;
+      color: #4b5563;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="sakura">🌸 🗻 🌸</div>
+    <h1>יפן 2026</h1>
+    <p>המסע המשפחתי שלנו — מרץ-אפריל 2026</p>
+  </header>
+  <nav>
+    <a href="index.html">🏠 בית</a>
+    <a href="japan-2026-north-notes.html">🏔️ צפון יפן</a>
+    <a href="japan-weeks-2-3.html">🌆 שבועות 2-3</a>
+  </nav>
+  <div class="container">
+    <div class="intro">
+      <h2>✈️ המסע מתקרב!</h2>
+      <p>מסע משפחתי לא רגיל — שלושה שבועות ביפן, מהצפון הקר ועד לדרום הצבעוני.<br>
+      כאן נרכז את כל התכנון, הטיפים, ותיעוד המסע בזמן אמת.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="number">21</div><div class="label">ימי מסע</div></div>
+      <div class="stat"><div class="number">8+</div><div class="label">יעדים</div></div>
+      <div class="stat"><div class="number">3</div><div class="label">שבועות</div></div>
+      <div class="stat"><div class="number">∞</div><div class="label">זיכרונות</div></div>
+    </div>
+    <div class="cards-grid">
+      <a href="japan-2026-north-notes.html" class="card">
+        <div class="card-header">
+          <div class="card-icon">🏔️❄️</div>
+          <h3>צפון יפן — הוקאידו ותוהוקו</h3>
+          <div class="dates">שבוע 1 — סאפורו, אוטארו, ועוד</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>שוקי שלג בסאפורו</li>
+            <li>תעלות אוטארו הרומנטיות</li>
+            <li>האלפים היפניים</li>
+            <li>אונסן בלב הטבע</li>
+          </ul>
+        </div>
+      </a>
+      <a href="japan-weeks-2-3.html" class="card">
+        <div class="card-header">
+          <div class="card-icon">🌸🏯</div>
+          <h3>מרכז ודרום — שבועות 2-3</h3>
+          <div class="dates">טוקיו, קיוטו, אוסקה ועוד</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>טוקיו — העיר שאף פעם לא ישנה</li>
+            <li>קיוטו — הגייישות והמקדשים</li>
+            <li>נארה — צבאי הפארק</li>
+            <li>אוסקה — מטבח הרחוב</li>
+          </ul>
+        </div>
+      </a>
+    </div>
+  </div>
+  <footer>
+    <p>🌸 nipon26 — המסע המשפחתי שלנו ליפן 2026 🌸</p>
+  </footer>
+</body>
+</html>
