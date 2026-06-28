@@ -17,7 +17,7 @@
 
 <div class="hero" style="padding:30px 18px 8px">
   <h1 style="font-size:2rem">🧭 החלטות הטיול</h1>
-  <div class="sub">סמנו את הבחירה בכל שאלה · ⭐ = המלצה · נשמר על המכשיר שלכם</div>
+  <div class="sub">סמנו את הבחירה בכל שאלה · ⭐ = המלצה · לחצו על הלינקים לחקור · נשמר על המכשיר</div>
 </div>
 
 <div class="wrap">
@@ -70,7 +70,11 @@ TRIP.decisions.forEach(group => {
     let html = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${multiNote}</div></div><div class="opts">`;
     it.o.forEach((opt,i) => {
       const rec = (it.rec===i) ? '<span class="rec">⭐ מומלץ</span>' : '';
-      html += `<div class="opt" data-n="${it.n}" data-i="${i}" data-multi="${it.multi||0}"><span class="mark"></span><span class="txt">${opt}</span>${rec}</div>`;
+      const desc = opt.d ? `<div class="opt-desc">${opt.d}</div>` : '';
+      const links = (opt.l && opt.l.length)
+        ? `<div class="opt-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
+      html += `<div class="opt" data-n="${it.n}" data-i="${i}" data-multi="${it.multi||0}">`
+        + `<div class="opt-head"><span class="mark"></span><span class="txt">${opt.t}</span>${rec}</div>${desc}${links}</div>`;
     });
     html += `</div>`;
     card.innerHTML = html;
@@ -100,6 +104,7 @@ function render() {
 }
 
 wrap.addEventListener('click', e => {
+  if(e.target.closest('a')) return; // לחיצה על לינק לא משנה בחירה
   const opt = e.target.closest('.opt');
   if(!opt) return;
   const n = opt.dataset.n, i = +opt.dataset.i, multi = +opt.dataset.multi;
@@ -123,7 +128,7 @@ function exportChoices(){
     group.items.forEach(it => {
       const v = store[it.n];
       if(v===undefined || (Array.isArray(v)&&v.length===0)) return;
-      const picks = (Array.isArray(v)?v:[v]).map(i=>it.o[i]).join(' + ');
+      const picks = (Array.isArray(v)?v:[v]).map(i=>it.o[i].t).join(' + ');
       lines.push(`  ${it.n}. ${it.q.replace(/⚠️.*$/,'').trim()} → ${picks}`);
     });
     if(lines.length){ out += group.g + '\n' + lines.join('\n') + '\n\n'; }
