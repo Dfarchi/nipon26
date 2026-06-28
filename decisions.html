@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>החלטות · יפן 2026</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="tab" href="index.html">🏠 שער</a>
+  <a class="tab active" href="decisions.html">🧭 החלטות</a>
+  <a class="tab" href="itinerary.html">🗓️ מסלול</a>
+  <a class="tab" href="documents.html">📂 מסמכים</a>
+  <span class="brand">🍁 NIPON26</span>
+</div></div>
+
+<div class="hero" style="padding:30px 18px 8px">
+  <h1 style="font-size:2rem">🧭 החלטות הטיול</h1>
+  <div class="sub">סמנו את הבחירה בכל שאלה · ⭐ = המלצה · נשמר על המכשיר שלכם</div>
+</div>
+
+<div class="wrap">
+  <div class="dec-progress">
+    <div class="bar-label"><span id="progLabel">0 מתוך 0 סומנו</span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progFill"></i></div>
+  </div>
+
+  <div id="decs"></div>
+
+  <div class="dec-actions">
+    <button class="btn primary" onclick="exportChoices()">📋 העתק בחירות לשליחה לקלוד</button>
+    <button class="btn" onclick="resetChoices()">↺ אפס</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>📋 הבחירות שלכם</h3>
+    <p style="color:var(--muted); font-size:0.88rem; margin-bottom:10px">העתיקו את הטקסט ושלחו לקלוד בצ'אט — הוא יעדכן את המסלול ואת הדרייב.</p>
+    <textarea id="exportText" readonly></textarea>
+    <div class="row">
+      <button class="btn" onclick="closeModal()">סגור</button>
+      <button class="btn primary" onclick="copyText()">העתק</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">הועתק ✓</div>
+
+<footer>🍁 NIPON26 · ⚠️ אשכול סנדאי (6ב) ממתין לאימות מול ההערות שלכם מאתמול 🍁</footer>
+
+<script src="data.js"></script>
+<script>
+const KEY = 'nipon26_choices_v1';
+let store = JSON.parse(localStorage.getItem(KEY) || '{}');
+const wrap = document.getElementById('decs');
+let total = 0;
+
+TRIP.decisions.forEach(group => {
+  const g = document.createElement('div');
+  g.className = 'dgroup';
+  g.innerHTML = `<div class="gh">${group.g}</div>`;
+  group.items.forEach(it => {
+    total++;
+    const card = document.createElement('div');
+    card.className = 'dcard';
+    card.dataset.n = it.n;
+    const multiNote = it.multi ? ` <span style="color:var(--dim);font-size:0.8rem">(בחרו ${it.multi})</span>` : '';
+    let html = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${multiNote}</div></div><div class="opts">`;
+    it.o.forEach((opt,i) => {
+      const rec = (it.rec===i) ? '<span class="rec">⭐ מומלץ</span>' : '';
+      html += `<div class="opt" data-n="${it.n}" data-i="${i}" data-multi="${it.multi||0}"><span class="mark"></span><span class="txt">${opt}</span>${rec}</div>`;
+    });
+    html += `</div>`;
+    card.innerHTML = html;
+    g.appendChild(card);
+  });
+  wrap.appendChild(g);
+});
+
+function render() {
+  document.querySelectorAll('.opt').forEach(o => {
+    const n = o.dataset.n, i = +o.dataset.i;
+    const sel = store[n];
+    const on = Array.isArray(sel) ? sel.includes(i) : sel===i;
+    o.classList.toggle('sel', !!on);
+  });
+  document.querySelectorAll('.dcard').forEach(c => {
+    c.classList.toggle('decided', store[c.dataset.n]!==undefined &&
+      (Array.isArray(store[c.dataset.n]) ? store[c.dataset.n].length>0 : true));
+  });
+  const done = Object.keys(store).filter(k => {
+    const v = store[k]; return Array.isArray(v) ? v.length>0 : v!==undefined;
+  }).length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('progLabel').textContent = `${done} מתוך ${total} סומנו`;
+  document.getElementById('progPct').textContent = pct+'%';
+  document.getElementById('progFill').style.width = pct+'%';
+}
+
+wrap.addEventListener('click', e => {
+  const opt = e.target.closest('.opt');
+  if(!opt) return;
+  const n = opt.dataset.n, i = +opt.dataset.i, multi = +opt.dataset.multi;
+  if(multi){
+    let arr = Array.isArray(store[n]) ? store[n] : [];
+    if(arr.includes(i)) arr = arr.filter(x=>x!==i);
+    else { arr.push(i); if(arr.length>multi) arr.shift(); }
+    store[n] = arr;
+  } else {
+    store[n] = (store[n]===i) ? undefined : i;
+    if(store[n]===undefined) delete store[n];
+  }
+  localStorage.setItem(KEY, JSON.stringify(store));
+  render();
+});
+
+function exportChoices(){
+  let out = 'בחירות הטיול שלי (יפן 2026):\n\n';
+  TRIP.decisions.forEach(group => {
+    let lines = [];
+    group.items.forEach(it => {
+      const v = store[it.n];
+      if(v===undefined || (Array.isArray(v)&&v.length===0)) return;
+      const picks = (Array.isArray(v)?v:[v]).map(i=>it.o[i]).join(' + ');
+      lines.push(`  ${it.n}. ${it.q.replace(/⚠️.*$/,'').trim()} → ${picks}`);
+    });
+    if(lines.length){ out += group.g + '\n' + lines.join('\n') + '\n\n'; }
+  });
+  if(out.trim().endsWith(':')) out += '(עדיין לא סומנו בחירות)';
+  document.getElementById('exportText').value = out.trim();
+  document.getElementById('modalBg').classList.add('show');
+}
+function copyText(){
+  const t = document.getElementById('exportText');
+  t.select(); navigator.clipboard.writeText(t.value).then(showToast);
+}
+function showToast(){ const x=document.getElementById('toast'); x.classList.add('show'); setTimeout(()=>x.classList.remove('show'),1600); }
+function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
+function resetChoices(){ if(confirm('לאפס את כל הבחירות?')){ store={}; localStorage.removeItem(KEY); render(); } }
+document.getElementById('modalBg').addEventListener('click',e=>{ if(e.target.id==='modalBg') closeModal(); });
+
+render();
+</script>
+</body>
+</html>
