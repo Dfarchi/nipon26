@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מסלול · יפן 2026</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="tab" href="index.html">🏠 שער</a>
+  <a class="tab" href="decisions.html">🧭 החלטות</a>
+  <a class="tab active" href="itinerary.html">🗓️ מסלול</a>
+  <a class="tab" href="documents.html">📂 מסמכים</a>
+  <span class="brand">🍁 NIPON26</span>
+</div></div>
+
+<div class="hero" style="padding-bottom:10px">
+  <h1 style="font-size:2.2rem">🗓️ ציר המסע</h1>
+  <div class="sub">השלד המעודכן · ~42 לילות, צפון→דרום</div>
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <div class="timeline" id="timeline"></div>
+  </div>
+  <div class="callout" style="margin-top:18px">
+    📌 השלד הוא טיוטה (DRAFT) — חלוקת הלילות המדויקת תיסגר אחרי שתסמנו את ההחלטות. כ-2–3 לילות "פלואוט" ברזרבה, מיקום בהמשך.
+  </div>
+</div>
+
+<footer>🍁 NIPON26 · השלד מתעדכן לפי ההחלטות 🍁</footer>
+<script src="data.js"></script>
+<script>
+  const tl = document.getElementById('timeline');
+  TRIP.phases.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'phase';
+    el.innerHTML = `<div class="ph-top"><h3>${p.h}</h3><span class="when">${p.when}</span></div>
+      <p>${p.p}</p><span class="nights">${p.nights}</span>`;
+    tl.appendChild(el);
+  });
+</script>
+</body>
+</html>

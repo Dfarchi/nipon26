@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מסמכים · יפן 2026</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="tab" href="index.html">🏠 שער</a>
+  <a class="tab" href="decisions.html">🧭 החלטות</a>
+  <a class="tab" href="itinerary.html">🗓️ מסלול</a>
+  <a class="tab active" href="documents.html">📂 מסמכים</a>
+  <span class="brand">🍁 NIPON26</span>
+</div></div>
+
+<div class="hero" style="padding-bottom:10px">
+  <h1 style="font-size:2.2rem">📂 מסמכי הטיול</h1>
+  <div class="sub">מקור האמת — מקושר ישירות לגוגל דרייב</div>
+</div>
+
+<div class="wrap">
+  <div style="display:grid; gap:12px;" id="docs"></div>
+  <div class="callout" style="margin-top:18px">
+    💡 ערכו במסמכים בדרייב מכל מכשיר (גם מהטלפון). כשתרצו שהקלסר יתעדכן — אמרו לי "תעדכן את האתר לפי הדרייב".
+  </div>
+</div>
+
+<footer>🍁 NIPON26 · כל הקבצים מסונכרנים מהדרייב 🍁</footer>
+<script src="data.js"></script>
+<script>
+  const c = document.getElementById('docs');
+  TRIP.docs.forEach(d => {
+    const a = document.createElement('a');
+    a.className = 'doc'; a.href = d.url; a.target = '_blank'; a.rel = 'noopener';
+    a.innerHTML = `<div class="ic">${d.ic}</div><div class="meta"><div class="t">${d.t}</div><div class="d">${d.d}</div></div><div class="go">↗</div>`;
+    c.appendChild(a);
+  });
+</script>
+</body>
+</html>
