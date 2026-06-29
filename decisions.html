@@ -29,15 +29,15 @@
   <div id="decs"></div>
 
   <div class="dec-actions">
-    <button class="btn primary" onclick="exportChoices()">📋 העתק בחירות לשליחה לקלוד</button>
+    <button class="btn primary" onclick="exportChoices()">📋 העתק בחירות + הערות לקלוד</button>
     <button class="btn" onclick="resetChoices()">↺ אפס</button>
   </div>
 </div>
 
 <div class="modal-bg" id="modalBg">
   <div class="modal">
-    <h3>📋 הבחירות שלכם</h3>
-    <p style="color:var(--muted); font-size:0.88rem; margin-bottom:10px">העתיקו את הטקסט ושלחו לקלוד בצ'אט — הוא יעדכן את המסלול ואת הדרייב.</p>
+    <h3>📋 הבחירות וההערות שלכם</h3>
+    <p style="color:var(--muted); font-size:0.88rem; margin-bottom:10px">העתיקו את הטקסט ושלחו לקלוד בצ'אט — כולל ההערות, כדי שנוכל להתכתב.</p>
     <textarea id="exportText" readonly></textarea>
     <div class="row">
       <button class="btn" onclick="closeModal()">סגור</button>
@@ -53,7 +53,9 @@
 <script src="data.js"></script>
 <script>
 const KEY = 'nipon26_choices_v1';
+const NKEY = 'nipon26_notes_v1';
 let store = JSON.parse(localStorage.getItem(KEY) || '{}');
+let notes = JSON.parse(localStorage.getItem(NKEY) || '{}');
 const wrap = document.getElementById('decs');
 let total = 0;
 
@@ -92,10 +94,17 @@ TRIP.decisions.forEach(group => {
         + `<button class="opt-toggle" type="button">הסבר ▾</button></div>${detail}</div>`;
     });
     html += `</div>`;
+    html += `<textarea class="note-in" data-n="${it.n}" rows="1" placeholder="📝 הערות / שאלות לקלוד (יצורפו להעתקה)"></textarea>`;
     card.innerHTML = html;
     g.appendChild(card);
   });
   wrap.appendChild(g);
+});
+
+// טעינת הערות שמורות לתוך השדות
+document.querySelectorAll('.note-in').forEach(t => {
+  const v = notes[t.dataset.n];
+  if(v){ t.value = v; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
 });
 
 function render() {
@@ -144,15 +153,29 @@ wrap.addEventListener('click', e => {
   render();
 });
 
+// שמירת הערות + גובה אוטומטי
+wrap.addEventListener('input', e => {
+  const t = e.target.closest('.note-in');
+  if(!t) return;
+  const n = t.dataset.n;
+  if(t.value.trim()) notes[n] = t.value; else delete notes[n];
+  localStorage.setItem(NKEY, JSON.stringify(notes));
+  t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px';
+});
+
 function exportChoices(){
   let out = 'בחירות הטיול שלי (יפן 2026):\n\n';
   TRIP.decisions.forEach(group => {
     let lines = [];
     group.items.forEach(it => {
       const v = store[it.n];
-      if(v===undefined || (Array.isArray(v)&&v.length===0)) return;
-      const picks = (Array.isArray(v)?v:[v]).map(i=>it.o[i].t).join(' + ');
-      lines.push(`  ${it.n}. ${it.q.replace(/⚠️.*$/,'').trim()} → ${picks}`);
+      const note = notes[it.n];
+      const hasPick = !(v===undefined || (Array.isArray(v)&&v.length===0));
+      if(!hasPick && !note) return;
+      const q = it.q.replace(/⚠️.*$/,'').trim();
+      const picks = hasPick ? (Array.isArray(v)?v:[v]).map(i=>it.o[i].t).join(' + ') : '(ללא בחירה עדיין)';
+      lines.push(`  ${it.n}. ${q} → ${picks}`);
+      if(note) lines.push(`     📝 הערה: ${note}`);
     });
     if(lines.length){ out += group.g + '\n' + lines.join('\n') + '\n\n'; }
   });
@@ -166,7 +189,7 @@ function copyText(){
 }
 function showToast(){ const x=document.getElementById('toast'); x.classList.add('show'); setTimeout(()=>x.classList.remove('show'),1600); }
 function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
-function resetChoices(){ if(confirm('לאפס את כל הבחירות?')){ store={}; localStorage.removeItem(KEY); render(); } }
+function resetChoices(){ if(confirm('לאפס את כל הבחירות וההערות?')){ store={}; notes={}; localStorage.removeItem(KEY); localStorage.removeItem(NKEY); document.querySelectorAll('.note-in').forEach(t=>{t.value='';t.style.height='auto';}); render(); } }
 document.getElementById('modalBg').addEventListener('click',e=>{ if(e.target.id==='modalBg') closeModal(); });
 
 render();
