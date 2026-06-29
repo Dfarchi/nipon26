@@ -17,7 +17,7 @@
 
 <div class="hero" style="padding:30px 18px 8px">
   <h1 style="font-size:2rem">🧭 החלטות הטיול</h1>
-  <div class="sub">סמנו את הבחירה בכל שאלה · ⭐ = המלצה · לחצו על הלינקים לחקור · נשמר על המכשיר</div>
+  <div class="sub">✓ ירוק = הבחירה הנוכחית של יובל · לחצו <b>"הסבר ▾"</b> לכל הפרטים · ⭐ = המלצה · אפשר לשנות, נשמר על המכשיר</div>
 </div>
 
 <div class="wrap">
@@ -57,6 +57,13 @@ let store = JSON.parse(localStorage.getItem(KEY) || '{}');
 const wrap = document.getElementById('decs');
 let total = 0;
 
+// במכשיר חדש (כמו של שיר) — טוענים את הבחירות הנוכחיות של יובל כברירת מחדל
+if(!localStorage.getItem(KEY)){
+  TRIP.decisions.forEach(gr => gr.items.forEach(it => {
+    if(it.decided !== null && it.decided !== undefined) store[it.n] = it.decided;
+  }));
+}
+
 TRIP.decisions.forEach(group => {
   const g = document.createElement('div');
   g.className = 'dgroup';
@@ -70,11 +77,19 @@ TRIP.decisions.forEach(group => {
     let html = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${multiNote}</div></div><div class="opts">`;
     it.o.forEach((opt,i) => {
       const rec = (it.rec===i) ? '<span class="rec">⭐ מומלץ</span>' : '';
-      const desc = opt.d ? `<div class="opt-desc">${opt.d}</div>` : '';
       const links = (opt.l && opt.l.length)
         ? `<div class="opt-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
+      const badges = [];
+      if(opt.w) badges.push(`<span class="badge">📍 ${opt.w}</span>`);
+      if(opt.c && opt.c!=='—') badges.push(`<span class="badge cost-${opt.c}">💰 ${opt.c}</span>`);
+      if(opt.tr) badges.push(`<span class="badge">🚆 ${opt.tr}</span>`);
+      const badgeRow = badges.length ? `<div class="badges">${badges.join('')}</div>` : '';
+      const seeLine = (opt.see && opt.see!=='—') ? `<div class="opt-line"><b>👁️ לראות/לעשות:</b> ${opt.see}</div>` : '';
+      const tipLine = opt.tp ? `<div class="opt-line"><b>⚖️ שיקול:</b> ${opt.tp}</div>` : '';
+      const detail = `<div class="opt-detail"><div class="opt-desc">${opt.d||''}</div>${badgeRow}${seeLine}${tipLine}${links}</div>`;
       html += `<div class="opt" data-n="${it.n}" data-i="${i}" data-multi="${it.multi||0}">`
-        + `<div class="opt-head"><span class="mark"></span><span class="txt">${opt.t}</span>${rec}</div>${desc}${links}</div>`;
+        + `<div class="opt-head"><span class="mark"></span><span class="txt">${opt.t}</span>${rec}`
+        + `<button class="opt-toggle" type="button">הסבר ▾</button></div>${detail}</div>`;
     });
     html += `</div>`;
     card.innerHTML = html;
@@ -104,7 +119,15 @@ function render() {
 }
 
 wrap.addEventListener('click', e => {
-  if(e.target.closest('a')) return; // לחיצה על לינק לא משנה בחירה
+  const toggle = e.target.closest('.opt-toggle');
+  if(toggle){
+    const d = toggle.closest('.opt').querySelector('.opt-detail');
+    const open = d.classList.toggle('show');
+    toggle.textContent = open ? 'הסבר ▴' : 'הסבר ▾';
+    return;
+  }
+  if(e.target.closest('a')) return;
+  if(e.target.closest('.opt-detail')) return;
   const opt = e.target.closest('.opt');
   if(!opt) return;
   const n = opt.dataset.n, i = +opt.dataset.i, multi = +opt.dataset.multi;

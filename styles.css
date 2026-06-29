@@ -91,8 +91,19 @@ a { color: inherit; text-decoration: none; }
 .opt.sel .mark { background: var(--green); border-color: var(--green); box-shadow: inset 0 0 0 3px var(--panel-2); }
 .opt .rec { flex:none; font-size:0.68rem; background: rgba(242,183,5,0.15); color: var(--gold); border:1px solid rgba(242,183,5,0.4); padding:1px 7px; border-radius:99px; }
 .opt .txt { flex:1; font-weight:600; }
-.opt .opt-desc { color: var(--muted); font-size:0.85rem; line-height:1.6; margin-top:8px; padding-right:28px; }
-.opt .opt-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; padding-right:28px; }
+.opt .opt-toggle { flex:none; font-size:0.76rem; color:var(--blue); background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:4px 10px; cursor:pointer; white-space:nowrap; font-family:inherit; }
+.opt .opt-toggle:hover { border-color:var(--blue); }
+.opt .opt-detail { display:none; margin-top:12px; padding:12px 4px 2px; border-top:1px dashed var(--border); }
+.opt .opt-detail.show { display:block; }
+.opt .opt-desc { color: var(--ink); font-size:0.88rem; line-height:1.7; }
+.badges { display:flex; flex-wrap:wrap; gap:7px; margin:11px 0 4px; }
+.badge { font-size:0.76rem; padding:3px 10px; border-radius:99px; border:1px solid var(--border); background:var(--bg); color:var(--muted); }
+.badge.cost-זול { color:var(--green); border-color:rgba(61,220,132,.4); }
+.badge.cost-בינוני { color:var(--gold); border-color:rgba(242,183,5,.4); }
+.badge.cost-יקר { color:var(--accent); border-color:rgba(233,69,96,.4); }
+.opt .opt-line { font-size:0.85rem; color: var(--muted); line-height:1.6; margin:7px 0; }
+.opt .opt-line b { color: var(--ink); font-weight:600; }
+.opt .opt-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:11px; }
 .opt .opt-links a { font-size:0.8rem; color: var(--blue); border:1px solid var(--border); background: var(--bg); padding:5px 11px; border-radius:8px; transition:.15s; }
 .opt .opt-links a:hover { border-color: var(--blue); background: var(--panel); }
 .dec-actions { position: sticky; bottom: 0; z-index: 45; padding: 14px 0; background: linear-gradient(transparent, var(--bg) 30%); }
