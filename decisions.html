@@ -59,7 +59,6 @@ let notes = JSON.parse(localStorage.getItem(NKEY) || '{}');
 const wrap = document.getElementById('decs');
 let total = 0;
 
-// במכשיר חדש (כמו של שיר) — טוענים את הבחירות הנוכחיות של יובל כברירת מחדל
 if(!localStorage.getItem(KEY)){
   TRIP.decisions.forEach(gr => gr.items.forEach(it => {
     if(it.decided !== null && it.decided !== undefined) store[it.n] = it.decided;
@@ -101,7 +100,6 @@ TRIP.decisions.forEach(group => {
   wrap.appendChild(g);
 });
 
-// טעינת הערות שמורות לתוך השדות
 document.querySelectorAll('.note-in').forEach(t => {
   const v = notes[t.dataset.n];
   if(v){ t.value = v; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
@@ -153,7 +151,6 @@ wrap.addEventListener('click', e => {
   render();
 });
 
-// שמירת הערות + גובה אוטומטי
 wrap.addEventListener('input', e => {
   const t = e.target.closest('.note-in');
   if(!t) return;
@@ -194,5 +191,6 @@ document.getElementById('modalBg').addEventListener('click',e=>{ if(e.target.id=
 
 render();
 </script>
+<script src="delight.js"></script>
 </body>
 </html>
