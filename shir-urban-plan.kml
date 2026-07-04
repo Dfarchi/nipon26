@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<!-- KYOTO SLOW EXPERIENCE -->
+<Folder>
+<name>🍵 Kyoto Slow Experience</name>
+<Placemark>
+<name>Demachiyanagi Riverside Walk</name>
+<description>Local Kyoto river lifestyle, cafés, students, quiet evenings</description>
+<Point><coordinates>135.7708,35.0295,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Sanjo Kawaramachi Backstreets</name>
+<description>Small izakayas, hidden cocktail bars, local nightlife</description>
+<Point><coordinates>135.7681,35.0095,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Okazaki Cultural Area</name>
+<description>Cafés, museums, quiet walking streets</description>
+<Point><coordinates>135.7827,35.0116,0</coordinates></Point>
+</Placemark>
+</Folder>
+<!-- NATURE DAYS -->
+<Folder>
+<name>🌿 Nature Experience Days</name>
+<Placemark>
+<name>Uji Riverside</name>
+<description>Tea houses, Byodoin temple, slow river walks</description>
+<Point><coordinates>135.8064,34.8894,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Kurama Temple Forest</name>
+<description>Mountain temple hike, forest paths, spiritual Kyoto nature</description>
+<Point><coordinates>135.7730,35.1162,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Minoh Park Waterfall</name>
+<description>Osaka forest hike + waterfall + autumn leaves</description>
+<Point><coordinates>135.4703,34.8373,0</coordinates></Point>
+</Placemark>
+</Folder>
+<!-- CERAMICS -->
+<Folder>
+<name>🏺 Ceramics Experience</name>
+<Placemark>
+<name>Shigaraki Pottery Village</name>
+<description>Artist kilns, handmade ceramics, workshops, tanuki statues</description>
+<Point><coordinates>136.0670,34.8790,0</coordinates></Point>
+</Placemark>
+</Folder>
+<!-- FOOD EXPERIENCES -->
+<Folder>
+<name>🍣 Food & Omakase</name>
+<Placemark>
+<name>Kyoto Sushi Counter Area (Sanjo)</name>
+<description>Local sushi counters, seasonal fish, non-tourist restaurants</description>
+<Point><coordinates>135.7681,35.0095,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Osaka Tenma Izakaya District</name>
+<description>True Osaka nightlife: standing bars, cheap food, locals only vibe</description>
+<Point><coordinates>135.5133,34.7039,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Fukushima Food District</name>
+<description>Stylish but local izakaya + cocktail + sushi area</description>
+<Point><coordinates>135.4857,34.6955,0</coordinates></Point>
+</Placemark>
+</Folder>
+<!-- COCKTAIL BARS -->
+<Folder>
+<name>🍸 Cocktail Bars (Local Only)</name>
+<Placemark>
+<name>Bar Rocking Chair Kyoto</name>
+<description>Classic Kyoto cocktail institution</description>
+<Point><coordinates>135.7685,35.0091,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>L'Escamoteur Kyoto</name>
+<description>Hidden creative cocktail bar</description>
+<Point><coordinates>135.7689,35.0100,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Bar Nayuta Osaka</name>
+<description>Hidden speakeasy Osaka cocktail bar</description>
+<Point><coordinates>135.5023,34.6937,0</coordinates></Point>
+</Placemark>
+<Placemark>
+<name>Bar K Osaka</name>
+<description>Classic Osaka whisky + cocktail counter</description>
+<Point><coordinates>135.5028,34.6734,0</coordinates></Point>
+</Placemark>
+</Folder>
+<!-- LIGHT VINTAGE -->
+<Folder>
+<name>🧥 Light Vintage Stops</name>
+<Placemark>
+<name>Nakazakicho Osaka</name>
+<description>Vintage shops, cafés, retro houses, slow wandering</description>
+<Point><coordinates>135.5080,34.7076,0</coordinates></Point>
+</Placemark>
+</Folder>
+</Document>
+</kml>
