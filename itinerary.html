@@ -5,6 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מסלול · יפן 2026</title>
 <link rel="stylesheet" href="styles.css">
+<style>
+  .ph-top { cursor:pointer; user-select:none; }
+  .chev { font-size:0.8rem; color:var(--dim); display:inline-block; transition:.2s; }
+  .phase.collapsed .chev { transform:rotate(-90deg); }
+  .phase.collapsed p, .phase.collapsed .stops { display:none; }
+  .stops { display:flex; flex-direction:column; gap:7px; margin-top:10px; }
+  .stop { border:1px solid var(--border); background:var(--panel-2); border-radius:10px; overflow:hidden; transition:.15s; }
+  .stop:hover { border-color:var(--blue); }
+  .stop-head { display:flex; align-items:center; gap:9px; padding:10px 12px; cursor:pointer; }
+  .snum { flex:none; min-width:28px; height:22px; padding:0 6px; border-radius:6px; background:var(--bg);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.72rem; color:var(--muted); font-weight:700; }
+  .stitle { flex:1; font-weight:600; font-size:0.93rem; }
+  .schev { flex:none; font-size:0.76rem; color:var(--blue); background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:4px 10px; white-space:nowrap; }
+  .otag { flex:none; font-size:0.67rem; background:rgba(74,158,218,0.16); color:#7fc1ff; border:1px solid rgba(74,158,218,0.45); border-radius:99px; padding:1px 8px; white-space:nowrap; }
+  .pending { flex:none; font-size:0.67rem; background:rgba(242,183,5,0.15); color:var(--gold); border:1px solid rgba(242,183,5,0.4); border-radius:99px; padding:1px 8px; white-space:nowrap; }
+  .stop-detail { display:none; padding:11px 13px 13px; }
+  .stop-detail.show { display:block; border-top:1px dashed var(--border); }
+  .s-desc { color:var(--ink); font-size:0.86rem; line-height:1.7; }
+  .s-line { font-size:0.84rem; color:var(--muted); line-height:1.6; margin:7px 0; }
+  .s-line b { color:var(--ink); font-weight:600; }
+  .s-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .s-links a { font-size:0.8rem; color:var(--blue); border:1px solid var(--border); background:var(--bg); padding:5px 11px; border-radius:8px; transition:.15s; }
+  .s-links a:hover { border-color:var(--blue); background:var(--panel); }
+  .ph-tools { display:flex; gap:8px; margin:0 0 4px; }
+  .tbtn { background:rgba(255,255,255,0.04); color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:6px 13px; font-size:0.84rem; cursor:pointer; font-family:inherit; }
+  .tbtn:hover { border-color:var(--blue); color:var(--ink); }
+</style>
 </head>
 <body>
 <div class="topbar"><div class="wrap">
@@ -17,29 +44,99 @@
 
 <div class="hero" style="padding-bottom:10px">
   <h1 style="font-size:2.2rem">🗓️ ציר המסע</h1>
-  <div class="sub">השלד המעודכן · ~42 לילות, צפון→דרום</div>
+  <div class="sub">נבנה מההחלטות שסגרתם · ~42 לילות, צפון→דרום · לחצו על כל תחנה כדי להרחיב</div>
 </div>
 
 <div class="wrap">
+  <div class="ph-tools">
+    <button class="tbtn" id="expandAll" type="button">⤢ הרחב הכל</button>
+    <button class="tbtn" id="collapseAll" type="button">⤡ כווץ הכל</button>
+  </div>
   <div class="panel">
     <div class="timeline" id="timeline"></div>
   </div>
   <div class="callout" style="margin-top:18px">
-    📌 השלד הוא טיוטה (DRAFT) — חלוקת הלילות המדויקת תיסגר אחרי שתסמנו את ההחלטות. כ-2–3 לילות "פלואוט" ברזרבה, מיקום בהמשך.
+    📌 המסלול משקף את הבחירות הנוכחיות. תחנות עם תג <b>«פתוח לדיון»</b> או <b>«טרם הוכרע»</b> עוד עשויות להשתנות — הכריעו אותן ב<a href="decisions.html" style="color:var(--blue)">דף ההחלטות</a>. כ-2–3 לילות "פלואוט" ברזרבה, מיקום בהמשך.
   </div>
 </div>
 
-<footer>🍁 NIPON26 · השלד מתעדכן לפי ההחלטות 🍁</footer>
+<footer>🍁 NIPON26 · המסלול מתעדכן אוטומטית לפי ההחלטות 🍁</footer>
 <script src="data.js"></script>
 <script>
+  const store = JSON.parse(localStorage.getItem('nipon26_choices_v1') || '{}');
   const tl = document.getElementById('timeline');
-  TRIP.phases.forEach(p => {
-    const el = document.createElement('div');
-    el.className = 'phase';
-    el.innerHTML = `<div class="ph-top"><h3>${p.h}</h3><span class="when">${p.when}</span></div>
-      <p>${p.p}</p><span class="nights">${p.nights}</span>`;
-    tl.appendChild(el);
+
+  // ניקוי סיומות כמו "(✓ נבחר)" / "(⭐ מומלץ...)" מכותרת האפשרות
+  function clean(t){ return t.replace(/\s*\((?:✓|⭐)[^)]*\)/g,'').trim(); }
+
+  function stopCard(it, opt, undecided){
+    const badges = [];
+    if(opt.w) badges.push(`<span class="badge">📍 ${opt.w}</span>`);
+    if(opt.c && opt.c!=='—') badges.push(`<span class="badge cost-${opt.c}">💰 ${opt.c}</span>`);
+    if(opt.tr) badges.push(`<span class="badge">🚆 ${opt.tr}</span>`);
+    const badgeRow = badges.length ? `<div class="badges">${badges.join('')}</div>` : '';
+    const see  = (opt.see && opt.see!=='—') ? `<div class="s-line"><b>👁️ לראות/לעשות:</b> ${opt.see}</div>` : '';
+    const tip  = opt.tp ? `<div class="s-line"><b>⚖️ שיקול:</b> ${opt.tp}</div>` : '';
+    const links = (opt.l && opt.l.length)
+      ? `<div class="s-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
+    const pend = undecided ? `<span class="pending">טרם הוכרע</span>` : '';
+    const open = it.open===true && !undecided ? `<span class="otag">פתוח לדיון</span>` : '';
+    return `<div class="stop">
+      <div class="stop-head">
+        <span class="snum">${it.n}</span>
+        <span class="stitle">${clean(opt.t)}</span>
+        ${pend}${open}
+        <span class="schev">הרחב ▾</span>
+      </div>
+      <div class="stop-detail">
+        <div class="s-desc">${opt.d||''}</div>
+        ${badgeRow}${see}${tip}${links}
+      </div>
+    </div>`;
+  }
+
+  TRIP.phases.forEach((p, pi) => {
+    const groups = TRIP.decisions.filter(g => g.ph === pi);
+    let stopsHtml = '';
+    groups.forEach(g => g.items.forEach(it => {
+      let pick = store[it.n];
+      if(pick === undefined) pick = it.decided;
+      const undecided = (pick === null || pick === undefined || (Array.isArray(pick) && pick.length===0));
+      let idxs;
+      if(undecided) idxs = (it.rec !== null && it.rec !== undefined) ? [it.rec] : [];
+      else idxs = Array.isArray(pick) ? pick : [pick];
+      idxs.forEach(i => { const opt = it.o[i]; if(opt) stopsHtml += stopCard(it, opt, undecided); });
+    }));
+    const phase = document.createElement('div');
+    phase.className = 'phase';
+    phase.innerHTML = `
+      <div class="ph-top">
+        <h3>${p.h} <span class="chev">▾</span></h3>
+        <span class="when">${p.when} · ${p.nights}</span>
+      </div>
+      <p>${p.p}</p>
+      <div class="stops">${stopsHtml || '<div class="s-line" style="padding:4px 2px">—</div>'}</div>`;
+    phase.querySelector('.ph-top').addEventListener('click', () => phase.classList.toggle('collapsed'));
+    tl.appendChild(phase);
   });
+
+  // הרחבה/כיווץ של תחנה בודדת
+  tl.addEventListener('click', e => {
+    const head = e.target.closest('.stop-head');
+    if(!head) return;
+    if(e.target.closest('a')) return;
+    const d = head.parentNode.querySelector('.stop-detail');
+    const on = d.classList.toggle('show');
+    head.querySelector('.schev').textContent = on ? 'סגור ▴' : 'הרחב ▾';
+  });
+
+  function setAll(show){
+    document.querySelectorAll('.stop-detail').forEach(d => d.classList.toggle('show', show));
+    document.querySelectorAll('.schev').forEach(s => s.textContent = show ? 'סגור ▴' : 'הרחב ▾');
+    if(show) document.querySelectorAll('.phase').forEach(p => p.classList.remove('collapsed'));
+  }
+  document.getElementById('expandAll').addEventListener('click', () => setAll(true));
+  document.getElementById('collapseAll').addEventListener('click', () => setAll(false));
 </script>
 <script src="delight.js"></script>
 </body>
