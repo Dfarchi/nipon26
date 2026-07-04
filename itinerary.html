@@ -71,7 +71,8 @@
 <footer>🍁 NIPON26 · המסלול מתעדכן אוטומטית לפי ההחלטות 🍁</footer>
 <script src="data.js"></script>
 <script>
-  const store = JSON.parse(localStorage.getItem('nipon26_choices_v1') || '{}');
+  // מקור האמת למסלול = data.js (השדה decided), לא localStorage. ככה הדף משקף
+  // את התוכנית המוסכמת ולא סימונים ישנים על מכשיר מסוים.
   const tl = document.getElementById('timeline');
 
   // ניקוי סיומות כמו "(✓ נבחר)" / "(⭐ מומלץ...)" מכותרת האפשרות
@@ -113,8 +114,7 @@
     let stopsHtml = '';
     groups.forEach(g => g.items.forEach(it => {
       if(it.cut) return; // בוטל מהמסלול
-      let pick = store[it.n];
-      if(pick === undefined) pick = it.decided;
+      const pick = it.decided;
       const undecided = (pick === null || pick === undefined || (Array.isArray(pick) && pick.length===0));
       let idxs;
       if(undecided) idxs = (it.rec !== null && it.rec !== undefined) ? [it.rec] : [];
