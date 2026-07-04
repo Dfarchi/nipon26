@@ -29,7 +29,7 @@
 
 <div class="hero" style="padding:30px 18px 8px">
   <h1 style="font-size:2rem">🧭 החלטות הטיול</h1>
-  <div class="sub">מוצגות כברירת מחדל רק ההחלטות <b>הפתוחות לדיון עכשיו</b> · ✓ ירוק = הבחירה הנוכחית · ⭐ = המלצה · נשמר על המכשיר</div>
+  <div class="sub">✓ ירוק = הבחירה הנוכחית · לחצו <b>"הסבר ▾"</b> לפרטים · ⭐ = המלצה · אפשר לשנות, נשמר על המכשיר</div>
 </div>
 
 <div class="wrap">
@@ -125,8 +125,8 @@ document.querySelectorAll('.note-in').forEach(t => {
   if(v){ t.value = v; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
 });
 
-let mode = 'open'; // 'open' = רק החלטות פתוחות לדיון, 'all' = הכל
 const openCount = (() => { let c=0; TRIP.decisions.forEach(g=>g.items.forEach(it=>{ if(it.open===true) c++; })); return c; })();
+let mode = openCount > 0 ? 'open' : 'all'; // אם אין פתוחות — מציגים הכל
 
 function render() {
   document.querySelectorAll('.opt').forEach(o => {
@@ -158,6 +158,8 @@ function updateProgress() {
 }
 
 function applyMode() {
+  // אם אין החלטות פתוחות — אין טעם במסנן
+  document.querySelector('.dec-filter').style.display = openCount > 0 ? '' : 'none';
   document.body.classList.toggle('mode-open', mode==='open');
   document.getElementById('fOpen').classList.toggle('active', mode==='open');
   document.getElementById('fAll').classList.toggle('active', mode==='all');
