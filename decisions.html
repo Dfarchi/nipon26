@@ -87,9 +87,10 @@ TRIP.decisions.forEach(group => {
   const g = document.createElement('div');
   g.className = 'dgroup';
   g.innerHTML = `<div class="gh">${group.g}</div>`;
+  let added = 0;
   group.items.forEach(it => {
     if(it.cut) return; // בוטל מהמסלול — לא מוצג
-    total++;
+    total++; added++;
     const card = document.createElement('div');
     card.className = 'dcard ' + (it.open===true ? 'open-dec' : 'closed-dec');
     card.dataset.n = it.n;
@@ -117,7 +118,7 @@ TRIP.decisions.forEach(group => {
     card.innerHTML = html;
     g.appendChild(card);
   });
-  wrap.appendChild(g);
+  if(added > 0) wrap.appendChild(g); // קבוצה שכולה בוטלה — לא מציגים כותרת ריקה
 });
 
 document.querySelectorAll('.note-in').forEach(t => {

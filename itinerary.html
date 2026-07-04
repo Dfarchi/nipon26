@@ -93,6 +93,7 @@
     // כותרת = שם המקום; ליד זה, כמאפיין, הבחירה עצמה (בלי "כן/לא" ריק)
     const place = (TRIP.places && TRIP.places[it.n]) || clean(opt.t);
     let qual = clean(opt.t).replace(/^(כן|לא)\s*[—–,-]\s*/,'').trim();
+    if(qual !== place && qual.startsWith(place)) qual = qual.slice(place.length).replace(/^\s*[—–·,-]\s*/,'').trim();
     if(qual === 'כן' || qual === 'לא' || qual === place) qual = '';
     const title = `${place}${qual ? ` <span class="squal">· ${qual}</span>` : ''}`;
     return `<div class="stop">
@@ -110,9 +111,10 @@
   }
 
   TRIP.phases.forEach((p, pi) => {
-    const groups = TRIP.decisions.filter(g => g.ph === pi);
     let stopsHtml = '';
-    groups.forEach(g => g.items.forEach(it => {
+    TRIP.decisions.forEach(g => g.items.forEach(it => {
+      const effPh = (it.ph !== undefined) ? it.ph : g.ph; // שיוך-שלב אפשרי ברמת ההחלטה
+      if(effPh !== pi) return;
       if(it.cut) return; // בוטל מהמסלול
       if(it.noStop) return; // מאפיין של תחנה אחרת (למשל תזמון/מודרך של קומאנו) — לא תחנה בפני עצמה
       const pick = it.decided;
