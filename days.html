@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>יום-ביום · יפן 2026</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .reg-h { margin:30px 0 8px; color:var(--accent); font-size:1.15rem; font-weight:700; letter-spacing:1px;
+    border-bottom:1px solid var(--border); padding-bottom:6px; }
+  .day { background:var(--panel); border:1px solid var(--border); border-radius:14px; margin-bottom:12px; overflow:hidden; }
+  .day-head { display:flex; align-items:center; gap:10px; padding:13px 15px; cursor:pointer; }
+  .day-num { flex:none; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:3px 9px;
+    font-size:0.78rem; font-weight:700; color:var(--muted); white-space:nowrap; }
+  .day-title { flex:1; font-weight:600; font-size:1rem; }
+  .day-chev { flex:none; color:var(--blue); font-size:0.8rem; }
+  .day-body { display:none; padding:2px 15px 14px; }
+  .day.open .day-body { display:block; }
+  .day.open .day-chev { transform:rotate(180deg); }
+  .act { display:flex; gap:11px; padding:10px 0; border-top:1px dashed var(--border); }
+  .act-ic { flex:none; font-size:1.15rem; line-height:1.5; width:26px; text-align:center; }
+  .act-main { flex:1; }
+  .act-t { font-weight:600; font-size:0.92rem; }
+  .act-d { color:var(--muted); font-size:0.84rem; line-height:1.55; margin-top:2px; }
+  .act-cr { flex:none; font-size:0.9rem; }
+  .act-links { display:flex; gap:7px; margin-top:6px; flex-wrap:wrap; }
+  .act-links a { font-size:0.76rem; color:var(--blue); border:1px solid var(--border); background:var(--bg); padding:3px 9px; border-radius:7px; }
+  .act-links a:hover { border-color:var(--blue); }
+  .day-flag { background:rgba(242,183,5,0.12); border:1px solid rgba(242,183,5,0.35); color:var(--gold);
+    border-radius:8px; padding:8px 11px; font-size:0.82rem; margin:10px 0 2px; }
+  .legend2 { color:var(--muted); font-size:0.82rem; margin:2px 0 6px; }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="tab" href="index.html">🏠 שער</a>
+  <a class="tab" href="decisions.html">🧭 החלטות</a>
+  <a class="tab" href="itinerary.html">🗓️ מסלול</a>
+  <a class="tab active" href="days.html">📆 יום-ביום</a>
+  <a class="tab" href="documents.html">📂 מסמכים</a>
+  <span class="brand">🍁 NIPON26</span>
+</div></div>
+
+<div class="hero" style="padding-bottom:10px">
+  <h1 style="font-size:2.2rem">📆 יום-ביום</h1>
+  <div class="sub">שבועיים אחרונים · קנסאי + טוקיו · חיים מקומיים, לא אטרקציות · לחצו על יום כדי להרחיב</div>
+</div>
+
+<div class="wrap">
+  <div class="ph-tools" style="display:flex;gap:8px;margin-bottom:6px">
+    <button class="tbtn" id="expandAll" type="button" style="background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 13px;font-size:0.84rem;cursor:pointer;font-family:inherit">⤢ הרחב הכל</button>
+    <button class="tbtn" id="collapseAll" type="button" style="background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 13px;font-size:0.84rem;cursor:pointer;font-family:inherit">⤡ כווץ הכל</button>
+  </div>
+  <div class="legend2">עומק קהל: 🟢 מקומי · 🟡 מעורב · 🔴 תיירותי</div>
+  <div id="days"></div>
+  <div class="callout" style="margin-top:18px">
+    📌 טיוטה לפי Final v2. הפרטים (מסעדות/ברים ספציפיים, שעות, הזמנות) יתמלאו בהמשך לפי Tabelog ומקורות מקומיים — לא לפי דירוגי גוגל.
+  </div>
+</div>
+
+<footer>🍁 NIPON26 · יום-ביום מתעדכן לפי התכנון 🍁</footer>
+<script src="data.js"></script>
+<script>
+  const wrap = document.getElementById('days');
+  let lastReg = null;
+  (TRIP.days || []).forEach((day, i) => {
+    if(day.st !== lastReg){
+      const h = document.createElement('div');
+      h.className = 'reg-h';
+      h.textContent = day.st;
+      wrap.appendChild(h);
+      lastReg = day.st;
+    }
+    const el = document.createElement('div');
+    el.className = 'day';
+    const flag = day.flag ? `<div class="day-flag">${day.flag}</div>` : '';
+    const acts = (day.acts || []).map(a => {
+      const links = (a.l && a.l.length)
+        ? `<div class="act-links">${a.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
+      const d = a.d ? `<div class="act-d">${a.d}</div>` : '';
+      const cr = a.cr ? `<span class="act-cr">${a.cr}</span>` : '';
+      return `<div class="act"><span class="act-ic">${a.ic||'•'}</span><div class="act-main"><div class="act-t">${a.t}</div>${d}${links}</div>${cr}</div>`;
+    }).join('');
+    el.innerHTML = `<div class="day-head"><span class="day-num">${day.n}</span><span class="day-title">${day.t}</span><span class="day-chev">▾</span></div>`
+      + `<div class="day-body">${flag}${acts}</div>`;
+    el.querySelector('.day-head').addEventListener('click', () => el.classList.toggle('open'));
+    wrap.appendChild(el);
+  });
+  document.getElementById('expandAll').addEventListener('click', ()=> document.querySelectorAll('.day').forEach(d=>d.classList.add('open')));
+  document.getElementById('collapseAll').addEventListener('click', ()=> document.querySelectorAll('.day').forEach(d=>d.classList.remove('open')));
+</script>
+<script src="delight.js"></script>
+</body>
+</html>
