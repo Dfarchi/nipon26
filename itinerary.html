@@ -114,6 +114,7 @@
     let stopsHtml = '';
     groups.forEach(g => g.items.forEach(it => {
       if(it.cut) return; // בוטל מהמסלול
+      if(it.noStop) return; // מאפיין של תחנה אחרת (למשל תזמון/מודרך של קומאנו) — לא תחנה בפני עצמה
       const pick = it.decided;
       const undecided = (pick === null || pick === undefined || (Array.isArray(pick) && pick.length===0));
       let idxs;
