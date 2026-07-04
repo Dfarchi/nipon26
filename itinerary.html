@@ -112,6 +112,7 @@
     const groups = TRIP.decisions.filter(g => g.ph === pi);
     let stopsHtml = '';
     groups.forEach(g => g.items.forEach(it => {
+      if(it.cut) return; // בוטל מהמסלול
       let pick = store[it.n];
       if(pick === undefined) pick = it.decided;
       const undecided = (pick === null || pick === undefined || (Array.isArray(pick) && pick.length===0));

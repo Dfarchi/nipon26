@@ -78,6 +78,7 @@ let total = 0;
 
 if(!localStorage.getItem(KEY)){
   TRIP.decisions.forEach(gr => gr.items.forEach(it => {
+    if(it.cut) return;
     if(it.decided !== null && it.decided !== undefined) store[it.n] = it.decided;
   }));
 }
@@ -87,6 +88,7 @@ TRIP.decisions.forEach(group => {
   g.className = 'dgroup';
   g.innerHTML = `<div class="gh">${group.g}</div>`;
   group.items.forEach(it => {
+    if(it.cut) return; // בוטל מהמסלול — לא מוצג
     total++;
     const card = document.createElement('div');
     card.className = 'dcard ' + (it.open===true ? 'open-dec' : 'closed-dec');
@@ -213,6 +215,7 @@ function exportChoices(){
   TRIP.decisions.forEach(group => {
     let lines = [];
     group.items.forEach(it => {
+      if(it.cut) return;
       const v = store[it.n];
       const note = notes[it.n];
       const hasPick = !(v===undefined || (Array.isArray(v)&&v.length===0));
