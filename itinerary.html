@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מסלול · יפן 2026</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
+  #map { height:380px; border-radius:14px; overflow:hidden; z-index:0; }
+  .leaflet-container { background:#0f1420; font-family:inherit; }
+  .map-legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:12px; font-size:0.82rem; color:var(--muted); }
+  .map-legend span { display:inline-flex; align-items:center; gap:6px; }
+  .map-legend i { width:11px; height:11px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,.5); }
+  .squal { color:var(--muted); font-weight:400; font-size:0.85rem; }
   .ph-top { cursor:pointer; user-select:none; }
   .chev { font-size:0.8rem; color:var(--dim); display:inline-block; transition:.2s; }
   .phase.collapsed .chev { transform:rotate(-90deg); }
@@ -48,6 +58,10 @@
 </div>
 
 <div class="wrap">
+  <div class="panel" style="margin-bottom:18px">
+    <div id="map"></div>
+    <div class="map-legend" id="mapLegend"></div>
+  </div>
   <div class="ph-tools">
     <button class="tbtn" id="expandAll" type="button">⤢ הרחב הכל</button>
     <button class="tbtn" id="collapseAll" type="button">⤡ כווץ הכל</button>
@@ -81,10 +95,15 @@
       ? `<div class="s-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
     const pend = undecided ? `<span class="pending">טרם הוכרע</span>` : '';
     const open = it.open===true && !undecided ? `<span class="otag">פתוח לדיון</span>` : '';
+    // כותרת = שם המקום; ליד זה, כמאפיין, הבחירה עצמה (בלי "כן/לא" ריק)
+    const place = (TRIP.places && TRIP.places[it.n]) || clean(opt.t);
+    let qual = clean(opt.t).replace(/^(כן|לא)\s*[—–,-]\s*/,'').trim();
+    if(qual === 'כן' || qual === 'לא' || qual === place) qual = '';
+    const title = `${place}${qual ? ` <span class="squal">· ${qual}</span>` : ''}`;
     return `<div class="stop">
       <div class="stop-head">
         <span class="snum">${it.n}</span>
-        <span class="stitle">${clean(opt.t)}</span>
+        <span class="stitle">${title}</span>
         ${pend}${open}
         <span class="schev">הרחב ▾</span>
       </div>
@@ -137,6 +156,37 @@
   }
   document.getElementById('expandAll').addEventListener('click', () => setAll(true));
   document.getElementById('collapseAll').addEventListener('click', () => setAll(false));
+
+  // ===== מפת המסלול (Leaflet) =====
+  const PHASE_COLORS = ['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
+  (function initMap(){
+    const pts = TRIP.mapPoints || [];
+    const mapEl = document.getElementById('map');
+    if(typeof L === 'undefined' || !pts.length){
+      mapEl.innerHTML = '<div style="padding:26px;text-align:center;color:var(--muted)">🗺️ לא ניתן לטעון את המפה כרגע (בדקו חיבור לאינטרנט).</div>';
+      return;
+    }
+    const map = L.map('map', { scrollWheelZoom:false }).setView([37,138], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom:12, attribution:'© OpenStreetMap'
+    }).addTo(map);
+    const latlngs = [];
+    pts.forEach((pt, idx) => {
+      latlngs.push([pt.lat, pt.lng]);
+      L.circleMarker([pt.lat, pt.lng], {
+        radius:7, color:'#fff', weight:1.5,
+        fillColor: PHASE_COLORS[pt.ph % PHASE_COLORS.length], fillOpacity:0.95
+      }).addTo(map).bindTooltip(`${idx+1}. ${pt.n}`, { direction:'top' });
+    });
+    L.polyline(latlngs, { color:'#e94560', weight:2, opacity:0.45, dashArray:'4 7' }).addTo(map);
+    map.fitBounds(latlngs, { padding:[30,30] });
+    // מקרא לפי שלב
+    const legend = document.getElementById('mapLegend');
+    legend.innerHTML = TRIP.phases.map((p,i) => {
+      const name = (p.h.split('·')[1] || p.h).trim();
+      return `<span><i style="background:${PHASE_COLORS[i % PHASE_COLORS.length]}"></i>${name}</span>`;
+    }).join('');
+  })();
 </script>
 <script src="delight.js"></script>
 </body>
