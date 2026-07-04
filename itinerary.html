@@ -10,11 +10,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
-  #map { height:380px; border-radius:14px; overflow:hidden; z-index:0; }
+  .phase-map { height:240px; border-radius:12px; overflow:hidden; z-index:0; margin:12px 0 4px; }
+  .phase.collapsed .phase-map { display:none; }
   .leaflet-container { background:#0f1420; font-family:inherit; }
-  .map-legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:12px; font-size:0.82rem; color:var(--muted); }
-  .map-legend span { display:inline-flex; align-items:center; gap:6px; }
-  .map-legend i { width:11px; height:11px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,.5); }
   .squal { color:var(--muted); font-weight:400; font-size:0.85rem; }
   .ph-top { cursor:pointer; user-select:none; }
   .chev { font-size:0.8rem; color:var(--dim); display:inline-block; transition:.2s; }
@@ -58,10 +56,6 @@
 </div>
 
 <div class="wrap">
-  <div class="panel" style="margin-bottom:18px">
-    <div id="map"></div>
-    <div class="map-legend" id="mapLegend"></div>
-  </div>
   <div class="ph-tools">
     <button class="tbtn" id="expandAll" type="button">⤢ הרחב הכל</button>
     <button class="tbtn" id="collapseAll" type="button">⤡ כווץ הכל</button>
@@ -134,6 +128,7 @@
         <span class="when">${p.when} · ${p.nights}</span>
       </div>
       <p>${p.p}</p>
+      <div class="phase-map" id="map-ph${pi}"></div>
       <div class="stops">${stopsHtml || '<div class="s-line" style="padding:4px 2px">—</div>'}</div>`;
     phase.querySelector('.ph-top').addEventListener('click', () => phase.classList.toggle('collapsed'));
     tl.appendChild(phase);
@@ -157,36 +152,35 @@
   document.getElementById('expandAll').addEventListener('click', () => setAll(true));
   document.getElementById('collapseAll').addEventListener('click', () => setAll(false));
 
-  // ===== מפת המסלול (Leaflet) =====
+  // ===== מפה נפרדת לכל מקטע (Leaflet, קבועה — נעצים ניתנים ללחיצה) =====
   const PHASE_COLORS = ['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
-  (function initMap(){
-    const pts = TRIP.mapPoints || [];
-    const mapEl = document.getElementById('map');
-    if(typeof L === 'undefined' || !pts.length){
-      mapEl.innerHTML = '<div style="padding:26px;text-align:center;color:var(--muted)">🗺️ לא ניתן לטעון את המפה כרגע (בדקו חיבור לאינטרנט).</div>';
-      return;
-    }
-    const map = L.map('map', { scrollWheelZoom:false }).setView([37,138], 5);
+  TRIP.phases.forEach((p, pi) => {
+    const el = document.getElementById('map-ph' + pi);
+    if(!el) return;
+    const pts = (TRIP.mapPoints || []).filter(mp => mp.ph === pi);
+    if(typeof L === 'undefined' || !pts.length){ el.style.display = 'none'; return; }
+    const map = L.map(el, {
+      scrollWheelZoom:false, dragging:false, zoomControl:false,
+      doubleClickZoom:false, boxZoom:false, keyboard:false, touchZoom:false
+    });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom:12, attribution:'© OpenStreetMap'
     }).addTo(map);
     const latlngs = [];
-    pts.forEach((pt, idx) => {
+    pts.forEach(pt => {
       latlngs.push([pt.lat, pt.lng]);
       L.circleMarker([pt.lat, pt.lng], {
-        radius:7, color:'#fff', weight:1.5,
-        fillColor: PHASE_COLORS[pt.ph % PHASE_COLORS.length], fillOpacity:0.95
-      }).addTo(map).bindTooltip(`${idx+1}. ${pt.n}`, { direction:'top' });
+        radius:8, color:'#fff', weight:1.5,
+        fillColor: PHASE_COLORS[pi % PHASE_COLORS.length], fillOpacity:0.95
+      }).addTo(map).bindPopup(`<b>${pt.n}</b>${pt.d ? '<br>'+pt.d : ''}`);
     });
-    L.polyline(latlngs, { color:'#e94560', weight:2, opacity:0.45, dashArray:'4 7' }).addTo(map);
-    map.fitBounds(latlngs, { padding:[30,30] });
-    // מקרא לפי שלב
-    const legend = document.getElementById('mapLegend');
-    legend.innerHTML = TRIP.phases.map((p,i) => {
-      const name = (p.h.split('·')[1] || p.h).trim();
-      return `<span><i style="background:${PHASE_COLORS[i % PHASE_COLORS.length]}"></i>${name}</span>`;
-    }).join('');
-  })();
+    if(pts.length > 1){
+      L.polyline(latlngs, { color:PHASE_COLORS[pi % PHASE_COLORS.length], weight:2, opacity:0.5, dashArray:'4 6' }).addTo(map);
+      map.fitBounds(latlngs, { padding:[35,35] });
+    } else {
+      map.setView(latlngs[0], 10);
+    }
+  });
 </script>
 <script src="delight.js"></script>
 </body>

@@ -5,7 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>יפן 2026 · קלסר הטיול</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
+  #map { height:420px; border-radius:16px; overflow:hidden; z-index:0; }
+  .leaflet-container { background:#14101f; font-family:inherit; }
+  .map-legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:14px; font-size:0.82rem; color:var(--muted); }
+  .map-legend span { display:inline-flex; align-items:center; gap:6px; }
+  .map-legend i { width:11px; height:11px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,.5); }
   .cine { position:relative; min-height:100vh; overflow:hidden; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:20px; }
   .layer { position:absolute; left:0; right:0; width:100%; pointer-events:none; will-change:transform; }
@@ -103,7 +112,13 @@
     <div class="fact"><div class="n">5</div><div class="l">אונסנים</div></div>
   </div>
 
-  <div class="sec-h reveal"><h2>🗺️ ציר המסע</h2><div class="line"></div></div>
+  <div class="sec-h reveal"><h2>🗺️ מפת המסע</h2><div class="line"></div></div>
+  <div class="panel reveal">
+    <div id="map"></div>
+    <div class="map-legend" id="mapLegend"></div>
+  </div>
+
+  <div class="sec-h reveal"><h2>🕒 ציר המסע</h2><div class="line"></div></div>
   <div class="panel reveal"><div class="timeline" id="timeline"></div></div>
 
   <div class="sec-h reveal"><h2>🚀 כניסה מהירה</h2><div class="line"></div></div>
@@ -170,6 +185,28 @@ setInterval(tick,1000); tick();
   TRIP.phases.forEach(p=>{ const el=document.createElement('div'); el.className='phase';
     el.innerHTML=`<div class="ph-top"><h3>${p.h}</h3><span class="when">${p.when}</span></div><p>${p.p}</p><span class="nights">${p.nights}</span>`;
     tl.appendChild(el); });
+})();
+
+// ===== מפת המסע המלאה (Leaflet) =====
+(function(){
+  const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
+  const pts=(window.TRIP&&TRIP.mapPoints)||[]; const mapEl=document.getElementById('map');
+  if(!mapEl) return;
+  if(typeof L==='undefined'||!pts.length){
+    mapEl.innerHTML='<div style="padding:26px;text-align:center;color:var(--muted)">🗺️ לא ניתן לטעון את המפה כרגע.</div>'; return;
+  }
+  const map=L.map('map',{scrollWheelZoom:false}).setView([37,138],5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© OpenStreetMap'}).addTo(map);
+  const latlngs=[];
+  pts.forEach((pt,idx)=>{ latlngs.push([pt.lat,pt.lng]);
+    L.circleMarker([pt.lat,pt.lng],{radius:7,color:'#fff',weight:1.5,fillColor:PHASE_COLORS[pt.ph%6],fillOpacity:0.95})
+      .addTo(map).bindPopup(`<b>${idx+1}. ${pt.n}</b>${pt.d?'<br>'+pt.d:''}`).bindTooltip(`${idx+1}. ${pt.n}`,{direction:'top'});
+  });
+  L.polyline(latlngs,{color:'#e94560',weight:2,opacity:0.45,dashArray:'4 7'}).addTo(map);
+  map.fitBounds(latlngs,{padding:[30,30]});
+  const legend=document.getElementById('mapLegend');
+  if(legend) legend.innerHTML=TRIP.phases.map((p,i)=>{ const name=(p.h.split('·')[1]||p.h).trim();
+    return `<span><i style="background:${PHASE_COLORS[i%6]}"></i>${name}</span>`; }).join('');
 })();
 
 const back=document.getElementById('mtsBack'), front=document.getElementById('mtsFront'),
