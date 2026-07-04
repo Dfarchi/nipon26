@@ -161,7 +161,7 @@
   TRIP.phases.forEach((p, pi) => {
     const el = document.getElementById('map-ph' + pi);
     if(!el) return;
-    const pts = (TRIP.mapPoints || []).filter(mp => mp.ph === pi);
+    const pts = (TRIP.mapPoints || []).filter(mp => mp.ph === pi && !mp.overviewOnly);
     if(typeof L === 'undefined' || !pts.length){ el.style.display = 'none'; return; }
     const map = L.map(el, {
       scrollWheelZoom:false, dragging:false, zoomControl:false,

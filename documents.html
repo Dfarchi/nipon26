@@ -22,6 +22,10 @@
 
 <div class="wrap">
   <div style="display:grid; gap:12px;" id="docs"></div>
+
+  <div class="sec-h" style="margin-top:26px"><h2 style="font-size:1.2rem">♨️ מקורות שימושיים</h2><div class="line"></div></div>
+  <div style="display:grid; gap:12px;" id="resources"></div>
+
   <div class="callout" style="margin-top:18px">
     💡 ערכו במסמכים בדרייב מכל מכשיר (גם מהטלפון). כשתרצו שהקלסר יתעדכן — אמרו לי "תעדכן את האתר לפי הדרייב".
   </div>
@@ -36,6 +40,13 @@
     a.className = 'doc'; a.href = d.url; a.target = '_blank'; a.rel = 'noopener';
     a.innerHTML = `<div class="ic">${d.ic}</div><div class="meta"><div class="t">${d.t}</div><div class="d">${d.d}</div></div><div class="go">↗</div>`;
     c.appendChild(a);
+  });
+  const rc = document.getElementById('resources');
+  (TRIP.resources || []).forEach(d => {
+    const a = document.createElement('a');
+    a.className = 'doc'; a.href = d.url; a.target = '_blank'; a.rel = 'noopener';
+    a.innerHTML = `<div class="ic">${d.ic}</div><div class="meta"><div class="t">${d.t}</div><div class="d">${d.d}</div></div><div class="go">↗</div>`;
+    rc.appendChild(a);
   });
 </script>
 <script src="delight.js"></script>
