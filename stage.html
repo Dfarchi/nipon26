@@ -39,6 +39,9 @@
   .day-flag { background:rgba(242,183,5,0.12); border:1px solid rgba(242,183,5,0.35); color:var(--gold); border-radius:8px; padding:8px 11px; font-size:0.82rem; margin:10px 0 2px; }
   .legend2 { color:var(--muted); font-size:0.82rem; margin:2px 0 8px; }
   .nodays { color:var(--muted); font-size:0.9rem; background:var(--panel-2); border:1px dashed var(--border); border-radius:10px; padding:14px; text-align:center; }
+  .act-note { margin-top:8px; font-size:0.82rem; padding:7px 10px; }
+  .act-note.has-val { border-style:solid; border-color:var(--gold); }
+  .note-hint { color:var(--dim); font-size:0.82rem; margin:2px 0 10px; }
 </style>
 </head>
 <body>
@@ -58,7 +61,26 @@
 <div class="wrap">
   <div id="mapWrap"></div>
   <div id="content"></div>
+
+  <div class="dec-actions" id="noteActions" style="display:none">
+    <button class="btn primary" onclick="exportNotes()">📋 העתק הערות לקלוד</button>
+    <button class="btn" onclick="resetNotes()">↺ נקה הערות</button>
+  </div>
 </div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>📝 ההערות שלכם על השלב</h3>
+    <p style="color:var(--muted); font-size:0.88rem; margin-bottom:10px">העתיקו את הטקסט ושלחו לקלוד בצ'אט — כך נוכל לערוך את היום-ביום יחד.</p>
+    <textarea id="exportText" readonly></textarea>
+    <div class="row">
+      <button class="btn" onclick="closeModal()">סגור</button>
+      <button class="btn primary" onclick="copyText()">העתק</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">הועתק ✓</div>
 
 <footer>🍁 NIPON26 · שלב במסע 🍁</footer>
 <script src="data.js"></script>
@@ -67,6 +89,39 @@
   const s = parseInt(new URLSearchParams(location.search).get('s'));
   const phase = (TRIP.phases||[])[s];
   const head = document.getElementById('head');
+
+  const DNKEY = 'nipon26_daynotes_v1';
+  let dayNotes = JSON.parse(localStorage.getItem(DNKEY) || '{}');
+  let stageDays = [];
+
+  function exportNotes(){
+    let out = 'הערות · ' + (phase ? phase.h : '') + ' (יום-ביום):\n\n';
+    let any = false;
+    stageDays.forEach(day => {
+      let lines = [];
+      (day.acts||[]).forEach((a,ai) => {
+        const v = (dayNotes[day.st+'|'+day.n+'|'+ai] || '').trim();
+        if(v){ lines.push(`   • ${a.t}: ${v}`); any = true; }
+      });
+      if(lines.length){ out += `${day.n} — ${day.t}\n` + lines.join('\n') + '\n\n'; }
+    });
+    if(!any) out += '(עדיין לא נכתבו הערות בשלב הזה)';
+    document.getElementById('exportText').value = out.trim();
+    document.getElementById('modalBg').classList.add('show');
+  }
+  function copyText(){
+    const t = document.getElementById('exportText');
+    t.select(); navigator.clipboard.writeText(t.value).then(showToast);
+  }
+  function showToast(){ const x=document.getElementById('toast'); x.classList.add('show'); setTimeout(()=>x.classList.remove('show'),1600); }
+  function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
+  function resetNotes(){
+    if(!confirm('לנקות את כל ההערות של השלב הזה?')) return;
+    stageDays.forEach(day => (day.acts||[]).forEach((a,ai) => { delete dayNotes[day.st+'|'+day.n+'|'+ai]; }));
+    localStorage.setItem(DNKEY, JSON.stringify(dayNotes));
+    document.querySelectorAll('.act-note').forEach(t => { t.value=''; t.classList.remove('has-val'); t.style.height='auto'; });
+  }
+  document.getElementById('modalBg').addEventListener('click', e => { if(e.target.id==='modalBg') closeModal(); });
 
   if(!phase){
     head.innerHTML = '<div class="nodays" style="margin-top:14px">שלב לא נמצא. <a href="itinerary.html" style="color:var(--blue)">חזרה למסלול</a></div>';
@@ -98,11 +153,13 @@
     // ===== יום-ביום של השלב =====
     const dphase = TRIP.dayPhase || {};
     const days = (TRIP.days||[]).filter(d => dphase[d.st] === s);
+    stageDays = days;
     const content = document.getElementById('content');
     if(!days.length){
       content.innerHTML = '<div class="sec2">📆 יום-ביום</div><div class="nodays">היום-ביום המפורט לשלב הזה יתווסף בהמשך. בינתיים — המפה והתיאור למעלה.</div>';
     } else {
-      let html = '<div class="sec2">📆 יום-ביום</div><div class="legend2">עומק קהל: 🟢 מקומי · 🟡 מעורב · 🔴 תיירותי</div><div id="days"></div>';
+      let html = '<div class="sec2">📆 יום-ביום</div><div class="legend2">עומק קהל: 🟢 מקומי · 🟡 מעורב · 🔴 תיירותי</div>'
+        + '<div class="note-hint">📝 ליד כל פריט יש מקום להערה — כתבו מה שתרצו ולחצו למטה "העתק הערות לקלוד".</div><div id="days"></div>';
       content.innerHTML = html;
       const wrap = document.getElementById('days');
       let lastReg = null;
@@ -110,16 +167,36 @@
         if(day.st !== lastReg){ const h=document.createElement('div'); h.className='reg-h'; h.textContent=day.st; wrap.appendChild(h); lastReg=day.st; }
         const el = document.createElement('div'); el.className='day';
         const flag = day.flag ? `<div class="day-flag">${day.flag}</div>` : '';
-        const acts = (day.acts||[]).map(a=>{
+        const acts = (day.acts||[]).map((a,ai)=>{
           const links = (a.l&&a.l.length) ? `<div class="act-links">${a.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
           const d = a.d ? `<div class="act-d">${a.d}</div>` : '';
           const cr = a.cr ? `<span class="act-cr">${a.cr}</span>` : '';
-          return `<div class="act"><span class="act-ic">${a.ic||'•'}</span><div class="act-main"><div class="act-t">${a.t}</div>${d}${links}</div>${cr}</div>`;
+          const nk = day.st+'|'+day.n+'|'+ai;
+          const ph = ('📝 הערה / שאלה על '+(a.t||'')+' (תיווסף להעתקה)').replace(/"/g,'&quot;');
+          const note = `<textarea class="note-in act-note" data-key="${nk}" rows="1" placeholder="${ph}"></textarea>`;
+          return `<div class="act"><span class="act-ic">${a.ic||'•'}</span><div class="act-main"><div class="act-t">${a.t}</div>${d}${links}${note}</div>${cr}</div>`;
         }).join('');
         el.innerHTML = `<div class="day-head"><span class="day-num">${day.n}</span><span class="day-title">${day.t}</span><span class="day-chev">▾</span></div><div class="day-body">${flag}${acts}</div>`;
         el.querySelector('.day-head').addEventListener('click', ()=> el.classList.toggle('open'));
         wrap.appendChild(el);
       });
+
+      // מילוי ההערות השמורות + התאמת גובה
+      document.querySelectorAll('.act-note').forEach(t => {
+        const v = dayNotes[t.dataset.key];
+        if(v){ t.value = v; t.classList.add('has-val'); t.style.height='auto'; t.style.height = t.scrollHeight+'px'; }
+      });
+      // שמירה בכל הקלדה
+      wrap.addEventListener('input', e => {
+        const t = e.target.closest('.act-note');
+        if(!t) return;
+        const k = t.dataset.key;
+        if(t.value.trim()){ dayNotes[k] = t.value; t.classList.add('has-val'); }
+        else { delete dayNotes[k]; t.classList.remove('has-val'); }
+        localStorage.setItem(DNKEY, JSON.stringify(dayNotes));
+        t.style.height='auto'; t.style.height = t.scrollHeight+'px';
+      });
+      document.getElementById('noteActions').style.display = '';
     }
   }
 </script>
