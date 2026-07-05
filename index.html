@@ -65,7 +65,6 @@
   <a class="tab active" href="index.html">🏠 שער</a>
   <a class="tab" href="decisions.html">🧭 החלטות</a>
   <a class="tab" href="itinerary.html">🗓️ מסלול</a>
-  <a class="tab" href="days.html">📆 יום-ביום</a>
   <a class="tab" href="documents.html">📂 מסמכים</a>
   <span class="brand">🍁 NIPON26</span>
 </div></div>
@@ -191,7 +190,7 @@ setInterval(tick,1000); tick();
 // ===== מפת המסע המלאה (Leaflet) =====
 (function(){
   const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
-  const pts=(window.TRIP&&TRIP.mapPoints)||[]; const mapEl=document.getElementById('map');
+  const pts=((window.TRIP&&TRIP.mapPoints)||[]).filter(p=>!p.parked); const mapEl=document.getElementById('map');
   if(!mapEl) return;
   if(typeof L==='undefined'||!pts.length){
     mapEl.innerHTML='<div style="padding:26px;text-align:center;color:var(--muted)">🗺️ לא ניתן לטעון את המפה כרגע.</div>'; return;
@@ -206,7 +205,7 @@ setInterval(tick,1000); tick();
   L.polyline(latlngs,{color:'#e94560',weight:2,opacity:0.45,dashArray:'4 7'}).addTo(map);
   map.fitBounds(latlngs,{padding:[30,30]});
   const legend=document.getElementById('mapLegend');
-  if(legend) legend.innerHTML=TRIP.phases.map((p,i)=>{ const name=(p.h.split('·')[1]||p.h).trim();
+  if(legend) legend.innerHTML=TRIP.phases.map((p,i)=>{ if(p.parked) return ''; const name=(p.h.split('·')[1]||p.h).trim();
     return `<span><i style="background:${PHASE_COLORS[i%6]}"></i>${name}</span>`; }).join('');
 })();
 

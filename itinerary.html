@@ -5,40 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מסלול · יפן 2026</title>
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
-  .phase-map { height:240px; border-radius:12px; overflow:hidden; z-index:0; margin:12px 0 4px; }
-  .phase.collapsed .phase-map { display:none; }
-  .leaflet-container { background:#0f1420; font-family:inherit; }
-  .squal { color:var(--muted); font-weight:400; font-size:0.85rem; }
-  .ph-top { cursor:pointer; user-select:none; }
-  .chev { font-size:0.8rem; color:var(--dim); display:inline-block; transition:.2s; }
-  .phase.collapsed .chev { transform:rotate(-90deg); }
-  .phase.collapsed p, .phase.collapsed .stops { display:none; }
-  .stops { display:flex; flex-direction:column; gap:7px; margin-top:10px; }
-  .stop { border:1px solid var(--border); background:var(--panel-2); border-radius:10px; overflow:hidden; transition:.15s; }
-  .stop:hover { border-color:var(--blue); }
-  .stop-head { display:flex; align-items:center; gap:9px; padding:10px 12px; cursor:pointer; }
-  .snum { flex:none; min-width:28px; height:22px; padding:0 6px; border-radius:6px; background:var(--bg);
-    border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:0.72rem; color:var(--muted); font-weight:700; }
-  .stitle { flex:1; font-weight:600; font-size:0.93rem; }
-  .schev { flex:none; font-size:0.76rem; color:var(--blue); background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:4px 10px; white-space:nowrap; }
-  .otag { flex:none; font-size:0.67rem; background:rgba(74,158,218,0.16); color:#7fc1ff; border:1px solid rgba(74,158,218,0.45); border-radius:99px; padding:1px 8px; white-space:nowrap; }
-  .pending { flex:none; font-size:0.67rem; background:rgba(242,183,5,0.15); color:var(--gold); border:1px solid rgba(242,183,5,0.4); border-radius:99px; padding:1px 8px; white-space:nowrap; }
-  .stop-detail { display:none; padding:11px 13px 13px; }
-  .stop-detail.show { display:block; border-top:1px dashed var(--border); }
-  .s-desc { color:var(--ink); font-size:0.86rem; line-height:1.7; }
-  .s-line { font-size:0.84rem; color:var(--muted); line-height:1.6; margin:7px 0; }
-  .s-line b { color:var(--ink); font-weight:600; }
-  .s-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-  .s-links a { font-size:0.8rem; color:var(--blue); border:1px solid var(--border); background:var(--bg); padding:5px 11px; border-radius:8px; transition:.15s; }
-  .s-links a:hover { border-color:var(--blue); background:var(--panel); }
-  .ph-tools { display:flex; gap:8px; margin:0 0 4px; }
-  .tbtn { background:rgba(255,255,255,0.04); color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:6px 13px; font-size:0.84rem; cursor:pointer; font-family:inherit; }
-  .tbtn:hover { border-color:var(--blue); color:var(--ink); }
+  .stage-card { display:flex; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--border);
+    border-radius:14px; padding:16px 18px; margin-bottom:12px; transition:.15s; cursor:pointer; }
+  .stage-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+  .stage-dot { flex:none; width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1.05rem; color:#fff; }
+  .stage-meta { flex:1; min-width:0; }
+  .stage-title { font-weight:700; font-size:1.05rem; }
+  .stage-sub { color:var(--dim); font-size:0.82rem; margin-top:2px; }
+  .stage-p { color:var(--muted); font-size:0.88rem; margin-top:5px; line-height:1.5; }
+  .stage-go { flex:none; color:var(--dim); font-size:1.3rem; }
+  .parked-h { margin:30px 0 10px; color:var(--gold); font-size:1.05rem; font-weight:700;
+    border-bottom:1px solid var(--border); padding-bottom:6px; }
+  .stage-card.parked { opacity:0.7; border-style:dashed; }
+  .stage-card.parked:hover { opacity:1; }
 </style>
 </head>
 <body>
@@ -46,146 +27,51 @@
   <a class="tab" href="index.html">🏠 שער</a>
   <a class="tab" href="decisions.html">🧭 החלטות</a>
   <a class="tab active" href="itinerary.html">🗓️ מסלול</a>
-  <a class="tab" href="days.html">📆 יום-ביום</a>
   <a class="tab" href="documents.html">📂 מסמכים</a>
   <span class="brand">🍁 NIPON26</span>
 </div></div>
 
 <div class="hero" style="padding-bottom:10px">
-  <h1 style="font-size:2.2rem">🗓️ ציר המסע</h1>
-  <div class="sub">נבנה מההחלטות שסגרתם · ~42 לילות, צפון→דרום · לחצו על כל תחנה כדי להרחיב</div>
+  <h1 style="font-size:2.2rem">🗓️ המסלול</h1>
+  <div class="sub">5 שלבים · צפון→דרום · לחצו על שלב כדי לפתוח מפה + יום-ביום</div>
 </div>
 
 <div class="wrap">
-  <div class="ph-tools">
-    <button class="tbtn" id="expandAll" type="button">⤢ הרחב הכל</button>
-    <button class="tbtn" id="collapseAll" type="button">⤡ כווץ הכל</button>
-  </div>
-  <div class="panel">
-    <div class="timeline" id="timeline"></div>
-  </div>
+  <div id="stages"></div>
+  <div id="parked"></div>
   <div class="callout" style="margin-top:18px">
-    📌 המסלול משקף את הבחירות הנוכחיות. תחנות עם תג <b>«פתוח לדיון»</b> או <b>«טרם הוכרע»</b> עוד עשויות להשתנות — הכריעו אותן ב<a href="decisions.html" style="color:var(--blue)">דף ההחלטות</a>. כ-2–3 לילות "פלואוט" ברזרבה, מיקום בהמשך.
+    📌 טיוטה. בכל שלב יש מפה עם התחנות ולינקים, ויום-ביום מפורט (מתמלא בהדרגה — כרגע קנסאי וטוקיו מלאים).
   </div>
 </div>
 
-<footer>🍁 NIPON26 · המסלול מתעדכן אוטומטית לפי ההחלטות 🍁</footer>
+<footer>🍁 NIPON26 · המסלול מתעדכן לפי ההחלטות 🍁</footer>
 <script src="data.js"></script>
 <script>
-  // מקור האמת למסלול = data.js (השדה decided), לא localStorage. ככה הדף משקף
-  // את התוכנית המוסכמת ולא סימונים ישנים על מכשיר מסוים.
-  const tl = document.getElementById('timeline');
+  const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
+  const stages = document.getElementById('stages');
+  const parkedWrap = document.getElementById('parked');
+  let parkedHtml = '';
 
-  // ניקוי סיומות כמו "(✓ נבחר)" / "(⭐ מומלץ...)" מכותרת האפשרות
-  function clean(t){ return t.replace(/\s*\((?:✓|⭐)[^)]*\)/g,'').trim(); }
+  (TRIP.phases||[]).forEach((p, i) => {
+    const color = PHASE_COLORS[i % PHASE_COLORS.length];
+    const label = (p.h.match(/שלב\s*([\d.]+)/) || [,'•'])[1];
+    const title = (p.h.split('·')[1] || p.h).trim();
+    const card = `<a class="stage-card ${p.parked?'parked':''}" href="stage.html?s=${i}">
+        <span class="stage-dot" style="background:${color}">${label}</span>
+        <span class="stage-meta">
+          <span class="stage-title">${title}</span>
+          <div class="stage-sub">${p.when} · ${p.nights}</div>
+          <div class="stage-p">${p.p||''}</div>
+        </span>
+        <span class="stage-go">←</span>
+      </a>`;
+    if(p.parked) parkedHtml += card;
+    else stages.insertAdjacentHTML('beforeend', card);
+  });
 
-  function stopCard(it, opt, undecided){
-    const badges = [];
-    if(opt.w) badges.push(`<span class="badge">📍 ${opt.w}</span>`);
-    if(opt.c && opt.c!=='—') badges.push(`<span class="badge cost-${opt.c}">💰 ${opt.c}</span>`);
-    if(opt.tr) badges.push(`<span class="badge">🚆 ${opt.tr}</span>`);
-    const badgeRow = badges.length ? `<div class="badges">${badges.join('')}</div>` : '';
-    const see  = (opt.see && opt.see!=='—') ? `<div class="s-line"><b>👁️ לראות/לעשות:</b> ${opt.see}</div>` : '';
-    const tip  = opt.tp ? `<div class="s-line"><b>⚖️ שיקול:</b> ${opt.tp}</div>` : '';
-    const links = (opt.l && opt.l.length)
-      ? `<div class="s-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
-    const pend = undecided ? `<span class="pending">טרם הוכרע</span>` : '';
-    const open = it.open===true && !undecided ? `<span class="otag">פתוח לדיון</span>` : '';
-    // כותרת = שם המקום; ליד זה, כמאפיין, הבחירה עצמה (בלי "כן/לא" ריק)
-    const place = (TRIP.places && TRIP.places[it.n]) || clean(opt.t);
-    let qual = clean(opt.t).replace(/^(כן|לא)\s*[—–,-]\s*/,'').trim();
-    if(qual !== place && qual.startsWith(place)) qual = qual.slice(place.length).replace(/^\s*[—–·,-]\s*/,'').trim();
-    if(qual === 'כן' || qual === 'לא' || qual === place) qual = '';
-    const title = `${place}${qual ? ` <span class="squal">· ${qual}</span>` : ''}`;
-    return `<div class="stop">
-      <div class="stop-head">
-        <span class="snum">${it.n}</span>
-        <span class="stitle">${title}</span>
-        ${pend}${open}
-        <span class="schev">הרחב ▾</span>
-      </div>
-      <div class="stop-detail">
-        <div class="s-desc">${opt.d||''}</div>
-        ${badgeRow}${see}${tip}${links}
-      </div>
-    </div>`;
+  if(parkedHtml){
+    parkedWrap.innerHTML = '<div class="parked-h">❓ בסימן שאלה — לא בתוכנית כרגע</div>' + parkedHtml;
   }
-
-  TRIP.phases.forEach((p, pi) => {
-    let stopsHtml = '';
-    TRIP.decisions.forEach(g => g.items.forEach(it => {
-      const effPh = (it.ph !== undefined) ? it.ph : g.ph; // שיוך-שלב אפשרי ברמת ההחלטה
-      if(effPh !== pi) return;
-      if(it.cut) return; // בוטל מהמסלול
-      if(it.noStop) return; // מאפיין של תחנה אחרת (למשל תזמון/מודרך של קומאנו) — לא תחנה בפני עצמה
-      const pick = it.decided;
-      const undecided = (pick === null || pick === undefined || (Array.isArray(pick) && pick.length===0));
-      let idxs;
-      if(undecided) idxs = (it.rec !== null && it.rec !== undefined) ? [it.rec] : [];
-      else idxs = Array.isArray(pick) ? pick : [pick];
-      idxs.forEach(i => { const opt = it.o[i]; if(opt) stopsHtml += stopCard(it, opt, undecided); });
-    }));
-    const phase = document.createElement('div');
-    phase.className = 'phase';
-    phase.innerHTML = `
-      <div class="ph-top">
-        <h3>${p.h} <span class="chev">▾</span></h3>
-        <span class="when">${p.when} · ${p.nights}</span>
-      </div>
-      <p>${p.p}</p>
-      <div class="phase-map" id="map-ph${pi}"></div>
-      <div class="stops">${stopsHtml || '<div class="s-line" style="padding:4px 2px">—</div>'}</div>`;
-    phase.querySelector('.ph-top').addEventListener('click', () => phase.classList.toggle('collapsed'));
-    tl.appendChild(phase);
-  });
-
-  // הרחבה/כיווץ של תחנה בודדת
-  tl.addEventListener('click', e => {
-    const head = e.target.closest('.stop-head');
-    if(!head) return;
-    if(e.target.closest('a')) return;
-    const d = head.parentNode.querySelector('.stop-detail');
-    const on = d.classList.toggle('show');
-    head.querySelector('.schev').textContent = on ? 'סגור ▴' : 'הרחב ▾';
-  });
-
-  function setAll(show){
-    document.querySelectorAll('.stop-detail').forEach(d => d.classList.toggle('show', show));
-    document.querySelectorAll('.schev').forEach(s => s.textContent = show ? 'סגור ▴' : 'הרחב ▾');
-    if(show) document.querySelectorAll('.phase').forEach(p => p.classList.remove('collapsed'));
-  }
-  document.getElementById('expandAll').addEventListener('click', () => setAll(true));
-  document.getElementById('collapseAll').addEventListener('click', () => setAll(false));
-
-  // ===== מפה נפרדת לכל מקטע (Leaflet, קבועה — נעצים ניתנים ללחיצה) =====
-  const PHASE_COLORS = ['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
-  TRIP.phases.forEach((p, pi) => {
-    const el = document.getElementById('map-ph' + pi);
-    if(!el) return;
-    const pts = (TRIP.mapPoints || []).filter(mp => mp.ph === pi && !mp.overviewOnly);
-    if(typeof L === 'undefined' || !pts.length){ el.style.display = 'none'; return; }
-    const map = L.map(el, {
-      scrollWheelZoom:false, dragging:false, zoomControl:false,
-      doubleClickZoom:false, boxZoom:false, keyboard:false, touchZoom:false
-    });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom:12, attribution:'© OpenStreetMap'
-    }).addTo(map);
-    const latlngs = [];
-    pts.forEach(pt => {
-      latlngs.push([pt.lat, pt.lng]);
-      L.circleMarker([pt.lat, pt.lng], {
-        radius:8, color:'#fff', weight:1.5,
-        fillColor: PHASE_COLORS[pi % PHASE_COLORS.length], fillOpacity:0.95
-      }).addTo(map).bindPopup(`<b>${pt.n}</b>${pt.d ? '<br>'+pt.d : ''}`);
-    });
-    if(pts.length > 1){
-      L.polyline(latlngs, { color:PHASE_COLORS[pi % PHASE_COLORS.length], weight:2, opacity:0.5, dashArray:'4 6' }).addTo(map);
-      map.fitBounds(latlngs, { padding:[35,35] });
-    } else {
-      map.setView(latlngs[0], 10);
-    }
-  });
 </script>
 <script src="delight.js"></script>
 </body>
