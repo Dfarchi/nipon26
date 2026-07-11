@@ -52,7 +52,7 @@ window.TRIP = {
   // st = אזור · acts = פעילויות (ic אימוג'י · t כותרת · d הסבר/למה · cr עומק: 🟢 מקומי/🟡 מעורב/🔴 תיירותי)
   days: [
     { st:"טוקיו · פתיחה", n:"יום 1", t:"14.10 — נחיתה בטוקיו (Tokyo · 東京)", acts:[
-      { ic:"✈️", t:"נחיתה 13:20 + כניסה לעיר", d:"רכבת מנריטה (Narita Express · 成田エクスプレス), צ'ק-אין 15:00 — אסאקוסה/קוראמאיי (Asakusa/Kuramae · 浅草・蔵前)", cr:"🟢", l:[{t:"🏨 פרטי הזמנה",u:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit"}] },
+      { ic:"✈️", t:"נחיתה 13:20 + נסיעה למלון", d:"קייסיי Access Express (京成アクセス特急) ישירות מנמל התעופה נריטה לתחנת אסאקוסה (~80 דק׳, בלי החלפה) — אסאקוסה/קוראמאיי (Asakusa/Kuramae · 浅草・蔵前), צ'ק-אין 15:00", cr:"🟢", l:[{t:"🧭 מסלול למלון",u:dir("Narita Airport","Tosei Hotel Cocone Asakusa Kuramae")},{t:"🏨 פרטי הזמנה",u:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit"}] },
       { ic:"🚶", t:"ערב רגוע בשכונה", d:"התאקלמות מהג'ט-לג — בלי אטרקציות", cr:"🟢" }
     ]},
     { st:"טוקיו · פתיחה", n:"יום 2", t:"15.10 — טוקיו רגוע (Tokyo · 東京)", acts:[
@@ -61,6 +61,7 @@ window.TRIP = {
       { ic:"🍶", t:"ערב: איזקאיה", d:"", cr:"🟢", l:[{t:"🏨 פרטי הזמנה",u:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit"}] }
     ]},
     { st:"גינזן אונסן", n:"יום 3", t:"16.10 — טוקיו → גינזן אונסן (Ginzan Onsen · 銀山温泉)", acts:[
+      { ic:"🚇", t:"מהמלון לתחנת טוקיו (~20–25 דק')", d:"צ'ק-אאוט, מטרו/רכבת מקוראמאיי/אסאקוסה לתחנת טוקיו", cr:"🟢", l:[{t:"🧭 מסלול",u:dir("Tosei Hotel Cocone Asakusa Kuramae","Tokyo Station")}] },
       { ic:"🚄", t:"שינקנסן צובאסה: טוקיו → אויישידה (~3 שעות)", d:"יציאה בצהריים — שינקנסן יאמאגאטה, קו Tsubasa (つばさ), מתחנת טוקיו לתחנת Oishida (大石田駅)", cr:"🟢", l:[{t:"🧭 מסלול",u:dir("Tokyo Station","Oishida Station")},{t:"🗺️ Oishida",u:m("Oishida Station Yamagata")}] },
       { ic:"🚌", t:"אויישידה → גינזן אונסן (~40 דק')", d:"אוטובוס הנגסה (花笠バス Hanagasa Bus) מתחנת Oishida לגינזן אונסן — ⚠️ לאמת לו״ז מול העונה", cr:"🟢", l:[{t:"🧭 מסלול",u:dir("Oishida Station","Ginzan Onsen")}] },
       { ic:"♨️", t:"ערב: רחוב האונסן המואר", d:"בנייני עץ ופנסי גז אחרי החשכה — ✅ טאטו: לאמת ריוקאן", cr:"🟢", l:[{t:"♨️ טאטו",u:"https://www.tattoo-friendly.com"},{t:"🗺️",u:m("Ginzan Onsen Yamagata")}] }
