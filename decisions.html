@@ -16,6 +16,15 @@
   .dcard.open-dec{ border-color:rgba(90,170,255,0.55); box-shadow:0 0 0 1px rgba(90,170,255,0.25) }
   .open-tag{ display:inline-block; background:rgba(90,170,255,0.18); color:#7fc1ff;
     border:1px solid rgba(90,170,255,0.4); border-radius:6px; font-size:0.72rem; padding:1px 7px; margin-inline-start:8px; vertical-align:middle }
+  .phase-header{ margin:34px 0 10px; padding-bottom:6px; border-bottom:2px solid rgba(255,140,66,0.35) }
+  .phase-header:first-child{ margin-top:6px }
+  .phase-header h2{ margin:0; font-size:1.3rem }
+  .phase-sub{ color:var(--dim,#9a8aa6); font-size:0.85rem; margin-top:2px }
+  .dcard.todo-dec{ border-color:rgba(120,205,150,0.55); box-shadow:0 0 0 1px rgba(120,205,150,0.25) }
+  .todo-tag{ display:inline-block; background:rgba(120,205,150,0.18); color:#7fdba0;
+    border:1px solid rgba(120,205,150,0.4); border-radius:6px; font-size:0.72rem; padding:1px 7px; margin-inline-start:8px; vertical-align:middle }
+  .todo-check{ display:flex; align-items:center; gap:8px; margin:10px 0 6px; cursor:pointer; font-size:0.92rem }
+  .todo-check input{ width:18px; height:18px; cursor:pointer }
 </style>
 </head>
 <body>
@@ -83,42 +92,68 @@ if(!localStorage.getItem(KEY)){
   }));
 }
 
+// קיבוץ החלטות לפי שלב (ph) — כל שלב מקבל כותרת מ-TRIP.phases, ומתחתיו קבוצות ההחלטות שלו
+const phaseBuckets = {};
 TRIP.decisions.forEach(group => {
-  const g = document.createElement('div');
-  g.className = 'dgroup';
-  g.innerHTML = `<div class="gh">${group.g}</div>`;
-  let added = 0;
-  group.items.forEach(it => {
-    if(it.cut) return; // בוטל מהמסלול — לא מוצג
-    total++; added++;
-    const card = document.createElement('div');
-    card.className = 'dcard ' + (it.open===true ? 'open-dec' : 'closed-dec');
-    card.dataset.n = it.n;
-    const multiNote = it.multi ? ` <span style="color:var(--dim);font-size:0.8rem">(בחרו ${it.multi})</span>` : '';
-    const openTag = it.open===true ? ' <span class="open-tag">פתוח לדיון</span>' : '';
-    let html = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${multiNote}${openTag}</div></div><div class="opts">`;
-    it.o.forEach((opt,i) => {
-      const rec = (it.rec===i) ? '<span class="rec">⭐ מומלץ</span>' : '';
-      const links = (opt.l && opt.l.length)
-        ? `<div class="opt-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
-      const badges = [];
-      if(opt.w) badges.push(`<span class="badge">📍 ${opt.w}</span>`);
-      if(opt.c && opt.c!=='—') badges.push(`<span class="badge cost-${opt.c}">💰 ${opt.c}</span>`);
-      if(opt.tr) badges.push(`<span class="badge">🚆 ${opt.tr}</span>`);
-      const badgeRow = badges.length ? `<div class="badges">${badges.join('')}</div>` : '';
-      const seeLine = (opt.see && opt.see!=='—') ? `<div class="opt-line"><b>👁️ לראות/לעשות:</b> ${opt.see}</div>` : '';
-      const tipLine = opt.tp ? `<div class="opt-line"><b>⚖️ שיקול:</b> ${opt.tp}</div>` : '';
-      const detail = `<div class="opt-detail"><div class="opt-desc">${opt.d||''}</div>${badgeRow}${seeLine}${tipLine}${links}</div>`;
-      html += `<div class="opt" data-n="${it.n}" data-i="${i}" data-multi="${it.multi||0}">`
-        + `<div class="opt-head"><span class="mark"></span><span class="txt">${opt.t}</span>${rec}`
-        + `<button class="opt-toggle" type="button">הסבר ▾</button></div>${detail}</div>`;
+  const ph = (group.ph === undefined || group.ph === null) ? -1 : group.ph;
+  (phaseBuckets[ph] = phaseBuckets[ph] || []).push(group);
+});
+Object.keys(phaseBuckets).map(Number).sort((a,b)=>a-b).forEach(ph => {
+  const phaseInfo = (ph >= 0) ? TRIP.phases[ph] : null;
+  if(phaseInfo){
+    const ph_header = document.createElement('div');
+    ph_header.className = 'phase-header';
+    ph_header.innerHTML = `<h2>${phaseInfo.h}</h2><div class="phase-sub">${phaseInfo.when} · ${phaseInfo.nights}</div>`;
+    wrap.appendChild(ph_header);
+  }
+  phaseBuckets[ph].forEach(group => {
+    const g = document.createElement('div');
+    g.className = 'dgroup';
+    g.innerHTML = `<div class="gh">${group.g}</div>`;
+    let added = 0;
+    group.items.forEach(it => {
+      if(it.cut) return; // בוטל מהמסלול — לא מוצג
+      total++; added++;
+      const card = document.createElement('div');
+      card.dataset.n = it.n;
+
+      if(it.todo === true){
+        // משימה פתוחה: לא בחירה מתוך אופציות — מסמנים "הוחלט/בוצע" בצ'קבוקס + הערה חופשית
+        card.className = 'dcard todo-dec ' + (it.open===true ? 'open-dec' : 'closed-dec');
+        card.innerHTML = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q} <span class="todo-tag">משימה פתוחה</span></div></div>`
+          + `<label class="todo-check"><input type="checkbox" class="todo-in" data-n="${it.n}"><span>✓ סומן כהוחלט / בוצע</span></label>`
+          + `<textarea class="note-in" data-n="${it.n}" rows="1" placeholder="📝 הערות (למשל: שם המקום שנבחר, מס' אישור הזמנה)"></textarea>`;
+        g.appendChild(card);
+        return;
+      }
+
+      card.className = 'dcard ' + (it.open===true ? 'open-dec' : 'closed-dec');
+      const multiNote = it.multi ? ` <span style="color:var(--dim);font-size:0.8rem">(בחרו ${it.multi})</span>` : '';
+      const openTag = it.open===true ? ' <span class="open-tag">פתוח לדיון</span>' : '';
+      let html = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${multiNote}${openTag}</div></div><div class="opts">`;
+      it.o.forEach((opt,i) => {
+        const rec = (it.rec===i) ? '<span class="rec">⭐ מומלץ</span>' : '';
+        const links = (opt.l && opt.l.length)
+          ? `<div class="opt-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
+        const badges = [];
+        if(opt.w) badges.push(`<span class="badge">📍 ${opt.w}</span>`);
+        if(opt.c && opt.c!=='—') badges.push(`<span class="badge cost-${opt.c}">💰 ${opt.c}</span>`);
+        if(opt.tr) badges.push(`<span class="badge">🚆 ${opt.tr}</span>`);
+        const badgeRow = badges.length ? `<div class="badges">${badges.join('')}</div>` : '';
+        const seeLine = (opt.see && opt.see!=='—') ? `<div class="opt-line"><b>👁️ לראות/לעשות:</b> ${opt.see}</div>` : '';
+        const tipLine = opt.tp ? `<div class="opt-line"><b>⚖️ שיקול:</b> ${opt.tp}</div>` : '';
+        const detail = `<div class="opt-detail"><div class="opt-desc">${opt.d||''}</div>${badgeRow}${seeLine}${tipLine}${links}</div>`;
+        html += `<div class="opt" data-n="${it.n}" data-i="${i}" data-multi="${it.multi||0}">`
+          + `<div class="opt-head"><span class="mark"></span><span class="txt">${opt.t}</span>${rec}`
+          + `<button class="opt-toggle" type="button">הסבר ▾</button></div>${detail}</div>`;
+      });
+      html += `</div>`;
+      html += `<textarea class="note-in" data-n="${it.n}" rows="1" placeholder="📝 הערות / שאלות לקלוד (יצורפו להעתקה)"></textarea>`;
+      card.innerHTML = html;
+      g.appendChild(card);
     });
-    html += `</div>`;
-    html += `<textarea class="note-in" data-n="${it.n}" rows="1" placeholder="📝 הערות / שאלות לקלוד (יצורפו להעתקה)"></textarea>`;
-    card.innerHTML = html;
-    g.appendChild(card);
+    if(added > 0) wrap.appendChild(g); // קבוצה שכולה בוטלה — לא מציגים כותרת ריקה
   });
-  if(added > 0) wrap.appendChild(g); // קבוצה שכולה בוטלה — לא מציגים כותרת ריקה
 });
 
 document.querySelectorAll('.note-in').forEach(t => {
@@ -135,6 +170,9 @@ function render() {
     const sel = store[n];
     const on = Array.isArray(sel) ? sel.includes(i) : sel===i;
     o.classList.toggle('sel', !!on);
+  });
+  document.querySelectorAll('.todo-in').forEach(cb => {
+    cb.checked = store[cb.dataset.n] === true;
   });
   document.querySelectorAll('.dcard').forEach(c => {
     c.classList.toggle('decided', store[c.dataset.n]!==undefined &&
@@ -204,6 +242,15 @@ wrap.addEventListener('click', e => {
   render();
 });
 
+wrap.addEventListener('change', e => {
+  const cb = e.target.closest('.todo-in');
+  if(!cb) return;
+  const n = cb.dataset.n;
+  if(cb.checked) store[n] = true; else delete store[n];
+  localStorage.setItem(KEY, JSON.stringify(store));
+  render();
+});
+
 wrap.addEventListener('input', e => {
   const t = e.target.closest('.note-in');
   if(!t) return;
@@ -221,10 +268,12 @@ function exportChoices(){
       if(it.cut) return;
       const v = store[it.n];
       const note = notes[it.n];
-      const hasPick = !(v===undefined || (Array.isArray(v)&&v.length===0));
+      const hasPick = it.todo ? (v===true) : !(v===undefined || (Array.isArray(v)&&v.length===0));
       if(!hasPick && !note) return;
       const q = it.q.replace(/⚠️.*$/,'').trim();
-      const picks = hasPick ? (Array.isArray(v)?v:[v]).map(i=>it.o[i].t).join(' + ') : '(ללא בחירה עדיין)';
+      const picks = it.todo
+        ? (hasPick ? '✓ הוחלט/בוצע' : '(עדיין לא הוחלט)')
+        : (hasPick ? (Array.isArray(v)?v:[v]).map(i=>it.o[i].t).join(' + ') : '(ללא בחירה עדיין)');
       lines.push(`  ${it.n}. ${q} → ${picks}`);
       if(note) lines.push(`     📝 הערה: ${note}`);
     });
