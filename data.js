@@ -55,11 +55,7 @@ window.TRIP = {
       { ic:"✈️", t:"נחיתה 13:20 + נסיעה למלון", d:"קייסיי Access Express (京成アクセス特急) ישירות מנמל התעופה נריטה לתחנת אסאקוסה (~80 דק׳, בלי החלפה) — אסאקוסה/קוראמאיי (Asakusa/Kuramae · 浅草・蔵前), צ'ק-אין 15:00", cr:"🟢", l:[{t:"🧭 מסלול למלון",u:dir("Narita Airport","Tosei Hotel Cocone Asakusa Kuramae")},{t:"🏨 פרטי הזמנה",u:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit"}] },
       { ic:"🚶", t:"ערב רגוע בשכונה", d:"התאקלמות מהג'ט-לג — בלי אטרקציות", cr:"🟢" }
     ]},
-    { st:"טוקיו · פתיחה", n:"יום 2", t:"15.10 — טוקיו רגוע (Tokyo · 東京)", acts:[
-      { ic:"☕", t:"בוקר בבית קפה", d:"", cr:"🟢" },
-      { ic:"⛩️", t:"אסאקוסה / שכונה ישנה (Asakusa · 浅草)", d:"סמטות ומקדש סנסו-ג'י (Senso-ji · 浅草寺) מוקדם", cr:"🟡" },
-      { ic:"🍶", t:"ערב: איזקאיה", d:"", cr:"🟢", l:[{t:"🏨 פרטי הזמנה",u:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit"}] }
-    ]},
+    { st:"טוקיו · פתיחה", n:"יום 2", t:"15.10 — טוקיו רגוע (Tokyo · 東京)", acts:[] },
     { st:"גינזן אונסן", n:"יום 3", t:"16.10 — טוקיו → גינזן אונסן (Ginzan Onsen · 銀山温泉)", acts:[
       { ic:"🚇", t:"מהמלון לתחנת טוקיו (~20–25 דק')", d:"צ'ק-אאוט, מטרו/רכבת מקוראמאיי/אסאקוסה לתחנת טוקיו", cr:"🟢", l:[{t:"🧭 מסלול",u:dir("Tosei Hotel Cocone Asakusa Kuramae","Tokyo Station")}] },
       { ic:"🚄", t:"שינקנסן צובאסה: טוקיו → אויישידה (~3 שעות)", d:"יציאה בצהריים — שינקנסן יאמאגאטה, קו Tsubasa (つばさ), מתחנת טוקיו לתחנת Oishida (大石田駅)", cr:"🟢", l:[{t:"🧭 מסלול",u:dir("Tokyo Station","Oishida Station")},{t:"🗺️ Oishida",u:m("Oishida Station Yamagata")}] },
