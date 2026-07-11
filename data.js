@@ -51,13 +51,13 @@ window.TRIP = {
   // st = אזור · acts = פעילויות (ic אימוג'י · t כותרת · d הסבר/למה · cr עומק: 🟢 מקומי/🟡 מעורב/🔴 תיירותי)
   days: [
     { st:"טוקיו · פתיחה", n:"יום 1", t:"נחיתה בטוקיו", acts:[
-      { ic:"✈️", t:"נחיתה 13:20 + כניסה לעיר", d:"רכבת מנריטה, צ'ק-אין", cr:"🟢" },
+      { ic:"✈️", t:"נחיתה 13:20 + כניסה לעיר", d:"רכבת מנריטה, צ'ק-אין 15:00 — אסאקוסה/קוראמאיי", cr:"🟢", l:[{t:"🏨 פרטי הזמנה",u:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit"}] },
       { ic:"🚶", t:"ערב רגוע בשכונה", d:"התאקלמות מהג'ט-לג — בלי אטרקציות", cr:"🟢" }
     ]},
     { st:"טוקיו · פתיחה", n:"יום 2", t:"טוקיו רגוע", acts:[
       { ic:"☕", t:"בוקר בבית קפה", d:"", cr:"🟢" },
       { ic:"⛩️", t:"אסאקוסה / שכונה ישנה", d:"סמטות ומקדש סנסו-ג'י מוקדם", cr:"🟡" },
-      { ic:"🍶", t:"ערב: איזקאיה", d:"", cr:"🟢" }
+      { ic:"🍶", t:"ערב: איזקאיה", d:"", cr:"🟢", l:[{t:"🏨 פרטי הזמנה",u:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit"}] }
     ]},
     { st:"גינזן אונסן", n:"יום 3", t:"צפונה לגינזן", acts:[
       { ic:"🚄", t:"שינקנסן ליאמאגאטה + גינזן", d:"נסיעת בוקר צפונה", cr:"🟢" },
@@ -220,6 +220,7 @@ window.TRIP = {
     { ic:"🗺️", t:"הצפון — מה עושים ולמה", d:"פירוט החצי הראשון", url:"https://docs.google.com/document/d/1OGKJhqLuQtugHwFJLnSFrMcfVXwK6sEobj6HDEmfdkI/edit" },
     { ic:"💴", t:"תקציב — עירוני מול כפרי", d:"Google Sheet — מודל תקציב", url:"https://docs.google.com/spreadsheets/d/1PtpBVer_JH-0arecqZWKX7-E7Z-8shlkH_tpMsq3UlA/edit" },
     { ic:"✈️", t:"Flight Details — Quick Reference", d:"פרטי טיסות וקודי הזמנה", url:"https://docs.google.com/document/d/1FQ-UNq07TvU7xvXi0IZuDpxx4dQNKn-5v4rkSC-5uMo/edit" },
+    { ic:"🏨", t:"מלון טוקיו — פתיחה (14–16 אוק')", d:"טוסיי הוטל קוקונה אסאקוסה קוראמאיי — פרטי הזמנה", url:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit" },
     { ic:"📁", t:"תיקיית התכנון המלאה", d:"כל המסמכים בדרייב", url:"https://drive.google.com/drive/folders/1vfeNF6SvUP1QUlh6Ko7Qs-jhANZeOumv" }
   ],
   // מקורות חיצוניים שימושיים לתכנון (לא דרייב)
