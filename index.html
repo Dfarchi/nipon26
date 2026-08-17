@@ -144,6 +144,7 @@
 <footer>🍁 NIPON26 · הקלסר המשפחתי של יפן 2026 🍁</footer>
 
 <script src="data.js"></script>
+<script src="basemap.js"></script>
 <script>
 const FLIGHT = new Date('2026-10-13T19:45:00+03:00');
 const TRIP_START = new Date('2026-10-14T00:00:00+09:00');
@@ -208,7 +209,7 @@ setInterval(tick,1000); tick();
     mapEl.innerHTML='<div style="padding:26px;text-align:center;color:var(--muted)">🗺️ לא ניתן לטעון את המפה כרגע.</div>'; return;
   }
   const map=L.map('map',{scrollWheelZoom:false}).setView([37,138],5);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© OpenStreetMap'}).addTo(map);
+  BASEMAP.add(map,12);
   const latlngs=[];
   pts.forEach((pt,idx)=>{ latlngs.push([pt.lat,pt.lng]);
     L.circleMarker([pt.lat,pt.lng],{radius:7,color:'#fff',weight:1.5,fillColor:PHASE_COLORS[pt.ph%6],fillOpacity:0.95})

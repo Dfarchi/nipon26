@@ -84,6 +84,7 @@
 
 <footer>🍁 NIPON26 · שלב במסע 🍁</footer>
 <script src="data.js"></script>
+<script src="basemap.js"></script>
 <script>
   const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
   const s = parseInt(new URLSearchParams(location.search).get('s'));
@@ -139,7 +140,7 @@
       const mw = document.getElementById('mapWrap');
       mw.innerHTML = '<div class="sec2">🗺️ מפת השלב</div><div id="map"></div>';
       const map = L.map('map', { scrollWheelZoom:false });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:13, attribution:'© OpenStreetMap' }).addTo(map);
+      BASEMAP.add(map, 13);
       const latlngs=[];
       pts.forEach(pt=>{ latlngs.push([pt.lat,pt.lng]);
         const gm = (typeof m==='function') ? m(pt.n+' Japan') : ('https://www.google.com/maps/search/'+encodeURIComponent(pt.n));
