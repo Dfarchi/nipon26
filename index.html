@@ -11,7 +11,7 @@
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
   #map { height:420px; border-radius:16px; overflow:hidden; z-index:0; }
-  .leaflet-container { background:#14101f; font-family:inherit; }
+  .leaflet-container { background:#e8e3da; font-family:inherit; }
   .map-legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:14px; font-size:0.82rem; color:var(--muted); }
   .map-legend span { display:inline-flex; align-items:center; gap:6px; }
   .map-legend i { width:11px; height:11px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,.5); }
@@ -212,10 +212,10 @@ setInterval(tick,1000); tick();
   BASEMAP.add(map,12);
   const latlngs=[];
   pts.forEach((pt,idx)=>{ latlngs.push([pt.lat,pt.lng]);
-    L.circleMarker([pt.lat,pt.lng],{radius:7,color:'#fff',weight:1.5,fillColor:PHASE_COLORS[pt.ph%6],fillOpacity:0.95})
+    L.circleMarker([pt.lat,pt.lng],{radius:7,color:'#1a1526',weight:2,fillColor:PHASE_COLORS[pt.ph%6],fillOpacity:1})
       .addTo(map).bindPopup(`<b>${idx+1}. ${pt.n}</b>${pt.d?'<br>'+pt.d:''}`).bindTooltip(`${idx+1}. ${pt.n}`,{direction:'top'});
   });
-  L.polyline(latlngs,{color:'#e94560',weight:2,opacity:0.45,dashArray:'4 7'}).addTo(map);
+  L.polyline(latlngs,{color:'#e94560',weight:3,opacity:0.8,dashArray:'4 7'}).addTo(map);
   map.fitBounds(latlngs,{padding:[30,30]});
   const legend=document.getElementById('mapLegend');
   if(legend) legend.innerHTML=TRIP.phases.map((p,i)=>{ if(p.parked) return ''; const name=(p.h.split('·')[1]||p.h).trim();

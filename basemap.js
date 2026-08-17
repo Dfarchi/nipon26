@@ -4,14 +4,13 @@
    בחינם ובלי מפתח API.
 
    להחלפת סגנון — שנה כאן בלבד (שתי המפות באתר נטענות מכאן):
-     dark_all                → כהה, מתאים לעיצוב האתר (ברירת מחדל)
-     light_all               → בהיר ונקי (Positron)
-     rastertiles/voyager     → צבעוני יותר, קרוב ל-OSM הרגיל
-     dark_nolabels           → בלי תוויות בכלל
+     rastertiles/voyager     → צבעוני וקריא, קרוב ל-OSM הרגיל (ברירת מחדל)
+     light_all               → אפור-לבן נקי, הכי קריא (Positron)
+     dark_all                → כהה — מתאים לעיצוב אבל התוויות כמעט לא נקראות
    כתובת: https://{s}.basemaps.cartocdn.com/<סגנון>/{z}/{x}/{y}{r}.png */
 
 window.BASEMAP = {
-  style: 'dark_all',
+  style: 'rastertiles/voyager',
   attribution: '© OpenStreetMap © CARTO',
   url: function () {
     return 'https://{s}.basemaps.cartocdn.com/' + this.style + '/{z}/{x}/{y}{r}.png';

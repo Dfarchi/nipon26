@@ -11,7 +11,7 @@
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
   #map { height:320px; border-radius:14px; overflow:hidden; z-index:0; margin-top:6px; }
-  .leaflet-container { background:#0f1420; font-family:inherit; }
+  .leaflet-container { background:#e8e3da; font-family:inherit; }
   .backlink { display:inline-flex; align-items:center; gap:6px; color:var(--blue); font-size:0.9rem; margin:4px 0 2px; }
   .st-when { color:var(--dim); font-size:0.9rem; }
   .st-nights { display:inline-block; background:var(--panel-2); border:1px solid var(--border); color:var(--muted);
@@ -144,10 +144,10 @@
       const latlngs=[];
       pts.forEach(pt=>{ latlngs.push([pt.lat,pt.lng]);
         const gm = (typeof m==='function') ? m(pt.n+' Japan') : ('https://www.google.com/maps/search/'+encodeURIComponent(pt.n));
-        L.circleMarker([pt.lat,pt.lng],{radius:8,color:'#fff',weight:1.5,fillColor:PHASE_COLORS[s%6],fillOpacity:0.95})
+        L.circleMarker([pt.lat,pt.lng],{radius:8,color:'#1a1526',weight:2,fillColor:PHASE_COLORS[s%6],fillOpacity:1})
           .addTo(map).bindPopup(`<b>${pt.n}</b>${pt.d?'<br>'+pt.d:''}<br><a href="${gm}" target="_blank" rel="noopener">🗺️ פתח במפות</a>`);
       });
-      if(pts.length>1){ L.polyline(latlngs,{color:PHASE_COLORS[s%6],weight:2,opacity:0.5,dashArray:'4 6'}).addTo(map); map.fitBounds(latlngs,{padding:[35,35]}); }
+      if(pts.length>1){ L.polyline(latlngs,{color:PHASE_COLORS[s%6],weight:3,opacity:0.85,dashArray:'4 6'}).addTo(map); map.fitBounds(latlngs,{padding:[35,35]}); }
       else map.setView(latlngs[0],11);
     }
 
