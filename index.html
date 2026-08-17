@@ -15,6 +15,10 @@
   .map-legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:14px; font-size:0.82rem; color:var(--muted); }
   .map-legend span { display:inline-flex; align-items:center; gap:6px; }
   .map-legend i { width:11px; height:11px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,.5); }
+  .map-export { margin-top:18px; padding-top:16px; border-top:1px solid var(--border);
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px; }
+  .map-export p { margin:0; flex:1 1 260px; font-size:0.82rem; line-height:1.65; color:var(--muted); }
+  .map-export a { color:var(--accent); }
   .cine { position:relative; min-height:100vh; overflow:hidden; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:20px; }
   .layer { position:absolute; left:0; right:0; width:100%; pointer-events:none; will-change:transform; }
@@ -116,6 +120,14 @@
   <div class="panel reveal">
     <div id="map"></div>
     <div class="map-legend" id="mapLegend"></div>
+    <div class="map-export">
+      <button class="btn" data-kml-export>📥 הורד את הנקודות לגוגל מאפס</button>
+      <p>
+        הקובץ (KML) נטען פעם אחת ל־<a href="https://www.google.com/maps/d/" target="_blank" rel="noopener">My&nbsp;Maps</a>
+        (מפה חדשה → ייבוא) — ומשם המפה מופיעה באפליקציית Google&nbsp;Maps בנייד תחת <b>שמורים → מפות</b>,
+        עם שכבה נפרדת לכל שלב.
+      </p>
+    </div>
   </div>
 
   <div class="sec-h reveal"><h2>🕒 ציר המסע</h2><div class="line"></div></div>
@@ -240,6 +252,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   addEventListener('resize',init,{passive:true});
 })();
 </script>
+<script src="mapexport.js"></script>
 <script src="delight.js"></script>
 </body>
 </html>
