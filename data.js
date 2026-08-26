@@ -263,7 +263,6 @@ window.TRIP = {
     { ic:"✅", t:"החלטות לסמן — יפן 2026", d:"דף העבודה של יובל ושיר", url:"https://docs.google.com/document/d/1cnobuz5tQJM-D_DZQuC2w_ZQ3cNSQjroHLokCuqAzIU/edit" },
     { ic:"📊", t:"מעקב והחלטות — גיליון משותף", d:"Google Sheet — מעקב סטטוס", url:"https://docs.google.com/spreadsheets/d/1cIgwJpYT2YqqsJXgropr0LjvbWarm6PVHnPy7YHpBoA/edit" },
     { ic:"🗺️", t:"הצפון — מה עושים ולמה", d:"פירוט החצי הראשון", url:"https://docs.google.com/document/d/1OGKJhqLuQtugHwFJLnSFrMcfVXwK6sEobj6HDEmfdkI/edit" },
-    { ic:"💴", t:"תקציב — עירוני מול כפרי", d:"Google Sheet — מודל תקציב", url:"https://docs.google.com/spreadsheets/d/1PtpBVer_JH-0arecqZWKX7-E7Z-8shlkH_tpMsq3UlA/edit" },
     { ic:"✈️", t:"Flight Details — Quick Reference", d:"פרטי טיסות וקודי הזמנה", url:"https://docs.google.com/document/d/1FQ-UNq07TvU7xvXi0IZuDpxx4dQNKn-5v4rkSC-5uMo/edit" },
     { ic:"🏨", t:"מלון טוקיו — פתיחה (14–16 אוק')", d:"טוסיי הוטל קוקונה אסאקוסה קוראמאיי — פרטי הזמנה", url:"https://docs.google.com/document/d/1gkHA-ONh9pwrBHsNx-J2JkcqEHlkABs2hAF0RwZaFtA/edit" },
     { ic:"🏨", t:"מלון סנדאי (16–18 אוק')", d:"Sendai Washington Hotel — אישור, PIN, ביטול", url:"https://docs.google.com/document/d/15edTVns8DLCXQ1D8wFoI7A8qbzm7wiYHQIjdSy8ZzH8/edit" },
