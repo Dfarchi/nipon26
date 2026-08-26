@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תקציב · יפן 2026</title>
+<link rel="stylesheet" href="styles.css?v=20260826d">
+<style>
+  .bnums { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:22px; }
+  .bnum { flex:1 1 150px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px 18px; }
+  .bnum .v { font-size:1.8rem; font-weight:800; font-variant-numeric:tabular-nums; }
+  .bnum .k { color:var(--dim); font-size:0.78rem; letter-spacing:1px; margin-top:2px; }
+  .bnum .s { color:var(--muted); font-size:0.8rem; margin-top:6px; line-height:1.5; }
+  .bnum.good .v { color:#3ddc84; } .bnum.warn .v { color:var(--gold); } .bnum.bad .v { color:var(--accent); }
+
+  .bar { height:14px; border-radius:99px; background:var(--border); overflow:hidden; display:flex; margin:6px 0 4px; }
+  .bar i { display:block; height:100%; }
+  .barkey { display:flex; flex-wrap:wrap; gap:10px 18px; font-size:0.8rem; color:var(--muted); }
+  .barkey span { display:inline-flex; align-items:center; gap:6px; }
+  .barkey i { width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  table.b { width:100%; border-collapse:collapse; font-size:0.9rem; }
+  table.b th { text-align:right; color:var(--dim); font-size:0.76rem; letter-spacing:1px;
+    font-weight:600; padding:8px 10px; border-bottom:1px solid var(--border); }
+  table.b td { padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  table.b tr:last-child td { border-bottom:none; }
+  table.b td.num { font-variant-numeric:tabular-nums; white-space:nowrap; text-align:left; }
+  table.b .nm { font-weight:600; }
+  table.b .sub { color:var(--dim); font-size:0.78rem; margin-top:3px; line-height:1.5; }
+  .tagm { display:inline-block; background:rgba(61,220,132,0.12); color:#3ddc84; border:1px solid rgba(61,220,132,0.3);
+    font-size:0.7rem; padding:1px 8px; border-radius:99px; margin-inline-start:6px; }
+  .tage { display:inline-block; background:rgba(242,183,5,0.12); color:var(--gold); border:1px solid rgba(242,183,5,0.3);
+    font-size:0.7rem; padding:1px 8px; border-radius:99px; margin-inline-start:6px; }
+  .sec-h { margin:26px 0 10px; font-size:1.05rem; font-weight:700; color:var(--gold);
+    border-bottom:1px solid var(--border); padding-bottom:6px; }
+  .foot { color:var(--dim); font-size:0.8rem; margin-top:10px; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="tab" href="index.html">🏠 שער</a>
+  <a class="tab" href="decisions.html">🧭 החלטות</a>
+  <a class="tab" href="itinerary.html">🗓️ מסלול</a>
+  <a class="tab active" href="budget.html">💴 תקציב</a>
+  <a class="tab" href="documents.html">📂 מסמכים</a>
+  <span class="brand">🍁 NIPON26</span>
+</div></div>
+
+<div class="hero" style="padding-bottom:10px">
+  <h1 style="font-size:2.2rem">💴 תקציב</h1>
+  <div class="sub" id="sub">לזוג · בלי טיסות</div>
+</div>
+
+<div class="wrap">
+  <div class="bnums" id="nums"></div>
+
+  <div class="card">
+    <div class="bar" id="bar"></div>
+    <div class="barkey">
+      <span><i style="background:#3ddc84"></i> לינה שנסגרה</span>
+      <span><i style="background:#4a9eda"></i> לינה שנותרה (הערכה)</span>
+      <span><i style="background:#f2b705"></i> אוכל, תחבורה, כניסות (הערכה)</span>
+    </div>
+  </div>
+
+  <div class="sec-h">✅ לינה שנסגרה</div>
+  <div class="card" style="padding:6px 8px"><table class="b" id="tbooked"></table></div>
+
+  <div class="sec-h">📊 הערכה להמשך</div>
+  <div class="card" style="padding:6px 8px"><table class="b" id="tforecast"></table></div>
+
+  <div class="callout" id="floor"></div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<footer>🍁 NIPON26 · המספרים מתעדכנים עם כל הזמנה חדשה 🍁</footer>
+<script src="data.js?v=20260826d"></script>
+<script>
+  const B = TRIP.budget;
+  const ils = r => r.ils != null ? r.ils : (r.jpy ? r.jpy * B.fx.jpy : 0) + (r.usd ? r.usd * B.fx.usd : 0);
+  const nis = n => '₪' + Math.round(n).toLocaleString('en-US');
+
+  const bookedTotal   = B.booked.reduce((a, r) => a + ils(r), 0);
+  const bookedNights  = B.booked.reduce((a, r) => a + (r.nights || 0), 0);
+  const lodgingAhead  = B.forecast.filter(r => r.nights).reduce((a, r) => a + ils(r), 0);
+  const runningAhead  = B.forecast.filter(r => !r.nights).reduce((a, r) => a + ils(r), 0);
+  const total         = bookedTotal + lodgingAhead + runningAhead;
+  const nightsAhead   = B.nights - bookedNights;
+  const vsTarget      = total - B.target;
+
+  document.getElementById('sub').textContent =
+    `לזוג · ${B.nights} לילות · בלי טיסות (${nis(B.flights)} שולמו בנפרד)`;
+
+  document.getElementById('nums').innerHTML = `
+    <div class="bnum good"><div class="v">${nis(bookedTotal)}</div><div class="k">לינה סגורה</div>
+      <div class="s">${bookedNights} לילות · ${nis(bookedTotal / bookedNights)} ללילה</div></div>
+    <div class="bnum"><div class="v">${nis(total)}</div><div class="k">סה״כ צפוי</div>
+      <div class="s">${nis(total / B.nights)} ליום · בלי טיסות</div></div>
+    <div class="bnum ${vsTarget > 0 ? 'bad' : 'good'}"><div class="v">${vsTarget > 0 ? '+' : ''}${nis(vsTarget)}</div>
+      <div class="k">מול היעד ${nis(B.target)}</div>
+      <div class="s">${vsTarget > 0 ? 'צריך לקצץ כדי לנחות על היעד' : 'בתוך היעד'}</div></div>
+    <div class="bnum warn"><div class="v">${nightsAhead}</div><div class="k">לילות עוד פתוחים</div>
+      <div class="s">תקציב מתוכנן: ${nis(lodgingAhead / nightsAhead)} ללילה</div></div>`;
+
+  document.getElementById('bar').innerHTML =
+    [[bookedTotal, '#3ddc84'], [lodgingAhead, '#4a9eda'], [runningAhead, '#f2b705']]
+      .map(([v, c]) => `<i style="width:${(v / total * 100).toFixed(1)}%;background:${c}"></i>`).join('');
+
+  const row = r => {
+    const v = ils(r);
+    const per = r.nights ? ` · ${nis(v / r.nights)} ללילה` : '';
+    const src = r.jpy ? `¥${r.jpy.toLocaleString('en-US')}` : r.usd ? `$${r.usd}` : '';
+    return `<tr>
+      <td><span class="nm">${r.n}</span>${r.meals ? `<span class="tagm">${r.meals}</span>` : ''}${r.est ? '<span class="tage">הערכה</span>' : ''}
+        <div class="sub">${[r.d, r.nights ? r.nights + ' לילות' : '', src].filter(Boolean).join(' · ')}${per}${r.note ? '<br>' + r.note : ''}</div></td>
+      <td class="num">${nis(v)}</td></tr>`;
+  };
+  const totalRow = (label, v) =>
+    `<tr><td class="nm" style="color:var(--gold)">${label}</td><td class="num nm" style="color:var(--gold)">${nis(v)}</td></tr>`;
+
+  document.getElementById('tbooked').innerHTML =
+    '<tr><th>מה</th><th style="text-align:left">₪</th></tr>' +
+    B.booked.map(row).join('') + totalRow(`סה״כ · ${bookedNights} לילות`, bookedTotal);
+
+  document.getElementById('tforecast').innerHTML =
+    '<tr><th>מה</th><th style="text-align:left">₪</th></tr>' +
+    B.forecast.map(row).join('') + totalRow('סה״כ הערכה', lodgingAhead + runningAhead);
+
+  const floorSum = bookedTotal + runningAhead;
+  document.getElementById('floor').innerHTML =
+    `🧮 <b>הרצפה:</b> ${nis(bookedTotal)} לינה שכבר נסגרה + ${nis(runningAhead)} אוכל, תחבורה וכניסות ל-${B.nights} הימים = <b>${nis(floorSum)}</b> —
+     גם אם ${nightsAhead} הלילות הבאים יהיו בחינם. טיול באורך הזה צובר ~${nis(runningAhead / B.nights)} ליום בהוצאות שוטפות בלי קשר לאיפה ישנים.`;
+
+  document.getElementById('foot').innerHTML =
+    `שערים: ¥100 = ₪${(B.fx.jpy * 100).toFixed(2)} · $1 = ₪${B.fx.usd.toFixed(2)}. הסכומים לזוג.
+     הטיסות (${nis(B.flights)}) שולמו כבר ולא נכללות. קניות ומזכרות אינן הוצאת בסיס ולא נספרו.`;
+</script>
+<script src="delight.js?v=20260826d"></script>
+</body>
+</html>
