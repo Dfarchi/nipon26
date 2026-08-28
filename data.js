@@ -298,6 +298,9 @@ window.TRIP = {
 
   // מקורות חיצוניים שימושיים לתכנון (לא דרייב)
   resources: [
+    { ic:"🚇", t:"Tokyo Subway Ticket — האתר הרשמי", d:"מחירים ותנאים ל-24/48/72 שעות", url:"https://www.tokyometro.jp/en/ticket/travel/index.html" },
+    { ic:"🎟️", t:"Tokunai Pass — JR East", d:"כרטיסיית JR יומית בתוך טוקיו (¥870)", url:"https://www.jreast.co.jp/en/multi/pass/tokunai_pass.html" },
+    { ic:"💳", t:"Welcome Suica — JR East", d:"כרטיס IC לתיירים — לבדוק תוקף 28 יום מול טיול של 42", url:"https://www.jreast.co.jp/multi/en/welcomesuica/" },
     { ic:"♨️", t:"Tattoo-Friendly — אונסנים", d:"מאגר אונסנים/ריוקאנים שמקבלים קעקועים — מקור לבדיקת כל אונסן במסלול", url:"https://www.tattoo-friendly.com" }
   ],
   phases: [
