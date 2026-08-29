@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>תקציב · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=20260829f">
+<link rel="stylesheet" href="styles.css?v=20260829g">
 <style>
   .bnums { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:22px; }
   .bnum { flex:1 1 150px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px 18px; }
@@ -76,7 +76,7 @@
 </div>
 
 <footer>🍁 NIPON26 · המספרים מתעדכנים עם כל הזמנה חדשה 🍁</footer>
-<script src="data.js?v=20260829f"></script>
+<script src="data.js?v=20260829g"></script>
 <script>
   const B = TRIP.budget;
   const ils = r => r.ils != null ? r.ils : (r.jpy ? r.jpy * B.fx.jpy : 0) + (r.usd ? r.usd * B.fx.usd : 0);
@@ -137,6 +137,6 @@
     `שערים: ¥100 = ₪${(B.fx.jpy * 100).toFixed(2)} · $1 = ₪${B.fx.usd.toFixed(2)}. הסכומים לזוג.
      הטיסות (${nis(B.flights)}) שולמו כבר ולא נכללות. קניות ומזכרות אינן הוצאת בסיס ולא נספרו.`;
 </script>
-<script src="delight.js?v=20260829f"></script>
+<script src="delight.js?v=20260829g"></script>
 </body>
 </html>
