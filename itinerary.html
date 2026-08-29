@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מסלול · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=20260829f">
+<link rel="stylesheet" href="styles.css?v=20260829h">
 <style>
   .stage-card { display:flex; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--border);
     border-radius:14px; padding:16px 18px; margin-bottom:12px; transition:.15s; cursor:pointer; }
@@ -35,7 +35,7 @@
 
 <div class="hero" style="padding-bottom:10px">
   <h1 style="font-size:2.2rem">🗓️ המסלול</h1>
-  <div class="sub">5 שלבים · צפון→דרום · לחצו על שלב כדי לפתוח מפה + יום-ביום</div>
+  <div class="sub"><span id="nStages">—</span> שלבים · צפון→דרום · לחצו על שלב כדי לפתוח מפה + יום-ביום</div>
 </div>
 
 <div class="wrap">
@@ -47,7 +47,7 @@
 </div>
 
 <footer>🍁 NIPON26 · המסלול מתעדכן לפי ההחלטות 🍁</footer>
-<script src="data.js?v=20260829f"></script>
+<script src="data.js?v=20260829h"></script>
 <script>
   const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
   const stages = document.getElementById('stages');
@@ -71,10 +71,13 @@
     else stages.insertAdjacentHTML('beforeend', card);
   });
 
+  const nEl=document.getElementById('nStages');
+  if(nEl) nEl.textContent=(TRIP.phases||[]).filter(p=>!p.parked).length;
+
   if(parkedHtml){
     parkedWrap.innerHTML = '<div class="parked-h">❓ בסימן שאלה — לא בתוכנית כרגע</div>' + parkedHtml;
   }
 </script>
-<script src="delight.js?v=20260829f"></script>
+<script src="delight.js?v=20260829h"></script>
 </body>
 </html>

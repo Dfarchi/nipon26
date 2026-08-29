@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>יפן 2026 · קלסר הטיול</title>
-<link rel="stylesheet" href="styles.css?v=20260829f">
+<link rel="stylesheet" href="styles.css?v=20260829h">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -112,10 +112,10 @@
   </div>
 
   <div class="facts reveal" style="margin-top:34px">
-    <div class="fact"><div class="n">42</div><div class="l">לילות</div></div>
-    <div class="fact"><div class="n">5</div><div class="l">שלבים</div></div>
-    <div class="fact"><div class="n">17</div><div class="l">החלטות</div></div>
-    <div class="fact"><div class="n">5</div><div class="l">אונסנים</div></div>
+    <div class="fact"><div class="n" id="fNights">—</div><div class="l">לילות</div></div>
+    <div class="fact"><div class="n" id="fStages">—</div><div class="l">שלבים</div></div>
+    <div class="fact"><div class="n" id="fOpen">—</div><div class="l">החלטות פתוחות</div></div>
+    <div class="fact"><div class="n" id="fBooked">—</div><div class="l">לילות מוזמנים</div></div>
   </div>
 
   <div class="sec-h reveal"><h2>🗺️ מפת המסע</h2><div class="line"></div></div>
@@ -137,8 +137,8 @@
 
   <div class="sec-h reveal"><h2>🚀 כניסה מהירה</h2><div class="line"></div></div>
   <div class="grid2 reveal">
-    <a class="doc" href="decisions.html"><div class="ic">🧭</div><div class="meta"><div class="t">החלטות</div><div class="d">17 החלטות עם הסבר על כל אפשרות</div></div><div class="go">←</div></a>
-    <a class="doc" href="itinerary.html"><div class="ic">🗓️</div><div class="meta"><div class="t">מסלול</div><div class="d">5 השלבים מהנחיתה ועד טוקיו</div></div><div class="go">←</div></a>
+    <a class="doc" href="decisions.html"><div class="ic">🧭</div><div class="meta"><div class="t">החלטות</div><div class="d"><span id="qOpen">—</span> החלטות פתוחות · הסבר על כל אפשרות</div></div><div class="go">←</div></a>
+    <a class="doc" href="itinerary.html"><div class="ic">🗓️</div><div class="meta"><div class="t">מסלול</div><div class="d"><span id="qStages">—</span> השלבים מהנחיתה ועד טוקיו</div></div><div class="go">←</div></a>
     <a class="doc" href="budget.html"><div class="ic">💴</div><div class="meta"><div class="t">תקציב</div><div class="d">מה נסגר, כמה זה עד עכשיו, ומה צפוי בהמשך</div></div><div class="go">←</div></a>
     <a class="doc" href="transit.html"><div class="ic">🚇</div><div class="meta"><div class="t">תחבורה</div><div class="d">JR Pass לא משתלם — הנה החישוב, וכרטיסי טוקיו</div></div><div class="go">←</div></a>
     <a class="doc" href="documents.html"><div class="ic">📂</div><div class="meta"><div class="t">מסמכים</div><div class="d">קישור ישיר לגוגל דרייב</div></div><div class="go">←</div></a>
@@ -147,14 +147,15 @@
 
 <footer>🍁 NIPON26 · הקלסר המשפחתי של יפן 2026 🍁</footer>
 
-<script src="data.js?v=20260829f"></script>
-<script src="basemap.js?v=20260829f"></script>
+<script src="data.js?v=20260829h"></script>
+<script src="basemap.js?v=20260829h"></script>
 <script>
 const FLIGHT = new Date('2026-10-13T19:45:00+03:00');
 const TRIP_START = new Date('2026-10-14T00:00:00+09:00');
 const TRIP_END   = new Date('2026-11-25T23:59:00+09:00');
-const PHASE_START = ['2026-10-14','2026-10-25','2026-11-01','2026-11-08','2026-11-19','2026-11-21']
-  .map(d=>new Date(d+'T00:00:00+09:00'));
+// מקור אחד לאמת: תאריך הפתיחה של כל שלב יושב ב-data.js (שדה start). שלבים מוחנים (parked) לא נספרים.
+const LIVE_PHASES = ((window.TRIP&&TRIP.phases)||[]).filter(p=>!p.parked && p.start);
+const PHASE_START = LIVE_PHASES.map(p=>new Date(p.start+'T00:00:00+09:00'));
 
 const pad=n=>String(n).padStart(2,'0');
 function tick(){
@@ -171,14 +172,14 @@ setInterval(tick,1000); tick();
 
 (function(){
   const now=new Date();
-  const ph=(window.TRIP&&TRIP.phases)||[];
+  const ph=LIVE_PHASES;
   const badge=document.getElementById('nowBadge'), title=document.getElementById('nowTitle'),
         text=document.getElementById('nowText'), next=document.getElementById('nowNext');
   if(now<TRIP_START){
     const days=Math.ceil((TRIP_START-now)/864e5);
     badge.textContent='לפני הטיול';
     title.textContent=`עוד ${days} ימים ליפן ✈️`;
-    text.textContent=ph[0]?('השלב הראשון: '+ph[0].h.replace(/^שלב \d+ · /,'')+' — '+ph[0].p):'';
+    text.textContent=ph[0]?('השלב הראשון: '+ph[0].h.replace(/^(?:שלב [\d.]+|אופציה) · /,'')+' — '+ph[0].p):'';
     next.innerHTML='💡 בינתיים: היכנסו ל<a href="decisions.html" style="color:#ff9a86">החלטות</a> וסמנו את הבחירות.';
   } else if(now>TRIP_END){
     badge.textContent='אחרי הטיול';
@@ -190,11 +191,24 @@ setInterval(tick,1000); tick();
     const dayNum=Math.floor((now-TRIP_START)/864e5)+1;
     const cur=ph[idx]||{};
     badge.textContent=`יום ${dayNum} במסע`;
-    title.textContent='📍 '+(cur.h?cur.h.replace(/^שלב \d+ · /,''):'בדרך');
+    title.textContent='📍 '+(cur.h?cur.h.replace(/^(?:שלב [\d.]+|אופציה) · /,''):'בדרך');
     text.textContent=cur.p||'';
     const nx=ph[idx+1];
-    next.innerHTML = nx ? ('➡️ הבא: <b style="color:#fff">'+nx.h.replace(/^שלב \d+ · /,'')+'</b> ('+nx.when+')') : '➡️ לקראת סיום המסע';
+    next.innerHTML = nx ? ('➡️ הבא: <b style="color:#fff">'+nx.h.replace(/^(?:שלב [\d.]+|אופציה) · /,'')+'</b> ('+nx.when+')') : '➡️ לקראת סיום המסע';
   }
+})();
+
+(function(){
+  if(!window.TRIP) return;
+  const items = (TRIP.decisions||[]).flatMap(g=>g.items||[]);
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  const bookedNights = (TRIP.budget.booked||[]).reduce((s,x)=>s+(x.nights||0),0);
+  set('fNights', TRIP.budget.nights);
+  set('fStages', LIVE_PHASES.length);
+  set('fOpen',   items.filter(i=>i.open).length);
+  set('fBooked', bookedNights);
+  set('qOpen',   items.filter(i=>i.open).length);
+  set('qStages', LIVE_PHASES.length);
 })();
 
 (function(){
@@ -257,7 +271,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   addEventListener('resize',init,{passive:true});
 })();
 </script>
-<script src="mapexport.js?v=20260829f"></script>
-<script src="delight.js?v=20260829f"></script>
+<script src="mapexport.js?v=20260829h"></script>
+<script src="delight.js?v=20260829h"></script>
 </body>
 </html>

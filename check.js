@@ -57,5 +57,30 @@ blocks.forEach(b => {
   else ok(`${b}: ${d.flag.match(/🏨 ([^·—.]+)/)[1].trim()}`);
 });
 
+console.log('=== שלבים: תאריך פתיחה + סכום לילות ===');
+const live = T.phases.filter(p => !p.parked);
+live.forEach((p, i) => {
+  if (!p.start || !/^\d{4}-\d{2}-\d{2}$/.test(p.start)) fail(`"${p.h}": אין שדה start תקין (index.html נשען עליו)`);
+  if (i && live[i - 1].start >= p.start) fail(`"${p.h}": מתחיל לפני השלב שלפניו`);
+});
+const phNights = live.reduce((s, p) => s + (parseInt(p.nights, 10) || 0), 0);
+phNights !== T.budget.nights
+  ? fail(`סכום הלילות בשלבים = ${phNights}, אבל budget.nights = ${T.budget.nights}`)
+  : ok(`סכום הלילות בשלבים = ${phNights}`);
+live.forEach((p, i) => /^שלב \d+ /.test(p.h) && +p.h.match(/\d+/)[0] === i + 1
+  ? null : fail(`"${p.h}": מספור השלב לא תואם את מקומו ברשימה (${i + 1})`));
+if (!bad) ok('מספור השלבים רציף');
+
+console.log('=== מחרוזת מטמון (?v=) זהה בכל ה-HTML ===');
+const fs = require('fs');
+const vers = new Set();
+fs.readdirSync('.').filter(f => f.endsWith('.html')).forEach(f => {
+  (fs.readFileSync(f, 'utf8').match(/\.(?:js|css)\?v=([0-9a-z]+)/g) || [])
+    .forEach(m => vers.add(m.split('=')[1]));
+});
+vers.size > 1
+  ? fail(`יש יותר ממחרוזת מטמון אחת: ${[...vers].join(', ')} — יובל יראה גרסה ישנה`)
+  : ok(`מחרוזת מטמון אחידה: ${[...vers][0] || 'אין'}`);
+
 console.log(bad ? `\n*** ${bad} בעיות — לא לדחוף ***` : '\n✅ הכל עקבי');
 process.exit(bad ? 1 : 0);
