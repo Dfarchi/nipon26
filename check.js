@@ -48,6 +48,15 @@ bn + fn !== T.budget.nights
 const tot = T.budget.booked.concat(T.budget.forecast).reduce((s, x) => s + ils(x), 0);
 ok(`סה"כ ₪${Math.round(tot).toLocaleString()} מול יעד ₪${T.budget.target.toLocaleString()}`);
 
+console.log('=== שערי המרה — טריות ===');
+if (!fx.asOf) fail('אין שדה asOf ב-budget.fx — אי אפשר לדעת מתי השער נבדק');
+else {
+  const age = Math.round((Date.now() - new Date(fx.asOf)) / 864e5);
+  age > 45
+    ? fail(`השער נבדק לפני ${age} ימים (${fx.asOf}) — לרענן, אחרת כל התקציב מוטה`)
+    : ok(`השער נבדק לפני ${age} ימים · ¥100=₪${(fx.jpy * 100).toFixed(2)} · $1=₪${fx.usd.toFixed(2)}`);
+}
+
 console.log('=== לינה לכל בלוק ===');
 const multi = ['טוקיו · פתיחה', 'דרום טוהוקו', 'האלפים היפנים'];  // בלוקים עם כמה מלונות — נבדקים ביום-ביום עצמו
 blocks.forEach(b => {
