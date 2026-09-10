@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>יפן 2026 · קלסר הטיול</title>
-<link rel="stylesheet" href="styles.css?v=20260910b">
+<link rel="stylesheet" href="styles.css?v=20260910c">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -114,7 +114,7 @@
   <div class="facts reveal" style="margin-top:34px">
     <div class="fact"><div class="n" id="fNights">—</div><div class="l">לילות</div></div>
     <div class="fact"><div class="n" id="fStages">—</div><div class="l">שלבים</div></div>
-    <div class="fact"><div class="n" id="fOpen">—</div><div class="l">החלטות פתוחות</div></div>
+    <div class="fact"><div class="n" id="fOpen">—</div><div class="l">משימות פתוחות</div></div>
     <div class="fact"><div class="n" id="fBooked">—</div><div class="l">לילות מוזמנים</div></div>
   </div>
 
@@ -137,7 +137,7 @@
 
   <div class="sec-h reveal"><h2>🚀 כניסה מהירה</h2><div class="line"></div></div>
   <div class="grid2 reveal">
-    <a class="doc" href="decisions.html"><div class="ic">🧭</div><div class="meta"><div class="t">החלטות</div><div class="d"><span id="qOpen">—</span> החלטות פתוחות · הסבר על כל אפשרות</div></div><div class="go">←</div></a>
+    <a class="doc" href="decisions.html"><div class="ic">🧭</div><div class="meta"><div class="t">החלטות</div><div class="d"><span id="qOpen">—</span> · הסבר על כל אפשרות</div></div><div class="go">←</div></a>
     <a class="doc" href="itinerary.html"><div class="ic">🗓️</div><div class="meta"><div class="t">מסלול</div><div class="d"><span id="qStages">—</span> השלבים מהנחיתה ועד טוקיו</div></div><div class="go">←</div></a>
     <a class="doc" href="budget.html"><div class="ic">💴</div><div class="meta"><div class="t">תקציב</div><div class="d">מה נסגר, כמה זה עד עכשיו, ומה צפוי בהמשך</div></div><div class="go">←</div></a>
     <a class="doc" href="transit.html"><div class="ic">🚇</div><div class="meta"><div class="t">תחבורה</div><div class="d">JR Pass לא משתלם — הנה החישוב, וכרטיסי טוקיו</div></div><div class="go">←</div></a>
@@ -147,8 +147,8 @@
 
 <footer>🍁 NIPON26 · הקלסר המשפחתי של יפן 2026 🍁</footer>
 
-<script src="data.js?v=20260910b"></script>
-<script src="basemap.js?v=20260910b"></script>
+<script src="data.js?v=20260910c"></script>
+<script src="basemap.js?v=20260910c"></script>
 <script>
 const FLIGHT = new Date('2026-10-13T19:45:00+03:00');
 const TRIP_START = new Date('2026-10-14T00:00:00+09:00');
@@ -205,9 +205,12 @@ setInterval(tick,1000); tick();
   const bookedNights = (TRIP.budget.booked||[]).reduce((s,x)=>s+(x.nights||0),0);
   set('fNights', TRIP.budget.nights);
   set('fStages', LIVE_PHASES.length);
-  set('fOpen',   items.filter(i=>i.open).length);
+  const live     = items.filter(i=>!i.cut && i.open===true);
+  const openDec  = live.filter(i=>i.todo!==true).length;
+  const openTask = live.filter(i=>i.todo===true).length;
+  set('fOpen',   openTask);
   set('fBooked', bookedNights);
-  set('qOpen',   items.filter(i=>i.open).length);
+  set('qOpen',   (openDec===1 ? 'החלטה אחת פתוחה' : openDec + ' החלטות פתוחות') + ' · ' + openTask + ' משימות');
   set('qStages', LIVE_PHASES.length);
 })();
 
@@ -271,7 +274,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   addEventListener('resize',init,{passive:true});
 })();
 </script>
-<script src="mapexport.js?v=20260910b"></script>
-<script src="delight.js?v=20260910b"></script>
+<script src="mapexport.js?v=20260910c"></script>
+<script src="delight.js?v=20260910c"></script>
 </body>
 </html>
