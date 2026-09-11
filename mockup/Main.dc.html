@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <style>
+    body { margin:0; background:#0b0e14; }
+    a { color:#4a9eda; text-decoration:none; }
+    a:hover { color:#7fc1ff; }
+    .jp { font-family:'Noto Sans JP', 'Heebo', sans-serif; }
+  </style>
+</helmet>
+
+<div style="width:390px; height:844px; position:relative; overflow:hidden; direction:rtl; text-align:right;
+  background:radial-gradient(1200px 600px at 80% -10%, #16213e 0%, #0b0e14 55%);
+  font-family:'Heebo','Segoe UI',Tahoma,sans-serif; color:#e8edf5; line-height:1.65;">
+
+  <!-- ===== שכבת עיטור: עננים (kumo) בראש המסך ===== -->
+  <svg viewBox="0 0 390 132" preserveAspectRatio="none" style="position:absolute; top:0; right:0; width:390px; height:132px; pointer-events:none;">
+    <defs>
+      <linearGradient id="kumoA" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e94560" stop-opacity="0.30"/>
+        <stop offset="100%" stop-color="#e94560" stop-opacity="0.04"/>
+      </linearGradient>
+      <linearGradient id="kumoB" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f2b705" stop-opacity="0.16"/>
+        <stop offset="100%" stop-color="#f2b705" stop-opacity="0.00"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#kumoB)" d="M0,74 a20,20 0 0 0 40,0 a13,13 0 0 0 26,0 a24,24 0 0 0 48,0 a16,16 0 0 0 32,0 a21,21 0 0 0 42,0 a12,12 0 0 0 24,0 a26,26 0 0 0 52,0 a18,18 0 0 0 36,0 a15,15 0 0 0 30,0 L390,0 L0,0 Z"/>
+    <path fill="url(#kumoA)" d="M0,52 a16,16 0 0 0 32,0 a22,22 0 0 0 44,0 a14,14 0 0 0 28,0 a20,20 0 0 0 40,0 a12,12 0 0 0 24,0 a18,18 0 0 0 36,0 a24,24 0 0 0 48,0 a15,15 0 0 0 30,0 a19,19 0 0 0 38,0 a11,11 0 0 0 22,0 a17,17 0 0 0 34,0 a7,7 0 0 0 14,0 L390,0 L0,0 Z"/>
+  </svg>
+
+  <!-- עלי מייפל צפים -->
+  <svg viewBox="0 0 390 844" style="position:absolute; inset:0; width:390px; height:844px; pointer-events:none; opacity:0.14;">
+    <g fill="#e94560">
+      <path transform="translate(322,146) rotate(24) scale(0.9)" d="M10,0 L12.4,5.6 L18,3 L15.4,9 L21,11 L15.4,13.4 L18,19 L12.4,16.4 L10,22 L7.6,16.4 L2,19 L4.6,13.4 L-1,11 L4.6,9 L2,3 L7.6,5.6 Z"/>
+      <path transform="translate(38,286) rotate(-38) scale(0.62)" fill="#f2b705" d="M10,0 L12.4,5.6 L18,3 L15.4,9 L21,11 L15.4,13.4 L18,19 L12.4,16.4 L10,22 L7.6,16.4 L2,19 L4.6,13.4 L-1,11 L4.6,9 L2,3 L7.6,5.6 Z"/>
+      <path transform="translate(352,512) rotate(52) scale(0.7)" d="M10,0 L12.4,5.6 L18,3 L15.4,9 L21,11 L15.4,13.4 L18,19 L12.4,16.4 L10,22 L7.6,16.4 L2,19 L4.6,13.4 L-1,11 L4.6,9 L2,3 L7.6,5.6 Z"/>
+    </g>
+  </svg>
+
+  <!-- ===== כותרת ===== -->
+  <div style="position:relative; display:flex; align-items:center; gap:8px; padding:16px 18px 0;">
+    <div style="display:flex; align-items:center; gap:7px; background:rgba(61,220,132,0.12); border:1px solid rgba(61,220,132,0.35);
+      border-radius:99px; padding:3px 10px; font-size:0.72rem; color:#3ddc84;">
+      <span style="width:6px; height:6px; border-radius:50%; background:#3ddc84; display:block;"></span>מסונכרן
+    </div>
+    <div style="flex-grow:1;"></div>
+    <div style="font-weight:800; color:#e94560; letter-spacing:1px; font-size:0.95rem;">NIPON26</div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#e94560" opacity="0.9"><path d="M12 2 C13 6 15 7 18 6 C17 9 18 11 21 12 C18 13 17 15 18 18 C15 17 13 18 12 22 C11 18 9 17 6 18 C7 15 6 13 3 12 C6 11 7 9 6 6 C9 7 11 6 12 2 Z"/></svg>
+  </div>
+
+  <!-- ===== התאריך ===== -->
+  <div style="position:relative; padding:14px 18px 0;">
+    <div style="display:flex; align-items:baseline; gap:10px;">
+      <div style="font-size:2.6rem; font-weight:800; letter-spacing:1px; line-height:1.1;">30.10</div>
+      <div style="font-size:1rem; color:#9aa6b8;">שישי</div>
+      <div style="flex-grow:1;"></div>
+      <div style="font-size:0.78rem; color:#5b6678;">יום 17 / 45</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+      <div style="font-size:1.15rem; font-weight:700;">נגיסו</div>
+      <div class="jp" style="font-size:0.95rem; color:#9aa6b8;">南木曽</div>
+      <div style="font-size:0.74rem; padding:2px 9px; border-radius:99px; border:1px solid rgba(242,183,5,0.4); background:#0b0e14; color:#f2b705;">יום נסיעה עם עצירה</div>
+    </div>
+  </div>
+
+  <!-- ===== עכשיו ===== -->
+  <div style="position:relative; margin:16px 18px 0; background:#121826; border:1px solid rgba(233,69,96,0.45);
+    border-radius:16px; padding:15px 16px; box-shadow:0 8px 30px rgba(0,0,0,0.35), 0 0 0 3px rgba(233,69,96,0.07);">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:9px;">
+      <div style="font-size:0.7rem; font-weight:700; letter-spacing:2px; color:#e94560;">עכשיו</div>
+      <div style="flex-grow:1; height:1px; background:#1f2937;"></div>
+      <div style="font-size:1.05rem; font-weight:800; color:#e8edf5;">12:00</div>
+    </div>
+    <div style="display:flex; gap:11px; align-items:flex-start;">
+      <div style="font-size:1.4rem; line-height:1;">🚐</div>
+      <div style="flex-grow:1;">
+        <div style="font-weight:700; font-size:1rem;">הסעת החזרה למאצומוטו</div>
+        <div style="font-size:0.84rem; color:#9aa6b8; margin-top:2px;">יוצאת מהריוקאן · טרמינל קמיקוצ׳י 12:30 · מאצומוטו ~14:00</div>
+      </div>
+    </div>
+    <div style="margin-top:11px; background:#0f1420; border-right:3px solid #f2b705; border-radius:0 10px 10px 0; padding:9px 13px; font-size:0.82rem; color:#9aa6b8;">
+      <b style="color:#f2b705; font-weight:700;">לא מובטחת.</b> לגשת לקבלה ב-17:00 אתמול ולאשר מקום. תוכנית ב׳: אוטובוס ציבורי מתחנת 中の湯.
+    </div>
+  </div>
+
+  <!-- ===== אחר כך ===== -->
+  <div style="position:relative; margin:15px 18px 0;">
+    <div style="font-size:0.7rem; font-weight:700; letter-spacing:2px; color:#5b6678; margin-bottom:8px;">אחר כך</div>
+    <div style="display:flex; flex-direction:column; gap:7px;">
+      <div style="display:flex; align-items:center; gap:11px; background:#121826; border:1px solid #1f2937; border-radius:12px; padding:10px 13px;">
+        <div style="font-size:0.86rem; font-weight:700; color:#9aa6b8; width:42px;">14:05</div>
+        <div style="width:7px; height:7px; border-radius:50%; background:#f2b705; flex-shrink:0;"></div>
+        <div style="flex-grow:1; font-size:0.9rem;">מאצומוטו → נאראי · קו צ׳ואו</div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f2b705" stroke-width="2.2" stroke-linecap="round"><path d="M12 8v5"/><path d="M12 16.5v.5"/><circle cx="12" cy="12" r="9.5" stroke-width="1.6"/></svg>
+      </div>
+      <div style="display:flex; align-items:center; gap:11px; background:#121826; border:1px solid #1f2937; border-radius:12px; padding:10px 13px;">
+        <div style="font-size:0.86rem; font-weight:700; color:#9aa6b8; width:42px;">15:00</div>
+        <div style="width:7px; height:7px; border-radius:50%; background:#3ddc84; flex-shrink:0;"></div>
+        <div style="flex-grow:1; font-size:0.9rem;">נאראי-ג׳וקו — צהריים עד דמדומים</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:11px; background:#121826; border:1px solid #1f2937; border-radius:12px; padding:10px 13px;">
+        <div style="font-size:0.86rem; font-weight:700; color:#9aa6b8; width:42px;">18:30</div>
+        <div style="width:7px; height:7px; border-radius:50%; background:#3ddc84; flex-shrink:0;"></div>
+        <div style="flex-grow:1; font-size:0.9rem;">נגיסו · צ׳ק-אין</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== הלילה ===== -->
+  <div style="position:relative; margin:15px 18px 0; background:#121826; border:1px solid #1f2937; border-radius:16px; padding:14px 16px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>
+      <div style="font-weight:700; font-size:0.98rem;">Nagi Stay</div>
+      <div class="jp" style="font-size:0.8rem; color:#5b6678;">読書</div>
+      <div style="flex-grow:1;"></div>
+      <div style="font-size:0.7rem; padding:2px 8px; border-radius:99px; background:rgba(242,183,5,0.13); border:1px solid rgba(242,183,5,0.4); color:#f2b705;">ממתין לאישור</div>
+    </div>
+    <div style="font-size:0.82rem; color:#9aa6b8; margin-top:4px;">2 לילות · 30.10–1.11 · דקה מהתחנה · בית שלם</div>
+    <div style="display:flex; gap:8px; margin-top:11px;">
+      <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; gap:7px; height:44px; border-radius:12px; background:#e94560; color:#fff; font-weight:700; font-size:0.88rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>ניווט
+      </div>
+      <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; gap:7px; height:44px; border-radius:12px; background:#0f1420; border:1px solid #1f2937; color:#e8edf5; font-size:0.88rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa6b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>ההזמנה
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ראלי חותמות ===== -->
+  <div style="position:relative; margin:14px 18px 0; display:flex; align-items:center; gap:9px;">
+    <div class="jp" style="font-size:0.68rem; color:#5b6678; letter-spacing:1px;">スタンプラリー</div>
+    <div style="display:flex; gap:7px; flex-grow:1; justify-content:flex-end;">
+      <svg width="26" height="26" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="none" stroke="#e94560" stroke-width="2" stroke-dasharray="3 2"/><text x="16" y="21" text-anchor="middle" font-size="13" fill="#e94560" font-family="Noto Sans JP, sans-serif">山</text></svg>
+      <svg width="26" height="26" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="none" stroke="#e94560" stroke-width="2" stroke-dasharray="3 2"/><text x="16" y="21" text-anchor="middle" font-size="13" fill="#e94560" font-family="Noto Sans JP, sans-serif">湯</text></svg>
+      <svg width="26" height="26" viewBox="0 0 32 32" opacity="0.28"><circle cx="16" cy="16" r="14" fill="none" stroke="#5b6678" stroke-width="2" stroke-dasharray="3 2"/><text x="16" y="21" text-anchor="middle" font-size="13" fill="#5b6678" font-family="Noto Sans JP, sans-serif">道</text></svg>
+      <svg width="26" height="26" viewBox="0 0 32 32" opacity="0.28"><circle cx="16" cy="16" r="14" fill="none" stroke="#5b6678" stroke-width="2" stroke-dasharray="3 2"/><text x="16" y="21" text-anchor="middle" font-size="13" fill="#5b6678" font-family="Noto Sans JP, sans-serif">海</text></svg>
+    </div>
+  </div>
+
+  <!-- ===== קו רקיע: מאצ׳יה, טורי, פגודה ===== -->
+  <svg viewBox="0 0 390 78" preserveAspectRatio="none" style="position:absolute; bottom:66px; right:0; width:390px; height:78px; pointer-events:none; opacity:0.5;">
+    <g fill="#16213e">
+      <path d="M0,78 L0,58 L14,50 L28,58 L28,78 Z"/>
+      <path d="M30,78 L30,54 L46,45 L62,54 L62,78 Z"/>
+      <path d="M64,78 L64,62 L78,55 L92,62 L92,78 Z"/>
+      <path d="M150,78 L150,60 L166,52 L182,60 L182,78 Z"/>
+      <path d="M184,78 L184,56 L200,47 L216,56 L216,78 Z"/>
+      <path d="M300,78 L300,58 L316,50 L332,58 L332,78 Z"/>
+      <path d="M334,78 L334,63 L348,56 L362,63 L362,78 Z"/>
+      <path d="M364,78 L364,54 L378,46 L390,54 L390,78 Z"/>
+      <path d="M232,78 L232,40 L238,40 L238,78 Z M266,78 L266,40 L272,40 L272,78 Z M224,36 C240,30 264,30 280,36 L280,41 C264,36 240,36 224,41 Z M228,48 L276,48 L276,52 L228,52 Z"/>
+      <path d="M104,78 L104,30 L108,30 L108,78 Z M94,34 L118,34 L114,29 L98,29 Z M96,44 L120,44 L116,39 L100,39 Z M98,54 L122,54 L118,49 L102,49 Z M92,64 L124,64 L119,58 L97,58 Z M106,18 L107,29 L105,29 Z"/>
+    </g>
+  </svg>
+
+  <!-- ===== ניווט תחתון ===== -->
+  <div style="position:absolute; bottom:0; right:0; width:390px; height:66px; background:rgba(11,14,20,0.92); border-top:1px solid #1f2937; display:flex; align-items:center; padding:0 6px;">
+    <svg viewBox="0 0 390 66" preserveAspectRatio="none" style="position:absolute; inset:0; width:390px; height:66px; opacity:0.10;">
+      <defs><pattern id="seiA" width="34" height="17" patternUnits="userSpaceOnUse">
+        <g fill="none" stroke="#4a9eda" stroke-width="1">
+          <circle cx="17" cy="17" r="16"/><circle cx="17" cy="17" r="11"/><circle cx="17" cy="17" r="6"/>
+          <circle cx="0" cy="17" r="16"/><circle cx="0" cy="17" r="11"/><circle cx="0" cy="17" r="6"/>
+          <circle cx="34" cy="17" r="16"/><circle cx="34" cy="17" r="11"/><circle cx="34" cy="17" r="6"/>
+        </g></pattern></defs>
+      <rect width="390" height="66" fill="url(#seiA)"/>
+    </svg>
+    <div style="position:relative; flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:#e94560;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/><circle cx="12" cy="15" r="2" fill="#e94560" stroke="none"/></svg>
+      <span style="font-size:0.62rem; font-weight:700;">היום</span>
+    </div>
+    <div style="position:relative; flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:#5b6678;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#5b6678" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M6 8.5v4a4 4 0 0 0 4 4h4"/></svg>
+      <span style="font-size:0.62rem;">מסלול</span>
+    </div>
+    <div style="position:relative; flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:#5b6678;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#5b6678" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="17" cy="14.5" r="1.3" fill="#5b6678" stroke="none"/></svg>
+      <span style="font-size:0.62rem;">ארנק</span>
+    </div>
+    <div style="position:relative; flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:#5b6678;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#5b6678" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l2 2 3.5-3.5"/><path d="M4 16l2 2 3.5-3.5"/><path d="M13 7.5h7M13 16.5h7"/></svg>
+      <span style="font-size:0.62rem;">משימות</span>
+    </div>
+    <div style="position:relative; flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:#5b6678;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#5b6678" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5H4v11h5l3 3 3-3h5z"/><path d="M8 9.5h8M8 12.5h5"/></svg>
+      <span style="font-size:0.62rem;">יפנית</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {}
+</script>
+</body>
+</html>
