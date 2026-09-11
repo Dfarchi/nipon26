@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0e14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>יפן 2026 · קלסר הטיול</title>
+<link rel="stylesheet" href="styles.css?v=20260911f">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  #map { height:420px; border-radius:16px; overflow:hidden; z-index:0; }
+  .leaflet-container { background:#e8e3da; font-family:inherit; }
+  .map-legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:14px; font-size:0.82rem; color:var(--muted); }
+  .map-legend span { display:inline-flex; align-items:center; gap:6px; }
+  .map-legend i { width:11px; height:11px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,.5); }
+  .map-export { margin-top:18px; padding-top:16px; border-top:1px solid var(--border);
+    display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px; }
+  .map-export p { margin:0; flex:1 1 260px; font-size:0.82rem; line-height:1.65; color:var(--muted); }
+  .map-export a { color:var(--accent); }
+  .cine { position:relative; min-height:100vh; overflow:hidden; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:20px; }
+  .layer { position:absolute; left:0; right:0; width:100%; pointer-events:none; will-change:transform; }
+  #sky { top:0; height:100%; background:
+      radial-gradient(120% 80% at 50% -10%, #3a1c2e 0%, #241026 30%, #14101f 60%, #0b0e14 100%); }
+  #glow { top:8%; height:380px; background:
+      radial-gradient(60% 60% at 50% 40%, rgba(233,69,96,0.35), rgba(255,140,66,0.12) 45%, transparent 70%);
+      filter:blur(10px); }
+  .mts { bottom:0; left:0; width:100%; line-height:0; }
+  .mts svg { width:100%; height:auto; display:block; }
+  #leafCanvas { position:absolute; inset:0; z-index:3; pointer-events:none; }
+  .cine .inner { position:relative; z-index:4; }
+  .kicker { letter-spacing:6px; color:#ffb3a7; font-size:0.85rem; text-transform:uppercase; margin-bottom:10px; }
+  .cine h1 { font-size:clamp(2.6rem,9vw,5.5rem); letter-spacing:4px; margin:0;
+    background:linear-gradient(180deg,#fff,#ffd9a0 60%,#ff8c42);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:0 0 60px rgba(233,69,96,0.25); }
+  .cine .tag { color:#c9b8c8; margin-top:8px; font-size:1.05rem; letter-spacing:1px; }
+  .cine .names { color:#7d6f86; font-size:0.9rem; margin-top:4px; }
+  .count { display:flex; gap:10px; justify-content:center; margin:34px 0 8px; flex-wrap:wrap; }
+  .cu { min-width:78px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10);
+    border-radius:16px; padding:14px 10px; backdrop-filter:blur(6px); }
+  .cu .v { font-size:2.2rem; font-weight:800; color:#fff; font-variant-numeric:tabular-nums;
+    text-shadow:0 0 24px rgba(255,140,66,0.5); }
+  .cu .k { font-size:0.72rem; color:#b9a; letter-spacing:2px; margin-top:2px; }
+  .count-note { color:#9a8ca3; font-size:0.85rem; margin-top:6px; }
+  .scrollhint { position:absolute; bottom:22px; left:50%; transform:translateX(-50%); z-index:4;
+    color:#b9a; font-size:0.8rem; letter-spacing:2px; animation:bob 2s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+  .nowcard { max-width:680px; margin:-40px auto 0; position:relative; z-index:5;
+    background:linear-gradient(135deg,rgba(35,16,38,0.9),rgba(20,16,31,0.9));
+    border:1px solid rgba(255,140,66,0.25); border-radius:20px; padding:22px 24px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5); backdrop-filter:blur(8px); }
+  .nowcard .badge2 { display:inline-block; background:rgba(233,69,96,0.18); color:#ff9a86;
+    border:1px solid rgba(233,69,96,0.4); font-size:0.74rem; padding:3px 12px; border-radius:99px; letter-spacing:1px; }
+  .nowcard h2 { font-size:1.5rem; margin:10px 0 4px; color:#fff; }
+  .nowcard p { color:#bcaec4; font-size:0.95rem; }
+  .nowcard .next { margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);
+    color:#9a8ca3; font-size:0.9rem; }
+  .reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity:1; transform:none; }
+  @media (max-width:520px){ .cu{min-width:64px} .cu .v{font-size:1.7rem} }
+  @media (prefers-reduced-motion: reduce){ .scrollhint{animation:none} #leafCanvas{display:none} }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="tab active" href="site.html">🏠 שער</a>
+  <a class="tab" href="decisions.html">🧭 החלטות</a>
+  <a class="tab" href="itinerary.html">🗓️ מסלול</a>
+  <a class="tab" href="budget.html">💴 תקציב</a>
+  <a class="tab" href="transit.html">🚇 תחבורה</a>
+  <a class="tab" href="documents.html">📂 מסמכים</a>
+  <span class="brand">🍁 NIPON26</span>
+</div></div>
+
+<header class="cine">
+  <div id="sky" class="layer"></div>
+  <div id="glow" class="layer"></div>
+  <div id="mtsBack" class="layer mts">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="#2a1530" d="M0,220 L240,120 L480,200 L720,90 L960,190 L1200,110 L1440,210 L1440,320 L0,320 Z"/></svg>
+  </div>
+  <div id="mtsFront" class="layer mts">
+    <svg viewBox="0 0 1440 240" preserveAspectRatio="none"><path fill="#160c1c" d="M0,180 L200,90 L420,170 L680,70 L900,160 L1160,100 L1440,170 L1440,240 L0,240 Z"/></svg>
+  </div>
+  <canvas id="leafCanvas"></canvas>
+
+  <div class="inner">
+    <div class="kicker">מרדף השלכת · צפון → דרום</div>
+    <h1>יפן 2026</h1>
+    <div class="tag">הקלסר הקולנועי של המסע</div>
+    <div class="names">יובו ושירשה</div>
+
+    <div class="count" id="count">
+      <div class="cu"><div class="v" id="cd">—</div><div class="k">ימים</div></div>
+      <div class="cu"><div class="v" id="ch">—</div><div class="k">שעות</div></div>
+      <div class="cu"><div class="v" id="cm">—</div><div class="k">דקות</div></div>
+      <div class="cu"><div class="v" id="cs">—</div><div class="k">שניות</div></div>
+    </div>
+    <div class="count-note" id="countNote">עד ההמראה · אל על LY91 · 13 אוק' 19:45</div>
+  </div>
+  <div class="scrollhint">⌄ גללו למטה</div>
+</header>
+
+<div class="wrap">
+  <div class="nowcard" id="nowcard">
+    <span class="badge2" id="nowBadge">טוען…</span>
+    <h2 id="nowTitle"></h2>
+    <p id="nowText"></p>
+    <div class="next" id="nowNext"></div>
+  </div>
+
+  <div class="facts reveal" style="margin-top:34px">
+    <div class="fact"><div class="n" id="fNights">—</div><div class="l">לילות</div></div>
+    <div class="fact"><div class="n" id="fStages">—</div><div class="l">שלבים</div></div>
+    <div class="fact"><div class="n" id="fOpen">—</div><div class="l">החלטות פתוחות</div></div>
+    <div class="fact"><div class="n" id="fBooked">—</div><div class="l">לילות מוזמנים</div></div>
+  </div>
+
+  <div class="sec-h reveal"><h2>🗺️ מפת המסע</h2><div class="line"></div></div>
+  <div class="panel reveal">
+    <div id="map"></div>
+    <div class="map-legend" id="mapLegend"></div>
+    <div class="map-export">
+      <button class="btn" data-kml-export>📥 הורד את הנקודות לגוגל מאפס</button>
+      <p>
+        הקובץ (KML) נטען פעם אחת ל־<a href="https://www.google.com/maps/d/" target="_blank" rel="noopener">My&nbsp;Maps</a>
+        (מפה חדשה → ייבוא) — ומשם המפה מופיעה באפליקציית Google&nbsp;Maps בנייד תחת <b>שמורים → מפות</b>,
+        עם שכבה נפרדת לכל שלב.
+      </p>
+    </div>
+  </div>
+
+  <div class="sec-h reveal"><h2>🕒 ציר המסע</h2><div class="line"></div></div>
+  <div class="panel reveal"><div class="timeline" id="timeline"></div></div>
+
+  <div class="sec-h reveal"><h2>🚀 כניסה מהירה</h2><div class="line"></div></div>
+  <div class="grid2 reveal">
+    <a class="doc" href="decisions.html"><div class="ic">🧭</div><div class="meta"><div class="t">החלטות</div><div class="d"><span id="qOpen">—</span> החלטות פתוחות · הסבר על כל אפשרות</div></div><div class="go">←</div></a>
+    <a class="doc" href="itinerary.html"><div class="ic">🗓️</div><div class="meta"><div class="t">מסלול</div><div class="d"><span id="qStages">—</span> השלבים מהנחיתה ועד טוקיו</div></div><div class="go">←</div></a>
+    <a class="doc" href="budget.html"><div class="ic">💴</div><div class="meta"><div class="t">תקציב</div><div class="d">מה נסגר, כמה זה עד עכשיו, ומה צפוי בהמשך</div></div><div class="go">←</div></a>
+    <a class="doc" href="transit.html"><div class="ic">🚇</div><div class="meta"><div class="t">תחבורה</div><div class="d">JR Pass לא משתלם — הנה החישוב, וכרטיסי טוקיו</div></div><div class="go">←</div></a>
+    <a class="doc" href="documents.html"><div class="ic">📂</div><div class="meta"><div class="t">מסמכים</div><div class="d">קישור ישיר לגוגל דרייב</div></div><div class="go">←</div></a>
+  </div>
+</div>
+
+<footer>🍁 NIPON26 · הקלסר המשפחתי של יפן 2026 🍁</footer>
+
+<script src="data.js?v=20260911f"></script>
+<script src="basemap.js?v=20260911f"></script>
+<script>
+const FLIGHT = new Date('2026-10-13T19:45:00+03:00');
+const TRIP_START = new Date('2026-10-14T00:00:00+09:00');
+const TRIP_END   = new Date('2026-11-25T23:59:00+09:00');
+// מקור אחד לאמת: תאריך הפתיחה של כל שלב יושב ב-data.js (שדה start). שלבים מוחנים (parked) לא נספרים.
+const LIVE_PHASES = ((window.TRIP&&TRIP.phases)||[]).filter(p=>!p.parked && p.start);
+const PHASE_START = LIVE_PHASES.map(p=>new Date(p.start+'T00:00:00+09:00'));
+
+const pad=n=>String(n).padStart(2,'0');
+function tick(){
+  const now=new Date(), diff=FLIGHT-now;
+  if(diff<=0){ document.getElementById('countNote').textContent='הטיסה המריאה! 🝫 בהצלחה 🍁';
+    ['cd','ch','cm','cs'].forEach(id=>document.getElementById(id).textContent='0'); return; }
+  const d=Math.floor(diff/864e5), h=Math.floor(diff%864e5/36e5), m=Math.floor(diff%36e5/6e4), s=Math.floor(diff%6e4/1e3);
+  document.getElementById('cd').textContent=d;
+  document.getElementById('ch').textContent=pad(h);
+  document.getElementById('cm').textContent=pad(m);
+  document.getElementById('cs').textContent=pad(s);
+}
+setInterval(tick,1000); tick();
+
+(function(){
+  const now=new Date();
+  const ph=LIVE_PHASES;
+  const badge=document.getElementById('nowBadge'), title=document.getElementById('nowTitle'),
+        text=document.getElementById('nowText'), next=document.getElementById('nowNext');
+  if(now<TRIP_START){
+    const days=Math.ceil((TRIP_START-now)/864e5);
+    badge.textContent='לפני הטיול';
+    title.textContent=`עוד ${days} ימים ליפן ✈️`;
+    text.textContent=ph[0]?('השלב הראשון: '+ph[0].h.replace(/^(?:שלב [\d.]+|אופציה) · /,'')+' — '+ph[0].p):'';
+    next.innerHTML='💡 בינתיים: היכנסו ל<a href="decisions.html" style="color:#ff9a86">החלטות</a> וסמנו את הבחירות.';
+  } else if(now>TRIP_END){
+    badge.textContent='אחרי הטיול';
+    title.textContent='הטיול הסתיים 🍁';
+    text.textContent='42 לילות ביפן. תודה על המסע!';
+    next.textContent='';
+  } else {
+    let idx=0; for(let i=0;i<PHASE_START.length;i++){ if(now>=PHASE_START[i]) idx=i; }
+    const dayNum=Math.floor((now-TRIP_START)/864e5)+1;
+    const cur=ph[idx]||{};
+    badge.textContent=`יום ${dayNum} במסע`;
+    title.textContent='📍 '+(cur.h?cur.h.replace(/^(?:שלב [\d.]+|אופציה) · /,''):'בדרך');
+    text.textContent=cur.p||'';
+    const nx=ph[idx+1];
+    next.innerHTML = nx ? ('➡️ הבא: <b style="color:#fff">'+nx.h.replace(/^(?:שלב [\d.]+|אופציה) · /,'')+'</b> ('+nx.when+')') : '➡️ לקראת סיום המסע';
+  }
+})();
+
+(function(){
+  if(!window.TRIP) return;
+  const items = (TRIP.decisions||[]).flatMap(g=>g.items||[]);
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  const bookedNights = (TRIP.budget.booked||[]).reduce((s,x)=>s+(x.nights||0),0);
+  set('fNights', TRIP.budget.nights);
+  set('fStages', LIVE_PHASES.length);
+  set('fOpen',   items.filter(i=>i.open).length);
+  set('fBooked', bookedNights);
+  set('qOpen',   items.filter(i=>i.open).length);
+  set('qStages', LIVE_PHASES.length);
+})();
+
+(function(){
+  const tl=document.getElementById('timeline'); if(!tl||!window.TRIP)return;
+  TRIP.phases.forEach(p=>{ const el=document.createElement('div'); el.className='phase';
+    el.innerHTML=`<div class="ph-top"><h3>${p.h}</h3><span class="when">${p.when}</span></div><p>${p.p}</p><span class="nights">${p.nights}</span>`;
+    tl.appendChild(el); });
+})();
+
+// ===== מפת המסע המלאה (Leaflet) =====
+(function(){
+  const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
+  const pts=((window.TRIP&&TRIP.mapPoints)||[]).filter(p=>!p.parked); const mapEl=document.getElementById('map');
+  if(!mapEl) return;
+  if(typeof L==='undefined'||!pts.length){
+    mapEl.innerHTML='<div style="padding:26px;text-align:center;color:var(--muted)">🗺️ לא ניתן לטעון את המפה כרגע.</div>'; return;
+  }
+  const map=L.map('map',{scrollWheelZoom:false}).setView([37,138],5);
+  BASEMAP.add(map,12);
+  const latlngs=[];
+  pts.forEach((pt,idx)=>{ latlngs.push([pt.lat,pt.lng]);
+    L.circleMarker([pt.lat,pt.lng],{radius:7,color:'#1a1526',weight:2,fillColor:PHASE_COLORS[pt.ph%6],fillOpacity:1})
+      .addTo(map).bindPopup(`<b>${idx+1}. ${pt.n}</b>${pt.d?'<br>'+pt.d:''}`).bindTooltip(`${idx+1}. ${pt.n}`,{direction:'top'});
+  });
+  L.polyline(latlngs,{color:'#e94560',weight:3,opacity:0.8,dashArray:'4 7'}).addTo(map);
+  map.fitBounds(latlngs,{padding:[30,30]});
+  const legend=document.getElementById('mapLegend');
+  if(legend) legend.innerHTML=TRIP.phases.map((p,i)=>{ if(p.parked) return ''; const name=(p.h.split('·')[1]||p.h).trim();
+    return `<span><i style="background:${PHASE_COLORS[i%6]}"></i>${name}</span>`; }).join('');
+})();
+
+const back=document.getElementById('mtsBack'), front=document.getElementById('mtsFront'),
+      glow=document.getElementById('glow');
+addEventListener('scroll',()=>{ const y=scrollY;
+  if(back) back.style.transform=`translateY(${y*0.18}px)`;
+  if(front) front.style.transform=`translateY(${y*0.32}px)`;
+  if(glow) glow.style.transform=`translateY(${y*0.10}px)`;
+},{passive:true});
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);} }),{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+(function(){
+  const c=document.getElementById('leafCanvas'); if(!c)return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx=c.getContext('2d'); let W,H,leaves;
+  const GLYPHS=['🍁','🍂','🍁'];
+  function size(){ const h=document.querySelector('.cine'); W=c.width=h.clientWidth; H=c.height=h.clientHeight; }
+  function mk(){ return {x:Math.random()*W, y:Math.random()*-H, s:14+Math.random()*16,
+    vy:0.6+Math.random()*1.1, vx:-0.4+Math.random()*0.8, rot:Math.random()*6.28,
+    vr:-0.03+Math.random()*0.06, sway:Math.random()*6.28, g:GLYPHS[Math.floor(Math.random()*GLYPHS.length)], o:0.5+Math.random()*0.5}; }
+  function init(){ size(); leaves=Array.from({length:Math.min(26,Math.round(W/40))},mk); }
+  function frame(){ ctx.clearRect(0,0,W,H);
+    leaves.forEach(l=>{ l.y+=l.vy; l.sway+=0.02; l.x+=l.vx+Math.sin(l.sway)*0.6; l.rot+=l.vr;
+      if(l.y>H+30){ Object.assign(l,mk(),{y:-30}); }
+      ctx.save(); ctx.globalAlpha=l.o; ctx.translate(l.x,l.y); ctx.rotate(l.rot);
+      ctx.font=l.s+'px serif'; ctx.fillText(l.g,0,0); ctx.restore(); });
+    requestAnimationFrame(frame); }
+  init(); frame();
+  addEventListener('resize',init,{passive:true});
+})();
+</script>
+<script src="mapexport.js?v=20260911f"></script>
+<script src="delight.js?v=20260911f"></script>
+<script src="pwa.js?v=20260911f"></script>
+</body>
+</html>
