@@ -1,0 +1,82 @@
+/* ===== NIPON26 app — שכבת האפליקציה. שתי ערכות, לפי שעה. ===== */
+:root{
+  --sky1:#16203c; --sky2:#1d3348; --sky3:#234049; --skyEnd:#0d1220;
+  --ink:#f2ece0; --dim:#b8a894; --soft:#c5a888;
+  --card:rgba(30,42,52,.80); --line:rgba(197,168,136,.16);
+  --hot:#e8b64c; --warn:#f08a5d; --ok:#7fd0a0; --hi:#c1303f;
+  --ridge:#4a6478; --ridge2:#26394a; --roof:#18232e; --lit:#f0a94e; --tree:#1d2b28;
+}
+body.is-day{
+  --sky1:#8fc4dd; --sky2:#bcd9e4; --sky3:#e4d8c0; --skyEnd:#f3ece0;
+  --ink:#2a2119; --dim:#6f6152; --soft:#8a7458;
+  --card:rgba(255,252,246,.88); --line:rgba(120,95,62,.18);
+  --hot:#c8621f; --warn:#c04a2a; --ok:#3f8a5c; --hi:#b3372c;
+  --ridge:#7f9bb0; --ridge2:#5d7f95; --roof:#6b5a48; --lit:#a8906e; --tree:#5c7a4a;
+}
+html,body{margin:0;padding:0;direction:rtl;text-align:right}
+body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Tahoma,sans-serif;
+  line-height:1.65;min-height:100vh;transition:background .6s}
+.scene{position:fixed;top:0;right:0;left:0;height:44vh;max-height:340px;z-index:0;pointer-events:none;
+  background:linear-gradient(175deg,var(--sky1) 0%,var(--sky2) 40%,var(--sky3) 66%,var(--skyEnd) 100%);transition:background .6s}
+.scene .art{position:absolute;inset:0;background-size:cover;background-position:center}
+.scene svg{position:absolute;bottom:0;right:0;width:100%}
+.page{position:relative;z-index:1;padding:14px 16px 92px;max-width:560px;margin:0 auto}
+.topline{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--soft)}
+.brand{font-weight:800;letter-spacing:2.5px;font-size:.82rem;color:var(--hot)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 7px currentColor}
+.head{padding-top:clamp(90px,22vh,170px)}
+.kicker{font-size:.73rem;color:var(--soft);letter-spacing:1px}
+.h1{font-size:2.1rem;font-weight:800;letter-spacing:-.5px;line-height:1.1}
+.dnum{font-size:3rem;font-weight:800;letter-spacing:-1px;line-height:1;text-shadow:0 3px 18px rgba(0,0,0,.35)}
+body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
+.row{display:flex;align-items:flex-end;gap:11px;margin-top:2px;flex-wrap:wrap}
+.city{font-size:1.05rem;font-weight:700}
+.jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;
+  backdrop-filter:blur(10px);box-shadow:0 12px 34px rgba(0,0,0,.24);margin-top:12px}
+.card.now{border-color:color-mix(in srgb,var(--hot) 45%,transparent)}
+.card.alert{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.lbl{font-size:.7rem;letter-spacing:2px;font-weight:700;color:var(--hot);display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.lbl.q{color:var(--soft)}
+.lbl i{flex:1;height:1px;background:var(--line);display:block}
+.big{font-size:1.3rem;font-weight:800;color:var(--ink)}
+.t{font-size:1rem;font-weight:700}
+.d{font-size:.85rem;color:var(--dim);margin-top:3px}
+.note{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:.82rem;display:flex;gap:8px;align-items:flex-start}
+.note.w{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
+.note.g{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
+.steps{display:flex;flex-direction:column;gap:7px}
+.step{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:13px;background:var(--card);border:1px solid var(--line)}
+.step b{font-size:.85rem;color:var(--soft);min-width:44px}
+.step span{flex:1;font-size:.92rem}
+.pip{width:7px;height:7px;border-radius:50%;flex:none}
+.chip{display:inline-block;font-size:.7rem;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
+.chip.hot{color:var(--hot);border-color:color-mix(in srgb,var(--hot) 42%,transparent)}
+.chip.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 42%,transparent)}
+.chip.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 42%,transparent)}
+.acts{display:flex;gap:10px;margin-top:14px}
+.cloud{position:relative;flex:1;height:58px;border:0;background:none;padding:0;cursor:pointer;font-family:inherit}
+.cloud svg{position:absolute;inset:0;width:100%;height:58px}
+.cloud span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:.88rem;font-weight:700;color:#fff6e8;padding-bottom:2px}
+.cloud.g span{color:var(--ink)}
+/* כרטיס להראות לנהג — הפוך בכוונה, קריא לזר בשמש */
+.tcard{background:#faf7f2;color:#14100c;border-radius:16px;padding:17px;margin-top:12px;
+  direction:ltr;text-align:left;box-shadow:0 10px 34px rgba(0,0,0,.4);position:relative;overflow:hidden}
+.tcard .ask{font-size:.72rem;color:#8a7f72;letter-spacing:.5px}
+.tcard .nm{font-size:1.45rem;font-weight:700;line-height:1.35;margin-top:5px}
+.tcard .ad{font-size:1.1rem;color:#2c261e;line-height:1.5;margin-top:3px}
+.tcard .ph{font-size:1.05rem;font-weight:600;margin-top:11px;padding-top:11px;border-top:1px solid #ddd4c6}
+.nav{position:fixed;bottom:0;right:0;left:0;z-index:5;display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+  background:color-mix(in srgb,var(--skyEnd) 94%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(12px)}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:.61rem;text-decoration:none}
+.nav a.on{color:var(--hot);font-weight:700}
+.pick{position:fixed;bottom:calc(62px + env(safe-area-inset-bottom));left:8px;z-index:6;max-width:44vw;
+  background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:9px;
+  padding:4px 7px;font-size:.66rem;font-family:inherit;opacity:.75}
+.scene .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.scene .l-far,.scene .l-village{will-change:transform}
+@keyframes fall{0%{transform:translateY(-40px) rotate(0);opacity:0}
+  10%{opacity:.8}88%{opacity:.8}100%{transform:translateY(46vh) rotate(340deg);opacity:0}}
+@keyframes drop{0%{transform:translateY(-30px);opacity:0}10%{opacity:.7}100%{transform:translateY(46vh);opacity:0}}
+@media (prefers-reduced-motion:reduce){.scene .fx{display:none}.scene .l-far,.scene .l-village{transform:none !important}}
