@@ -7,168 +7,147 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;400;500;700&family=Noto+Sans+JP:wght@300;400;500&display=swap">
   <style>
-    body { margin:0; background:#0b0e14; }
-    a { color:#4a9eda; text-decoration:none; }
-    a:hover { color:#7fc1ff; }
-    .jp { font-family:'Noto Sans JP','Heebo',sans-serif; }
+    body { margin:0; background:#0a0f14; }
+    a { color:#8fb8c4; text-decoration:none; } a:hover { color:#b6d8e2; }
+    .jp { font-family:'Noto Sans JP','Heebo',sans-serif; font-weight:300; }
   </style>
 </helmet>
 
 <div style="width:390px; height:1180px; position:relative; overflow:hidden; direction:rtl; text-align:right;
-  background:radial-gradient(1200px 600px at 80% -10%, #16213e 0%, #0b0e14 55%);
-  font-family:'Heebo','Segoe UI',Tahoma,sans-serif; color:#e8edf5; line-height:1.65;">
+  background:#0a0f14; font-family:'Heebo','Segoe UI',Tahoma,sans-serif; color:#e4ecf0; line-height:1.7;">
 
-  <!-- אסאנוהא כטקסטורת רקע -->
-  <svg style="position:absolute; inset:0; width:390px; height:1180px; pointer-events:none; opacity:0.045;">
-    <defs><pattern id="asaB" width="34" height="59" patternUnits="userSpaceOnUse">
-      <g fill="none" stroke="#9aa6b8" stroke-width="0.9">
-        <path d="M17,0 L34,9.8 L34,29.5 L17,39.3 L0,29.5 L0,9.8 Z"/>
-        <path d="M17,0 L17,39.3 M0,9.8 L34,29.5 M34,9.8 L0,29.5"/>
-      </g></pattern></defs>
-    <rect width="390" height="1180" fill="url(#asaB)"/>
+  <div style="position:absolute; inset:0;
+    background:
+      radial-gradient(460px 300px at 88% 2%,  rgba(126,104,142,0.26) 0%, rgba(126,104,142,0) 68%),
+      radial-gradient(520px 380px at 4% 30%,  rgba(74,100,120,0.24) 0%, rgba(74,100,120,0) 70%),
+      radial-gradient(560px 400px at 60% 100%, rgba(58,84,92,0.26) 0%, rgba(58,84,92,0) 72%),
+      linear-gradient(180deg, #121a24 0%, #0a0f14 40%, #080c11 100%);"></div>
+
+  <svg viewBox="0 0 390 330" preserveAspectRatio="none" style="position:absolute; top:0; right:0; width:390px; height:330px; pointer-events:none;">
+    <defs>
+      <filter id="pY" x="-15%" y="-15%" width="130%" height="130%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.028" numOctaves="4" seed="11" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="15"/><feGaussianBlur stdDeviation="2.6"/>
+      </filter>
+      <linearGradient id="rY1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#54708a" stop-opacity="0.36"/><stop offset="60%" stop-color="#54708a" stop-opacity="0.09"/><stop offset="100%" stop-color="#54708a" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="rY2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2a3e50" stop-opacity="0.66"/><stop offset="54%" stop-color="#2a3e50" stop-opacity="0.20"/><stop offset="100%" stop-color="#2a3e50" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path filter="url(#pY)" fill="url(#rY1)" d="M-30,118 C14,102 34,58 62,74 C90,90 108,44 142,62 C172,78 194,56 218,74 C248,96 266,50 300,68 C330,84 354,62 420,88 L420,330 L-30,330 Z"/>
+    <path filter="url(#pY)" fill="url(#rY2)" d="M-30,168 C22,152 50,110 84,128 C118,146 138,100 172,120 C206,140 228,112 260,134 C294,157 318,120 352,140 C382,158 402,146 420,152 L420,330 L-30,330 Z"/>
   </svg>
 
-  <!-- כותרת עם ענן -->
-  <svg viewBox="0 0 390 108" preserveAspectRatio="none" style="position:absolute; top:0; right:0; width:390px; height:108px; pointer-events:none;">
-    <defs><linearGradient id="kumoC" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.24"/><stop offset="100%" stop-color="#c084fc" stop-opacity="0.02"/>
-    </linearGradient></defs>
-    <path fill="url(#kumoC)" d="M0,48 a18,18 0 0 0 36,0 a13,13 0 0 0 26,0 a22,22 0 0 0 44,0 a15,15 0 0 0 30,0 a25,25 0 0 0 50,0 a12,12 0 0 0 24,0 a20,20 0 0 0 40,0 a17,17 0 0 0 34,0 a19,19 0 0 0 38,0 a11,11 0 0 0 22,0 L390,0 L0,0 Z"/>
+  <svg style="position:absolute; inset:0; width:390px; height:1180px; pointer-events:none; opacity:0.15; mix-blend-mode:overlay;">
+    <filter id="gY"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/></filter>
+    <rect width="390" height="1180" filter="url(#gY)"/>
   </svg>
 
-  <div style="position:relative; display:flex; align-items:center; gap:10px; padding:16px 18px 0;">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9aa6b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
-    <div style="font-size:0.8rem; color:#9aa6b8;">האלפים היפנים</div>
+  <!-- כותרת -->
+  <div style="position:relative; display:flex; align-items:center; gap:11px; padding:18px 20px 0;">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7e96a2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+    <div style="font-size:0.76rem; color:#7e96a2; font-weight:300; letter-spacing:0.5px;">האלפים היפנים</div>
     <div style="flex-grow:1;"></div>
-    <div style="font-size:0.75rem; color:#5b6678;">יום 17 / 45</div>
+    <div style="font-size:0.7rem; color:#5c7480; font-weight:300;">17 / 45</div>
   </div>
 
-  <div style="position:relative; padding:10px 18px 0;">
-    <div style="display:flex; align-items:baseline; gap:10px;">
-      <div style="font-size:1.9rem; font-weight:800; letter-spacing:0.5px;">30.10</div>
-      <div style="font-size:0.95rem; color:#9aa6b8;">שישי</div>
+  <div style="position:relative; padding:24px 20px 0;">
+    <div style="display:flex; align-items:flex-end; gap:11px;">
+      <div style="font-size:2.5rem; font-weight:200; letter-spacing:-0.5px; line-height:1; color:#eef4f7;">30.10</div>
+      <div style="font-size:0.9rem; color:#7e96a2; font-weight:300; padding-bottom:6px;">שישי</div>
     </div>
-    <div style="font-size:1.02rem; font-weight:700; margin-top:2px;">נקאנויו → נאראי-ג׳וקו → נגיסו</div>
-    <div style="display:flex; gap:7px; margin-top:9px; flex-wrap:wrap;">
-      <div style="font-size:0.74rem; padding:3px 10px; border-radius:99px; border:1px solid rgba(242,183,5,0.4); background:#0b0e14; color:#f2b705;">יום נסיעה</div>
-      <div style="font-size:0.74rem; padding:3px 10px; border-radius:99px; border:1px solid #1f2937; background:#0b0e14; color:#9aa6b8;">3 מעברים</div>
-      <div style="font-size:0.74rem; padding:3px 10px; border-radius:99px; border:1px solid #1f2937; background:#0b0e14; color:#9aa6b8;">🧳 עם מזוודות</div>
-    </div>
+    <div style="font-size:1.02rem; font-weight:400; margin-top:9px; color:#dbe6ec;">נקאנויו → נאראי-ג׳וקו → נגיסו</div>
+    <div style="font-size:0.82rem; color:#7e96a2; font-weight:300; margin-top:3px;">יום נסיעה · שלושה מעברים · עם מזוודות</div>
   </div>
 
-  <div style="position:relative; margin:18px 18px 0; display:flex; flex-direction:column; gap:10px;">
+  <!-- ציר הפעילויות -->
+  <div style="position:relative; margin:28px 20px 0; padding-right:19px;">
+    <div style="position:absolute; right:4px; top:10px; bottom:14px; width:1px;
+      background:linear-gradient(rgba(143,168,180,0.30), rgba(143,168,180,0.30) 76%, rgba(143,168,180,0.05));"></div>
 
-    <!-- act 1 -->
-    <div style="background:#121826; border:1px solid #1f2937; border-radius:14px; padding:14px 15px;">
-      <div style="display:flex; gap:11px; align-items:flex-start;">
-        <div style="font-size:1.3rem; line-height:1.2;">🚐</div>
-        <div style="flex-grow:1;">
-          <div style="display:flex; align-items:center; gap:7px;">
-            <div style="font-weight:700; font-size:0.96rem; flex-grow:1;">הסעת החזרה למאצומוטו</div>
-            <div style="width:8px; height:8px; border-radius:50%; background:#f2b705;"></div>
-          </div>
-          <div style="font-size:0.83rem; color:#9aa6b8; margin-top:3px;">יוצאת <b style="color:#e8edf5;">12:00</b> · טרמינל קמיקוצ׳י <b style="color:#e8edf5;">12:30</b> · מאצומוטו <b style="color:#e8edf5;">~14:00</b></div>
-        </div>
-      </div>
-      <div style="margin-top:10px; background:#0f1420; border-right:3px solid #f2b705; border-radius:0 10px 10px 0; padding:9px 12px; font-size:0.8rem; color:#9aa6b8;">
-        חינם, אבל <b style="color:#f2b705;">לא מובטחת</b> — הריוקאן שומר מקומות קודם למי שהגיע בהסעת הלוך-חזור
-      </div>
-    </div>
+    <div style="display:flex; flex-direction:column; gap:22px;">
 
-    <!-- act 2 -->
-    <div style="background:#121826; border:1px solid #1f2937; border-radius:14px; padding:14px 15px; opacity:0.82;">
-      <div style="display:flex; gap:11px; align-items:flex-start;">
-        <div style="font-size:1.3rem; line-height:1.2;">🥾</div>
-        <div style="flex-grow:1;">
-          <div style="display:flex; align-items:center; gap:7px;">
-            <div style="font-weight:700; font-size:0.96rem; flex-grow:1;">אופציונלי — בוקר רביעי בקמיקוצ׳י</div>
-            <div style="width:8px; height:8px; border-radius:50%; background:#3ddc84;"></div>
-          </div>
-          <div style="font-size:0.83rem; color:#9aa6b8; margin-top:3px;">משאירים מזוודות בקבלה, עולים בהסעת הבוקר, מצטרפים לחזרה בטרמינל ב-12:30</div>
+      <div style="position:relative;">
+        <div style="position:absolute; right:-19px; top:9px; width:9px; height:9px; border-radius:50%; background:#0a0f14; border:1.5px solid #d9a441;"></div>
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <div style="font-size:0.82rem; color:#7e96a2; font-weight:300;">12:00</div>
+          <div style="font-size:1rem; font-weight:400; color:#e4ecf0;">הסעת החזרה למאצומוטו</div>
+        </div>
+        <div style="font-size:0.85rem; color:#8fa8b4; font-weight:300; margin-top:4px;">טרמינל קמיקוצ׳י 12:30 · מאצומוטו ~14:00</div>
+        <div style="margin-top:10px; background:rgba(217,164,65,0.07); border:1px solid rgba(217,164,65,0.22); border-radius:12px; padding:10px 13px; font-size:0.82rem; color:#c9b389; font-weight:300;">
+          חינם, אבל לא מובטחת — הריוקאן שומר מקומות קודם למי שהגיע בהלוך-חזור
         </div>
       </div>
-    </div>
 
-    <!-- act 3 -->
-    <div style="background:#121826; border:1px solid #1f2937; border-radius:14px; padding:14px 15px;">
-      <div style="display:flex; gap:11px; align-items:flex-start;">
-        <div style="font-size:1.3rem; line-height:1.2;">🚃</div>
-        <div style="flex-grow:1;">
-          <div style="display:flex; align-items:center; gap:7px;">
-            <div style="font-weight:700; font-size:0.96rem; flex-grow:1;">מאצומוטו → נאראי</div>
-            <div style="width:8px; height:8px; border-radius:50%; background:#f2b705;"></div>
-          </div>
-          <div style="font-size:0.83rem; color:#9aa6b8; margin-top:3px;">~50 דק׳ · קו צ׳ואו דרומה, החלפה בשיוג׳ירי</div>
+      <div style="position:relative; opacity:0.62;">
+        <div style="position:absolute; right:-18px; top:10px; width:7px; height:7px; border-radius:50%; background:#4e6878;"></div>
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <div style="font-size:0.82rem; color:#7e96a2; font-weight:300;">אופציונלי</div>
+          <div style="font-size:0.97rem; font-weight:300; color:#cfdde4;">בוקר רביעי בקמיקוצ׳י</div>
         </div>
+        <div style="font-size:0.84rem; color:#8fa8b4; font-weight:300; margin-top:4px;">מזוודות בקבלה, הסעת הבוקר, מצטרפים לחזרה ב-12:30</div>
       </div>
-      <div style="margin-top:10px; background:#0f1420; border-right:3px solid #e94560; border-radius:0 10px 10px 0; padding:9px 12px; font-size:0.8rem; color:#9aa6b8;">
-        <b style="color:#e94560;">הקטע נפגע בגשמי ספטמבר 2026.</b> לבדוק שוב לפני היציאה — ראו I28
-      </div>
-      <div style="display:flex; gap:7px; margin-top:10px;">
-        <div style="display:inline-flex; align-items:center; gap:6px; font-size:0.78rem; color:#4a9eda; border:1px solid #1f2937; background:#0b0e14; padding:6px 11px; border-radius:8px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a9eda" stroke-width="2" stroke-linecap="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>מסלול
-        </div>
-        <div style="display:inline-flex; align-items:center; gap:6px; font-size:0.78rem; color:#4a9eda; border:1px solid #1f2937; background:#0b0e14; padding:6px 11px; border-radius:8px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a9eda" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>לוח זמנים
-        </div>
-      </div>
-    </div>
 
-    <!-- act 4 -->
-    <div style="background:#121826; border:1px solid #1f2937; border-radius:14px; padding:14px 15px;">
-      <div style="display:flex; gap:11px; align-items:flex-start;">
-        <div style="font-size:1.3rem; line-height:1.2;">🏘️</div>
-        <div style="flex-grow:1;">
-          <div style="display:flex; align-items:center; gap:7px;">
-            <div style="font-weight:700; font-size:0.96rem; flex-grow:1;">נאראי-ג׳וקו · צהריים עד דמדומים</div>
-            <div style="width:8px; height:8px; border-radius:50%; background:#f2b705;"></div>
+      <div style="position:relative;">
+        <div style="position:absolute; right:-19px; top:9px; width:9px; height:9px; border-radius:50%; background:#0a0f14; border:1.5px solid #d63a4a;"></div>
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <div style="font-size:0.82rem; color:#7e96a2; font-weight:300;">14:05</div>
+          <div style="font-size:1rem; font-weight:400; color:#e4ecf0;">מאצומוטו → נאראי</div>
+        </div>
+        <div style="font-size:0.85rem; color:#8fa8b4; font-weight:300; margin-top:4px;">~50 דק׳ · קו צ׳ואו, החלפה בשיוג׳ירי</div>
+        <div style="margin-top:10px; background:rgba(214,58,74,0.08); border:1px solid rgba(214,58,74,0.26); border-radius:12px; padding:10px 13px; font-size:0.82rem; color:#e0959e; font-weight:300;">
+          הקטע נפגע בגשמי ספטמבר — לבדוק לפני היציאה
+        </div>
+        <div style="display:flex; gap:8px; margin-top:11px;">
+          <div style="display:inline-flex; align-items:center; gap:7px; font-size:0.78rem; color:#a8c4d0; font-weight:300; border:1px solid rgba(143,168,180,0.20); border-radius:10px; padding:7px 13px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a8c4d0" stroke-width="1.6" stroke-linecap="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>מסלול
           </div>
-          <div style="font-size:0.83rem; color:#9aa6b8; margin-top:3px;">רחוב אחד באורך קילומטר — תחנת הדרך הארוכה ביפן. בתי סוחרים מעץ, ולכה מסורתית <span class="jp">木曽漆器</span></div>
-          <div style="font-size:0.8rem; color:#3ddc84; margin-top:6px;">✅ שטוח לגמרי · אפס טיפוס</div>
+          <div style="display:inline-flex; align-items:center; gap:7px; font-size:0.78rem; color:#a8c4d0; font-weight:300; border:1px solid rgba(143,168,180,0.20); border-radius:10px; padding:7px 13px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a8c4d0" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5l3 2"/></svg>לוח זמנים
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- act 5 -->
-    <div style="background:#121826; border:1px solid rgba(192,132,252,0.35); border-radius:14px; padding:14px 15px;">
-      <div style="display:flex; gap:11px; align-items:flex-start;">
-        <div style="font-size:1.3rem; line-height:1.2;">🏠</div>
-        <div style="flex-grow:1;">
-          <div style="display:flex; align-items:center; gap:7px;">
-            <div style="font-weight:700; font-size:0.96rem; flex-grow:1;">צ׳ק-אין — Nagi Stay</div>
-            <div style="width:8px; height:8px; border-radius:50%; background:#3ddc84;"></div>
-          </div>
-          <div style="font-size:0.83rem; color:#9aa6b8; margin-top:3px;">בית שלם · 2 חדרי שינה · אמבטיה פרטית · מטבח · $513.74</div>
-          <div style="margin-top:9px; display:inline-flex; align-items:center; gap:6px; font-size:0.72rem; padding:3px 9px; border-radius:99px; background:rgba(242,183,5,0.13); border:1px solid rgba(242,183,5,0.4); color:#f2b705;">
-            בקשת שינוי תאריכים ממתינה לאישור המארח
-          </div>
+      <div style="position:relative;">
+        <div style="position:absolute; right:-18px; top:10px; width:7px; height:7px; border-radius:50%; background:#4e6878;"></div>
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <div style="font-size:0.82rem; color:#7e96a2; font-weight:300;">15:00</div>
+          <div style="font-size:1rem; font-weight:400; color:#e4ecf0;">נאראי-ג׳וקו</div>
+        </div>
+        <div style="font-size:0.85rem; color:#8fa8b4; font-weight:300; margin-top:4px;">
+          רחוב אחד באורך קילומטר — תחנת הדרך הארוכה ביפן. בתי סוחרים מעץ, ולכה מסורתית <span class="jp">木曽漆器</span>
+        </div>
+        <div style="font-size:0.8rem; color:#7fbf9a; font-weight:300; margin-top:7px;">שטוח לגמרי · אפס טיפוס</div>
+      </div>
+
+      <div style="position:relative;">
+        <div style="position:absolute; right:-19px; top:9px; width:9px; height:9px; border-radius:50%; background:#9db4bf;"></div>
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <div style="font-size:0.82rem; color:#9db4bf; font-weight:400;">18:30</div>
+          <div style="font-size:1rem; font-weight:500; color:#f0f6f9;">צ׳ק-אין · Nagi Stay</div>
+        </div>
+        <div style="font-size:0.85rem; color:#8fa8b4; font-weight:300; margin-top:4px;">בית שלם · שני חדרי שינה · אמבטיה פרטית · מטבח</div>
+        <div style="display:inline-block; margin-top:9px; font-size:0.75rem; color:#c9b389; font-weight:300; border:1px solid rgba(217,164,65,0.28); border-radius:99px; padding:3px 11px;">
+          שינוי התאריכים ממתין לאישור המארח
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- מקרא -->
-  <div style="position:relative; margin:16px 18px 0; display:flex; align-items:center; gap:14px; font-size:0.74rem; color:#5b6678;">
-    <div style="display:flex; align-items:center; gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#3ddc84;display:block;"></span>רגוע</div>
-    <div style="display:flex; align-items:center; gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#f2b705;display:block;"></span>בינוני</div>
-    <div style="display:flex; align-items:center; gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#e94560;display:block;"></span>עמוס</div>
-    <div style="flex-grow:1;"></div>
-    <div class="jp">紅葉</div>
   </div>
 
   <!-- ניווט בין ימים -->
-  <div style="position:relative; margin:16px 18px 0; display:flex; gap:9px;">
-    <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; gap:7px; height:46px; border-radius:12px; background:#121826; border:1px solid #1f2937; font-size:0.85rem; color:#9aa6b8;">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5b6678" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>29.10 · קמיקוצ׳י
+  <div style="position:absolute; bottom:30px; right:20px; left:20px; display:flex; align-items:center; gap:14px;">
+    <div style="flex-grow:1; display:flex; align-items:center; gap:8px; font-size:0.82rem; color:#7e96a2; font-weight:300;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5c7480" stroke-width="1.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>29.10 קמיקוצ׳י
     </div>
-    <div style="flex-grow:1; display:flex; align-items:center; justify-content:center; gap:7px; height:46px; border-radius:12px; background:#121826; border:1px solid #1f2937; font-size:0.85rem; color:#9aa6b8;">
-      31.10 · נקאסנדו<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5b6678" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+    <div class="jp" style="font-size:0.7rem; color:#4e6878;">紅葉</div>
+    <div style="flex-grow:1; display:flex; align-items:center; justify-content:flex-end; gap:8px; font-size:0.82rem; color:#7e96a2; font-weight:300;">
+      31.10 נקאסנדו<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5c7480" stroke-width="1.6" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
     </div>
   </div>
-
-  <div style="position:absolute; bottom:26px; right:0; width:390px; text-align:center; font-size:0.72rem; color:#5b6678;">🍁 NIPON26</div>
 </div>
 </x-dc>
 <script data-dc-script data-props='{"$preview":{"width":390,"height":1180}}'>
