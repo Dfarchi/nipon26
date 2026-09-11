@@ -3,8 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0e14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>מסלול · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=20260911b">
+<link rel="stylesheet" href="styles.css?v=20260911c">
 <style>
   .stage-card { display:flex; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--border);
     border-radius:14px; padding:16px 18px; margin-bottom:12px; transition:.15s; cursor:pointer; }
@@ -47,7 +51,7 @@
 </div>
 
 <footer>🍁 NIPON26 · המסלול מתעדכן לפי ההחלטות 🍁</footer>
-<script src="data.js?v=20260911b"></script>
+<script src="data.js?v=20260911c"></script>
 <script>
   const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
   const stages = document.getElementById('stages');
@@ -78,6 +82,7 @@
     parkedWrap.innerHTML = '<div class="parked-h">❓ בסימן שאלה — לא בתוכנית כרגע</div>' + parkedHtml;
   }
 </script>
-<script src="delight.js?v=20260911b"></script>
+<script src="delight.js?v=20260911c"></script>
+<script src="pwa.js?v=20260911c"></script>
 </body>
 </html>

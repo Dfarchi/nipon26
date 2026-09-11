@@ -12,5 +12,7 @@ else
 fi
 new="${today}${next}"
 sed -i "s/?v=[0-9a-z]*/?v=$new/g" ./*.html
+sed -i "s/^const V = '[0-9a-z]*';/const V = '$new';/" sw.js
+node build-trip-json.js
 echo "מטמון: $cur → $new"
 node check.js
