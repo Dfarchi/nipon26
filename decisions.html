@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>החלטות · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=20260910c">
+<link rel="stylesheet" href="styles.css?v=20260911b">
 <style>
   .dec-filter{ display:flex; gap:8px; margin:0 0 14px; flex-wrap:wrap; align-items:center }
   .fbtn{ background:rgba(255,255,255,0.05); color:var(--muted,#cbb8d6); border:1px solid rgba(255,140,66,0.25);
@@ -25,9 +25,6 @@
     border:1px solid rgba(120,205,150,0.4); border-radius:6px; font-size:0.72rem; padding:1px 7px; margin-inline-start:8px; vertical-align:middle }
   .todo-check{ display:flex; align-items:center; gap:8px; margin:10px 0 6px; cursor:pointer; font-size:0.92rem }
   .todo-check input{ width:18px; height:18px; cursor:pointer }
-  .res{ margin:8px 0 2px; padding:8px 11px; border-radius:9px; font-size:0.88rem; line-height:1.5;
-    background:rgba(120,205,150,0.10); border:1px solid rgba(120,205,150,0.30); color:#cfe8d8 }
-  .res b{ color:#7fdba0 }
 </style>
 </head>
 <body>
@@ -43,13 +40,12 @@
 
 <div class="hero" style="padding:30px 18px 8px">
   <h1 style="font-size:2rem">🧭 החלטות הטיול</h1>
-  <div class="sub">✓ ירוק = הבחירה הנוכחית · לחצו <b>"הסבר ▾"</b> לפרטים · ⭐ = המלצה · אפשר לשנות, נשמר על המכשיר<br>
-  <span style="opacity:.8">החלטות שכבר נסגרו מוצגות עם שורת ✅ שמסבירה מה נבחר בפועל — לחצו "הצג הכל" כדי לראות אותן</span></div>
+  <div class="sub">✓ ירוק = הבחירה הנוכחית · לחצו <b>"הסבר ▾"</b> לפרטים · ⭐ = המלצה · אפשר לשנות, נשמר על המכשיר</div>
 </div>
 
 <div class="wrap">
   <div class="dec-filter">
-    <button class="fbtn active" id="fOpen" type="button">🔵 פתוח עכשיו</button>
+    <button class="fbtn active" id="fOpen" type="button">🔵 פתוחות לדיון</button>
     <button class="fbtn" id="fAll" type="button">📋 הצג הכל</button>
     <span class="fhint" id="fHint"></span>
   </div>
@@ -80,9 +76,9 @@
 
 <div class="toast" id="toast">הועתק ✓</div>
 
-<footer>🍁 NIPON26 · מבנה המסלול סגור · מה שנשאר פתוח: ליל 4.11 (K18) והפאסים (J11) 🍁</footer>
+<footer>🍁 NIPON26 · ⚠️ אשכול סנדאי (6ב) ממתין לאימות מול ההערות שלכם מאתמול 🍁</footer>
 
-<script src="data.js?v=20260910c"></script>
+<script src="data.js?v=20260911b"></script>
 <script>
 const KEY = 'nipon26_choices_v1';
 const NKEY = 'nipon26_notes_v1';
@@ -109,14 +105,12 @@ Object.keys(phaseBuckets).map(Number).sort((a,b)=>a-b).forEach(ph => {
   if(phaseInfo){
     const ph_header = document.createElement('div');
     ph_header.className = 'phase-header';
-    ph_header.dataset.ph = ph;
     ph_header.innerHTML = `<h2>${phaseInfo.h}</h2><div class="phase-sub">${phaseInfo.when} · ${phaseInfo.nights}</div>`;
     wrap.appendChild(ph_header);
   }
   phaseBuckets[ph].forEach(group => {
     const g = document.createElement('div');
     g.className = 'dgroup';
-    g.dataset.ph = ph;
     g.innerHTML = `<div class="gh">${group.g}</div>`;
     let added = 0;
     group.items.forEach(it => {
@@ -128,8 +122,7 @@ Object.keys(phaseBuckets).map(Number).sort((a,b)=>a-b).forEach(ph => {
       if(it.todo === true){
         // משימה פתוחה: לא בחירה מתוך אופציות — מסמנים "הוחלט/בוצע" בצ'קבוקס + הערה חופשית
         card.className = 'dcard todo-dec ' + (it.open===true ? 'open-dec' : 'closed-dec');
-        const todoTag = it.open===true ? ' <span class="todo-tag">משימה פתוחה</span>' : '';
-        card.innerHTML = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${todoTag}</div></div>`
+        card.innerHTML = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q} <span class="todo-tag">משימה פתוחה</span></div></div>`
           + `<label class="todo-check"><input type="checkbox" class="todo-in" data-n="${it.n}"><span>✓ סומן כהוחלט / בוצע</span></label>`
           + `<textarea class="note-in" data-n="${it.n}" rows="1" placeholder="📝 הערות (למשל: שם המקום שנבחר, מס' אישור הזמנה)"></textarea>`;
         g.appendChild(card);
@@ -139,10 +132,9 @@ Object.keys(phaseBuckets).map(Number).sort((a,b)=>a-b).forEach(ph => {
       card.className = 'dcard ' + (it.open===true ? 'open-dec' : 'closed-dec');
       const multiNote = it.multi ? ` <span style="color:var(--dim);font-size:0.8rem">(בחרו ${it.multi})</span>` : '';
       const openTag = it.open===true ? ' <span class="open-tag">פתוח לדיון</span>' : '';
-      const resLine = it.res ? `<div class="res"><b>✅ נסגר —</b> ${it.res}</div>` : '';
-      let html = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${multiNote}${openTag}</div></div>${resLine}<div class="opts">`;
+      let html = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q}${multiNote}${openTag}</div></div><div class="opts">`;
       it.o.forEach((opt,i) => {
-        const rec = (it.rec===i && !it.res) ? '<span class="rec">⭐ מומלץ</span>' : '';
+        const rec = (it.rec===i) ? '<span class="rec">⭐ מומלץ</span>' : '';
         const links = (opt.l && opt.l.length)
           ? `<div class="opt-links">${opt.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
         const badges = [];
@@ -171,12 +163,7 @@ document.querySelectorAll('.note-in').forEach(t => {
   if(v){ t.value = v; t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
 });
 
-let openDec = 0, openTask = 0;
-TRIP.decisions.forEach(g=>g.items.forEach(it=>{
-  if(it.cut || it.open!==true) return;
-  if(it.todo===true) openTask++; else openDec++;
-}));
-const openCount = openDec + openTask;
+const openCount = (() => { let c=0; TRIP.decisions.forEach(g=>g.items.forEach(it=>{ if(it.open===true) c++; })); return c; })();
 let mode = openCount > 0 ? 'open' : 'all'; // אם אין פתוחות — מציגים הכל
 
 function render() {
@@ -198,8 +185,7 @@ function render() {
 
 function updateProgress() {
   if(mode==='open'){
-    const decTxt = openDec===0 ? 'אין החלטות פתוחות' : (openDec===1 ? 'החלטה אחת פתוחה' : `${openDec} החלטות פתוחות`);
-    document.getElementById('progLabel').textContent = `🔵 ${decTxt} · 🟢 ${openTask} משימות לסגור`;
+    document.getElementById('progLabel').textContent = `🔵 ${openCount} החלטות פתוחות לדיון עכשיו`;
     document.getElementById('progPct').textContent = '';
     return;
   }
@@ -223,13 +209,9 @@ function applyMode() {
     const visible = [...g.querySelectorAll('.dcard')].some(c => mode==='all' || c.classList.contains('open-dec'));
     g.style.display = visible ? '' : 'none';
   });
-  document.querySelectorAll('.phase-header').forEach(h => {
-    const groups = [...document.querySelectorAll('.dgroup')].filter(g => g.dataset.ph === h.dataset.ph);
-    h.style.display = groups.some(g => g.style.display !== 'none') ? '' : 'none';
-  });
   const closed = total - openCount;
   document.getElementById('fHint').textContent =
-    mode==='open' ? `(${closed} שכבר נסגרו מוסתרות)` : `מציג את כל ${total} הכרטיסים`;
+    mode==='open' ? `(${closed} החלטות שכבר הוחלטו מוסתרות)` : `מציג את כל ${total} ההחלטות`;
   updateProgress();
 }
 
@@ -315,6 +297,6 @@ document.getElementById('modalBg').addEventListener('click',e=>{ if(e.target.id=
 render();
 applyMode();
 </script>
-<script src="delight.js?v=20260910c"></script>
+<script src="delight.js?v=20260911b"></script>
 </body>
 </html>
