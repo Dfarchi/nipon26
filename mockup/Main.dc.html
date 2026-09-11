@@ -7,194 +7,319 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;400;500;700;800&family=Noto+Sans+JP:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
   <style>
-    body { margin:0; background:#0a0f14; }
-    a { color:#8fb8c4; text-decoration:none; } a:hover { color:#b6d8e2; }
-    .jp { font-family:'Noto Sans JP','Heebo',sans-serif; font-weight:300; }
-    @keyframes mistA { 0%{transform:translateX(0)}   100%{transform:translateX(-26px)} }
-    @keyframes mistB { 0%{transform:translateX(0)}   100%{transform:translateX(18px)} }
-    @media (prefers-reduced-motion: reduce){ .mist{animation:none !important} }
+    body { margin:0; background:#0d1220; }
+    a { color:#e8b64c; text-decoration:none; } a:hover { color:#ffd27a; }
+    .jp { font-family:'Noto Sans JP','Heebo',sans-serif; }
+    @keyframes drift1 { 0%{transform:translateX(0)}    100%{transform:translateX(-34px)} }
+    @keyframes drift2 { 0%{transform:translateX(0)}    100%{transform:translateX(26px)} }
+    @keyframes fall   { 0%{transform:translateY(-30px) rotate(0deg); opacity:0}
+                        12%{opacity:.85} 88%{opacity:.85}
+                        100%{transform:translateY(300px) rotate(340deg); opacity:0} }
+    @keyframes rattle { 0%,72%,100%{transform:rotate(0deg)} 78%{transform:rotate(-13deg)}
+                        84%{transform:rotate(11deg)} 90%{transform:rotate(-6deg)} 95%{transform:rotate(0deg)} }
+    @keyframes glow   { 0%,100%{opacity:.72} 50%{opacity:1} }
+    @keyframes bob    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+    @media (prefers-reduced-motion: reduce){ *{animation:none !important} }
   </style>
 </helmet>
 
-<div style="width:390px; height:844px; position:relative; overflow:hidden; direction:rtl; text-align:right;
-  background:#0a0f14; font-family:'Heebo','Segoe UI',Tahoma,sans-serif; color:#e4ecf0; line-height:1.7;">
+<div style="width:390px; height:1080px; position:relative; overflow:hidden; direction:rtl; text-align:right;
+  background:#0d1220; font-family:'Heebo','Segoe UI',Tahoma,sans-serif; color:#f2ece0; line-height:1.65;">
 
-  <!-- ========= אטמוספרה: רשת גרדיאנטים במקום מילוי שטוח ========= -->
-  <div style="position:absolute; inset:0;
-    background:
-      radial-gradient(520px 340px at 82% -6%,  rgba(94,126,150,0.34) 0%, rgba(94,126,150,0) 68%),
-      radial-gradient(420px 300px at 8% 12%,   rgba(126,104,142,0.26) 0%, rgba(126,104,142,0) 70%),
-      radial-gradient(600px 420px at 50% 96%,  rgba(58,84,92,0.30)   0%, rgba(58,84,92,0)   72%),
-      linear-gradient(180deg, #101822 0%, #0a0f14 58%, #080c11 100%);"></div>
+  <!-- ═══════════ שמיים ═══════════ -->
+  <div style="position:absolute; top:0; right:0; width:390px; height:460px;
+    background:linear-gradient(175deg, #16203c 0%, #1d3348 40%, #234049 64%, #17242e 86%, #0d1220 100%);"></div>
 
-  <!-- ========= רכסים בערפל — מטושטשים ומעוותים, לא וקטור שטוח ========= -->
-  <svg viewBox="0 0 390 430" preserveAspectRatio="none" style="position:absolute; top:0; right:0; width:390px; height:430px; pointer-events:none;">
+  <!-- כוכבים + ירח -->
+  <svg viewBox="0 0 390 460" style="position:absolute; top:0; right:0; width:390px; height:460px; pointer-events:none;">
     <defs>
-      <filter id="paint" x="-15%" y="-15%" width="130%" height="130%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.014 0.03" numOctaves="4" seed="7" result="n"/>
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="13" xChannelSelector="R" yChannelSelector="G"/>
-        <feGaussianBlur stdDeviation="0.7"/>
-      </filter>
-      <filter id="far" x="-15%" y="-15%" width="130%" height="130%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.01 0.024" numOctaves="3" seed="19" result="n"/>
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="17" xChannelSelector="R" yChannelSelector="G"/>
-        <feGaussianBlur stdDeviation="3.4"/>
-      </filter>
-      <linearGradient id="r1" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#4a6478" stop-opacity="0.42"/><stop offset="62%" stop-color="#4a6478" stop-opacity="0.10"/><stop offset="100%" stop-color="#4a6478" stop-opacity="0"/>
-      </linearGradient>
-      <linearGradient id="r2" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#3c5566" stop-opacity="0.58"/><stop offset="58%" stop-color="#3c5566" stop-opacity="0.14"/><stop offset="100%" stop-color="#3c5566" stop-opacity="0"/>
-      </linearGradient>
-      <linearGradient id="r3" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#26394a" stop-opacity="0.88"/><stop offset="52%" stop-color="#26394a" stop-opacity="0.34"/><stop offset="100%" stop-color="#26394a" stop-opacity="0"/>
-      </linearGradient>
+      <radialGradient id="moonGlow"><stop offset="0%" stop-color="#fff3d4" stop-opacity="0.55"/><stop offset="100%" stop-color="#fff3d4" stop-opacity="0"/></radialGradient>
     </defs>
-    <g class="mist" style="animation:mistB 54s ease-in-out infinite alternate;">
-      <path filter="url(#far)" fill="url(#r1)" d="M-30,168 C12,150 32,100 60,116 C88,132 106,70 140,90 C170,108 192,84 216,104 C246,128 264,76 298,96 C328,114 352,90 420,118 L420,430 L-30,430 Z"/>
+    <circle cx="306" cy="58" r="50" fill="url(#moonGlow)"/>
+    <circle cx="306" cy="58" r="20" fill="#fdf2d8"/>
+    <circle cx="314" cy="52" r="18" fill="#1d3348" opacity="0.92"/>
+    <g fill="#f6efd8">
+      <circle cx="168" cy="34" r="1.3" opacity=".8"/><circle cx="238" cy="58" r="1" opacity=".6"/>
+      <circle cx="300" cy="30" r="1.4" opacity=".85"/><circle cx="348" cy="72" r="1" opacity=".55"/>
+      <circle cx="206" cy="96" r="1.1" opacity=".5"/><circle cx="368" cy="26" r="1.2" opacity=".7"/>
+      <circle cx="128" cy="120" r="0.9" opacity=".45"/><circle cx="276" cy="112" r="1" opacity=".5"/>
     </g>
-    <g class="mist" style="animation:mistA 38s ease-in-out infinite alternate;">
-      <path filter="url(#far)" fill="url(#r2)" d="M-30,214 C20,196 46,146 78,164 C112,182 130,128 164,150 C198,172 218,140 250,163 C284,187 308,146 342,167 C374,186 398,170 420,180 L420,430 L-30,430 Z"/>
-    </g>
-    <path filter="url(#paint)" fill="url(#r3)" d="M-20,268 C26,252 54,216 90,236 C126,256 148,210 186,232 C222,253 248,218 284,242 C320,265 350,234 410,256 L410,430 L-20,430 Z"/>
   </svg>
 
-  <!-- ========= גרעין פילם על כל המסך ========= -->
-  <svg style="position:absolute; inset:0; width:390px; height:844px; pointer-events:none; opacity:0.16; mix-blend-mode:overlay;">
-    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/></filter>
-    <rect width="390" height="844" filter="url(#grain)"/>
+  <!-- ═══════════ עננים אדומים ═══════════ -->
+  <svg viewBox="0 0 480 150" style="position:absolute; top:66px; right:-60px; width:410px; height:128px; pointer-events:none;
+    animation:drift1 46s ease-in-out infinite alternate; opacity:.9;">
+    <g fill="#efe4d2" opacity="0.92">
+      <circle cx="70" cy="60" r="25"/><circle cx="106" cy="48" r="31"/><circle cx="148" cy="53" r="27"/><circle cx="182" cy="62" r="22"/>
+      <rect x="70" y="60" width="112" height="24" rx="12"/>
+    </g>
+    <g fill="#c1303f">
+      <circle cx="70" cy="60" r="21"/><circle cx="106" cy="48" r="27"/><circle cx="148" cy="53" r="23"/><circle cx="182" cy="62" r="18"/>
+      <rect x="70" y="60" width="112" height="20" rx="10"/>
+    </g>
+    <g fill="#efe4d2" opacity="0.85">
+      <circle cx="300" cy="96" r="19"/><circle cx="330" cy="86" r="24"/><circle cx="364" cy="92" r="20"/>
+      <rect x="300" y="96" width="64" height="18" rx="9"/>
+    </g>
+    <g fill="#a82a38">
+      <circle cx="300" cy="96" r="15.5"/><circle cx="330" cy="86" r="20"/><circle cx="364" cy="92" r="16"/>
+      <rect x="300" y="96" width="64" height="15" rx="7.5"/>
+    </g>
+  </svg>
+  <svg viewBox="0 0 480 120" style="position:absolute; top:150px; right:-90px; width:420px; height:105px; pointer-events:none;
+    animation:drift2 62s ease-in-out infinite alternate; opacity:.55;">
+    <g fill="#e8d9c4" opacity="0.7"><circle cx="196" cy="52" r="17"/><circle cx="224" cy="43" r="22"/><circle cx="254" cy="50" r="18"/><rect x="196" y="52" width="58" height="16" rx="8"/></g>
+    <g fill="#8e2531"><circle cx="196" cy="52" r="14"/><circle cx="224" cy="43" r="18.5"/><circle cx="254" cy="50" r="15"/><rect x="196" y="52" width="58" height="13" rx="6.5"/></g>
   </svg>
 
-  <!-- ========= כותרת ========= -->
-  <div style="position:relative; display:flex; align-items:center; gap:8px; padding:18px 20px 0;">
-    <div style="display:flex; align-items:center; gap:7px; font-size:0.7rem; color:#7e96a2; letter-spacing:0.5px;">
-      <span style="width:5px; height:5px; border-radius:50%; background:#7fbf9a; display:block; box-shadow:0 0 6px rgba(127,191,154,0.8);"></span>מסונכרן
+  <!-- ═══════════ רכס מעורפל ═══════════ -->
+  <svg viewBox="0 0 390 150" preserveAspectRatio="none" style="position:absolute; top:238px; right:0; width:390px; height:150px; pointer-events:none;">
+    <defs>
+      <filter id="soft"><feTurbulence type="fractalNoise" baseFrequency="0.013 0.03" numOctaves="3" seed="9" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="12"/><feGaussianBlur stdDeviation="2.2"/></filter>
+      <linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2c4a52" stop-opacity="0.9"/><stop offset="70%" stop-color="#22383f" stop-opacity="0.55"/><stop offset="100%" stop-color="#1b2c33" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path filter="url(#soft)" fill="url(#rg)" d="M-30,72 C14,56 36,16 66,30 C96,44 116,6 150,24 C182,41 204,20 228,38 C258,60 278,16 312,34 C342,50 366,30 420,52 L420,150 L-30,150 Z"/>
+  </svg>
+
+  <!-- ═══════════ גגות מאצ׳יה + פנסים ═══════════ -->
+  <svg viewBox="0 0 390 118" preserveAspectRatio="none" style="position:absolute; top:316px; right:0; width:390px; height:118px; pointer-events:none;">
+    <!-- פגודה -->
+    <g fill="#141d26">
+      <path d="M44,118 L44,44 L50,44 L50,118 Z"/>
+      <path d="M26,50 L68,50 L60,42 L34,42 Z"/><path d="M23,62 L71,62 L62,53 L32,53 Z"/>
+      <path d="M20,76 L74,76 L64,66 L30,66 Z"/><path d="M15,92 L79,92 L67,80 L27,80 Z"/>
+      <path d="M46,26 L48,42 L46,42 Z M42,30 L52,30 L52,32 L42,32 Z"/>
+    </g>
+    <!-- מאצ׳יה: גגות רעפים עם שורות -->
+    <g fill="#18232e">
+      <path d="M92,118 L92,86 L120,72 L148,86 L148,118 Z"/>
+      <path d="M150,118 L150,94 L174,82 L198,94 L198,118 Z"/>
+      <path d="M200,118 L200,80 L232,64 L264,80 L264,118 Z"/>
+      <path d="M266,118 L266,92 L292,79 L318,92 L318,118 Z"/>
+      <path d="M320,118 L320,84 L352,68 L384,84 L384,118 Z"/>
+    </g>
+    <g stroke="#25333f" stroke-width="1" fill="none" opacity="0.85">
+      <path d="M96,90 L144,90 M99,96 L141,96 M154,98 L194,98 M204,86 L260,86 M207,93 L257,93 M270,96 L314,96 M324,90 L380,90 M327,97 L377,97"/>
+    </g>
+    <!-- חלונות מוארים -->
+    <g fill="#f0a94e">
+      <rect x="104" y="100" width="9" height="12" rx="1.5" opacity=".95"/>
+      <rect x="126" y="100" width="9" height="12" rx="1.5" opacity=".8"/>
+      <rect x="214" y="96" width="10" height="16" rx="1.5" opacity=".9"/>
+      <rect x="240" y="96" width="10" height="16" rx="1.5" opacity=".65"/>
+      <rect x="334" y="100" width="9" height="12" rx="1.5" opacity=".85"/>
+      <rect x="358" y="100" width="9" height="12" rx="1.5" opacity=".7"/>
+      <rect x="166" y="104" width="8" height="10" rx="1.5" opacity=".75"/>
+      <rect x="282" y="104" width="8" height="10" rx="1.5" opacity=".8"/>
+    </g>
+  </svg>
+
+  <!-- פנסים תלויים -->
+  <svg viewBox="0 0 390 70" style="position:absolute; top:330px; right:0; width:390px; height:70px; pointer-events:none;">
+    <defs><radialGradient id="lg"><stop offset="0%" stop-color="#ffb45e" stop-opacity="0.55"/><stop offset="100%" stop-color="#ffb45e" stop-opacity="0"/></radialGradient></defs>
+    <g style="animation:glow 4.2s ease-in-out infinite;">
+      <circle cx="126" cy="30" r="26" fill="url(#lg)"/>
+      <path d="M126,10 L126,17" stroke="#2a3a44" stroke-width="1.4"/>
+      <ellipse cx="126" cy="27" rx="9" ry="11" fill="#e2603f"/>
+      <path d="M117.6,22 h16.8 M117.2,27 h17.6 M117.6,32 h16.8" stroke="#a83c28" stroke-width="1"/>
+      <rect x="121" y="15.5" width="10" height="2.5" rx="1" fill="#2a3a44"/>
+      <rect x="121" y="36.5" width="10" height="2.5" rx="1" fill="#2a3a44"/>
+    </g>
+    <g style="animation:glow 5.6s ease-in-out infinite .8s;">
+      <circle cx="298" cy="34" r="22" fill="url(#lg)"/>
+      <path d="M298,16 L298,22" stroke="#2a3a44" stroke-width="1.2"/>
+      <ellipse cx="298" cy="31" rx="7.5" ry="9.5" fill="#e2603f"/>
+      <path d="M291,27 h14 M291,31.5 h14 M291,36 h14" stroke="#a83c28" stroke-width="0.9"/>
+      <rect x="294" y="20.5" width="8" height="2.2" rx="1" fill="#2a3a44"/>
+      <rect x="294" y="39" width="8" height="2.2" rx="1" fill="#2a3a44"/>
+    </g>
+  </svg>
+
+  <!-- עלי שלכת נופלים -->
+  <div style="position:absolute; top:0; right:0; width:390px; height:660px; pointer-events:none; overflow:hidden;">
+    <svg viewBox="0 0 22 24" style="position:absolute; right:56px; width:15px; animation:fall 13s linear infinite;">
+      <path fill="#d4622f" d="M11,0 L13.4,6 L19,3.4 L16.4,9.4 L22,11.6 L16.4,14 L19,19.6 L13.4,17 L11,23 L8.6,17 L3,19.6 L5.6,14 L0,11.6 L5.6,9.4 L3,3.4 L8.6,6 Z"/></svg>
+    <svg viewBox="0 0 22 24" style="position:absolute; right:184px; width:12px; animation:fall 17s linear infinite 3.5s;">
+      <path fill="#e0a03a" d="M11,0 L13.4,6 L19,3.4 L16.4,9.4 L22,11.6 L16.4,14 L19,19.6 L13.4,17 L11,23 L8.6,17 L3,19.6 L5.6,14 L0,11.6 L5.6,9.4 L3,3.4 L8.6,6 Z"/></svg>
+    <svg viewBox="0 0 22 24" style="position:absolute; right:312px; width:14px; animation:fall 15s linear infinite 7s;">
+      <path fill="#c1303f" d="M11,0 L13.4,6 L19,3.4 L16.4,9.4 L22,11.6 L16.4,14 L19,19.6 L13.4,17 L11,23 L8.6,17 L3,19.6 L5.6,14 L0,11.6 L5.6,9.4 L3,3.4 L8.6,6 Z"/></svg>
+  </div>
+
+  <!-- ═══════════ כותרת ═══════════ -->
+  <div style="position:relative; display:flex; align-items:center; gap:8px; padding:16px 20px 0;">
+    <div style="display:flex; align-items:center; gap:6px; font-size:0.71rem; color:#9fc4a8;">
+      <span style="width:5px; height:5px; border-radius:50%; background:#7fd0a0; display:block; box-shadow:0 0 7px #7fd0a0;"></span>מסונכרן
     </div>
     <div style="flex-grow:1;"></div>
-    <div style="font-weight:300; color:#8fa8b4; letter-spacing:4px; font-size:0.76rem;">NIPON26</div>
+    <div style="font-weight:800; color:#e8b64c; letter-spacing:2.5px; font-size:0.82rem;">NIPON26</div>
   </div>
 
-  <!-- ========= התאריך — הרבה אוויר ========= -->
-  <div style="position:relative; padding:30px 20px 0;">
-    <div style="font-size:0.72rem; color:#6f8894; letter-spacing:1.5px; font-weight:300;">יום 17 · מתוך 45</div>
-    <div style="display:flex; align-items:flex-end; gap:12px; margin-top:6px;">
-      <div style="font-size:3.4rem; font-weight:200; letter-spacing:-1px; line-height:1; color:#eef4f7;">30.10</div>
-      <div style="font-size:0.95rem; color:#8fa8b4; font-weight:300; padding-bottom:8px;">שישי</div>
-    </div>
-    <div style="display:flex; align-items:baseline; gap:9px; margin-top:10px;">
-      <div style="font-size:1.1rem; font-weight:400; color:#dbe6ec;">נגיסו</div>
-      <div class="jp" style="font-size:0.9rem; color:#6f8894;">南木曽</div>
-    </div>
-  </div>
-
-  <!-- ========= עכשיו ========= -->
-  <div style="position:relative; margin:26px 20px 0;">
-    <div style="font-size:0.66rem; color:#6f8894; letter-spacing:2px; font-weight:300; margin-bottom:10px;">עכשיו</div>
-    <div style="background:rgba(24,34,44,0.62); border:1px solid rgba(143,168,180,0.16); border-radius:18px; padding:17px 18px;
-      backdrop-filter:blur(9px); box-shadow:0 14px 40px rgba(0,0,0,0.4);">
-      <div style="display:flex; align-items:baseline; gap:11px;">
-        <div style="font-size:1.7rem; font-weight:300; letter-spacing:0.5px; color:#f4f8fa;">12:00</div>
-        <div style="font-size:1rem; font-weight:400; flex-grow:1; color:#dbe6ec;">הסעה למאצומוטו</div>
-      </div>
-      <div style="font-size:0.85rem; color:#8fa8b4; font-weight:300; margin-top:5px;">טרמינל קמיקוצ׳י 12:30 · מאצומוטו ~14:00</div>
-      <div style="display:flex; align-items:flex-start; gap:9px; margin-top:13px; padding-top:13px; border-top:1px solid rgba(143,168,180,0.13);">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d9a441" stroke-width="1.6" stroke-linecap="round" style="margin-top:3px; flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16v.5"/></svg>
-        <div style="font-size:0.83rem; color:#a8bcc6; font-weight:300;">המקום לא מובטח. לגשת לקבלה ולאשר.</div>
+  <!-- ═══════════ תאריך ═══════════ -->
+  <div style="position:relative; padding:232px 20px 0;">
+    <div style="font-size:0.73rem; color:#c5a888; letter-spacing:1px;">יום 17 · מתוך 45</div>
+    <div style="display:flex; align-items:flex-end; gap:11px; margin-top:2px;">
+      <div style="font-size:3.1rem; font-weight:800; letter-spacing:-1px; line-height:1; color:#fdf6e8; text-shadow:0 3px 18px rgba(0,0,0,.6);">30.10</div>
+      <div style="font-size:0.95rem; color:#d9bb95; padding-bottom:8px;">שישי</div>
+      <div style="flex-grow:1;"></div>
+      <div style="display:flex; align-items:baseline; gap:7px; padding-bottom:6px;">
+        <div style="font-size:1.05rem; font-weight:700; color:#f2ece0;">נגיסו</div>
+        <div class="jp" style="font-size:0.85rem; color:#c5a888;">南木曽</div>
       </div>
     </div>
   </div>
 
-  <!-- ========= אחר כך — ציר שקט ========= -->
-  <div style="position:relative; margin:24px 20px 0;">
-    <div style="font-size:0.66rem; color:#6f8894; letter-spacing:2px; font-weight:300; margin-bottom:12px;">אחר כך</div>
-    <div style="position:relative; padding-right:17px;">
-      <div style="position:absolute; right:3px; top:7px; bottom:9px; width:1px;
-        background:linear-gradient(rgba(143,168,180,0.34), rgba(143,168,180,0.06));"></div>
-      <div style="display:flex; flex-direction:column; gap:15px;">
-        <div style="position:relative; display:flex; align-items:baseline; gap:12px;">
-          <div style="position:absolute; right:-17px; top:8px; width:7px; height:7px; border-radius:50%; background:#5a7a8a;"></div>
-          <div style="font-size:0.84rem; color:#7e96a2; font-weight:300; width:40px;">14:05</div>
-          <div style="font-size:0.92rem; color:#cfdde4; font-weight:300;">מאצומוטו → נאראי</div>
-        </div>
-        <div style="position:relative; display:flex; align-items:baseline; gap:12px;">
-          <div style="position:absolute; right:-17px; top:8px; width:7px; height:7px; border-radius:50%; background:#5a7a8a;"></div>
-          <div style="font-size:0.84rem; color:#7e96a2; font-weight:300; width:40px;">15:00</div>
-          <div style="font-size:0.92rem; color:#cfdde4; font-weight:300;">נאראי-ג׳וקו עד דמדומים</div>
-        </div>
-        <div style="position:relative; display:flex; align-items:baseline; gap:12px;">
-          <div style="position:absolute; right:-18px; top:7px; width:9px; height:9px; border-radius:50%; background:#0a0f14; border:1.5px solid #9db4bf;"></div>
-          <div style="font-size:0.84rem; color:#9db4bf; font-weight:400; width:40px;">18:30</div>
-          <div style="font-size:0.92rem; color:#e4ecf0; font-weight:400;">נגיסו · צ׳ק-אין</div>
-        </div>
+  <!-- ═══════════ עכשיו ═══════════ -->
+  <div style="position:relative; margin:74px 20px 0;">
+    <div style="background:linear-gradient(160deg, rgba(38,52,64,0.94), rgba(24,34,44,0.94));
+      border:1px solid rgba(232,182,76,0.28); border-radius:18px; padding:16px 17px;
+      box-shadow:0 16px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);">
+      <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8b64c" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l4 2.5"/></svg>
+        <div style="font-size:0.7rem; color:#e8b64c; letter-spacing:2px; font-weight:700;">עכשיו</div>
+        <div style="flex-grow:1; height:1px; background:linear-gradient(to left, rgba(232,182,76,.3), transparent);"></div>
+        <div style="font-size:1.35rem; font-weight:800; color:#fdf6e8;">12:00</div>
+      </div>
+      <div style="font-size:1.05rem; font-weight:700; color:#f2ece0;">הסעה למאצומוטו</div>
+      <div style="font-size:0.85rem; color:#b8a894; margin-top:3px;">טרמינל קמיקוצ׳י 12:30 · מאצומוטו ~14:00</div>
+      <div style="display:flex; align-items:flex-start; gap:9px; margin-top:12px; padding:10px 12px; border-radius:12px;
+        background:rgba(226,96,63,0.10); border:1px solid rgba(226,96,63,0.3);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f08a5d" stroke-width="2" stroke-linecap="round" style="margin-top:2px; flex-shrink:0;"><path d="M12 7v6M12 16.5v.5"/><circle cx="12" cy="12" r="9.4" stroke-width="1.5"/></svg>
+        <div style="font-size:0.83rem; color:#f0b79b;">המקום לא מובטח — לגשת לקבלה ולאשר</div>
       </div>
     </div>
   </div>
 
-  <!-- ========= הרגע השונן: חותמת שנחתה ========= -->
-  <div style="position:relative; margin:26px 20px 0; display:flex; align-items:center; gap:14px;">
-    <div style="position:relative; width:62px; height:62px; flex-shrink:0;">
-      <svg viewBox="0 0 72 72" style="position:absolute; inset:0; width:62px; height:62px; transform:rotate(-13deg);">
-        <filter id="stampRough"><feTurbulence type="fractalNoise" baseFrequency="0.14" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/></filter>
-        <g filter="url(#stampRough)">
-          <circle cx="36" cy="36" r="29" fill="rgba(214,58,74,0.13)" stroke="#d63a4a" stroke-width="3.4"/>
-          <text x="36" y="47" text-anchor="middle" font-size="31" fill="#d63a4a" font-family="Noto Sans JP, sans-serif" font-weight="500">湯</text>
-        </g>
+  <!-- ═══════════ כפתורי ענן ═══════════ -->
+  <div style="position:relative; margin:18px 20px 0; display:flex; gap:12px;">
+    <div style="position:relative; flex-grow:1; height:62px;">
+      <svg viewBox="0 0 160 62" style="position:absolute; inset:0; width:100%; height:62px;">
+        <g fill="#efe4d2"><circle cx="34" cy="34" r="20"/><circle cx="66" cy="25" r="24"/><circle cx="100" cy="28" r="22"/><circle cx="128" cy="35" r="18"/><rect x="34" y="34" width="94" height="20" rx="10"/></g>
+        <g fill="#c1303f"><circle cx="34" cy="34" r="16.5"/><circle cx="66" cy="25" r="20.5"/><circle cx="100" cy="28" r="18.5"/><circle cx="128" cy="35" r="14.5"/><rect x="34" y="34" width="94" height="16" rx="8"/></g>
       </svg>
-      <svg viewBox="0 0 72 72" style="position:absolute; inset:0; width:62px; height:62px; opacity:0.5;">
-        <g stroke="#d63a4a" stroke-width="1.6" stroke-linecap="round" fill="none">
-          <path d="M36 3 v5 M36 64 v5 M3 36 h5 M64 36 h5 M12 12 l3.5 3.5 M56.5 56.5 l3.5 3.5 M60 12 l-3.5 3.5 M15.5 56.5 l-3.5 3.5"/>
+      <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:7px; padding-bottom:2px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff6e8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>
+        <span style="font-size:0.88rem; font-weight:700; color:#fff6e8;">ניווט</span>
+      </div>
+    </div>
+    <div style="position:relative; flex-grow:1; height:62px;">
+      <svg viewBox="0 0 160 62" style="position:absolute; inset:0; width:100%; height:62px;">
+        <g fill="#d8cbb4" opacity=".55"><circle cx="34" cy="34" r="20"/><circle cx="66" cy="25" r="24"/><circle cx="100" cy="28" r="22"/><circle cx="128" cy="35" r="18"/><rect x="34" y="34" width="94" height="20" rx="10"/></g>
+        <g fill="#2b3b48"><circle cx="34" cy="34" r="16.5"/><circle cx="66" cy="25" r="20.5"/><circle cx="100" cy="28" r="18.5"/><circle cx="128" cy="35" r="14.5"/><rect x="34" y="34" width="94" height="16" rx="8"/></g>
+      </svg>
+      <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:7px; padding-bottom:2px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e0d3bc" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+        <span style="font-size:0.88rem; font-weight:700; color:#e0d3bc;">ההזמנה</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ אחר כך + קודאמה ═══════════ -->
+  <div style="position:relative; margin:20px 20px 0;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+      <div style="font-size:0.7rem; color:#c5a888; letter-spacing:2px; font-weight:700;">אחר כך</div>
+      <div style="flex-grow:1; height:1px; background:rgba(197,168,136,.22);"></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:13px;
+        background:rgba(30,42,52,0.7); border:1px solid rgba(197,168,136,0.14);">
+        <div style="font-size:0.85rem; font-weight:700; color:#c5a888; width:42px;">14:05</div>
+        <div style="flex-grow:1; font-size:0.92rem;">מאצומוטו → נאראי</div>
+        <div style="width:7px; height:7px; border-radius:50%; background:#e0a03a;"></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:13px;
+        background:rgba(30,42,52,0.7); border:1px solid rgba(197,168,136,0.14);">
+        <div style="font-size:0.85rem; font-weight:700; color:#c5a888; width:42px;">15:00</div>
+        <div style="flex-grow:1; font-size:0.92rem;">נאראי-ג׳וקו עד דמדומים</div>
+        <div style="width:7px; height:7px; border-radius:50%; background:#7fd0a0;"></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:13px;
+        background:rgba(48,38,30,0.82); border:1px solid rgba(232,182,76,0.3);">
+        <div style="font-size:0.85rem; font-weight:800; color:#e8b64c; width:42px;">18:30</div>
+        <div style="flex-grow:1; font-size:0.92rem; font-weight:600;">נגיסו · צ׳ק-אין</div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e8b64c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+      </div>
+    </div>
+
+    <!-- קודאמה מציץ מאחורי הכרטיסים -->
+    <svg viewBox="0 0 40 56" style="position:absolute; left:-6px; bottom:-14px; width:38px; height:53px; animation:bob 5s ease-in-out infinite;">
+      <g style="animation:rattle 7s ease-in-out infinite; transform-origin:20px 20px;">
+        <ellipse cx="20" cy="19" rx="13" ry="14" fill="#e6ece4"/>
+        <ellipse cx="15" cy="16" rx="2.6" ry="3" fill="#1a2228"/>
+        <ellipse cx="25" cy="15.5" rx="2.4" ry="2.8" fill="#1a2228"/>
+        <ellipse cx="20" cy="24" rx="2.8" ry="3.4" fill="#1a2228"/>
+      </g>
+      <path d="M16,32 L15,53 L25,53 L24,32 Z" fill="#dae2d8"/>
+      <path d="M16,39 L8,34 M24,39 L32,34" stroke="#dae2d8" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- ═══════════ חותמת ═══════════ -->
+  <div style="position:relative; margin:22px 20px 124px; display:flex; align-items:center; gap:13px;">
+    <div style="position:relative; width:54px; height:54px; flex-shrink:0;">
+      <svg viewBox="0 0 72 72" style="position:absolute; inset:0; width:54px; height:54px; transform:rotate(-12deg);">
+        <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.8"/></filter>
+        <g filter="url(#rough)">
+          <circle cx="36" cy="36" r="29" fill="rgba(193,48,63,0.16)" stroke="#d6414f" stroke-width="3.6"/>
+          <text x="36" y="47" text-anchor="middle" font-size="31" fill="#d6414f" font-family="Noto Sans JP, sans-serif" font-weight="700">湯</text>
         </g>
       </svg>
     </div>
     <div style="flex-grow:1;">
-      <div style="font-size:0.95rem; font-weight:500; color:#f0a0aa;">חותמת שלישית</div>
-      <div style="font-size:0.8rem; color:#7e96a2; font-weight:300;">נקאנויו · שלושה לילות בעמק</div>
+      <div style="font-size:0.93rem; font-weight:700; color:#f2a0aa;">חותמת שלישית</div>
+      <div style="font-size:0.79rem; color:#b8a894;">נקאנויו · שלושה לילות בעמק</div>
     </div>
-    <div class="jp" style="font-size:0.66rem; color:#5c7480; letter-spacing:1px;">スタンプラリー</div>
+    <div class="jp" style="font-size:0.64rem; color:#8a7a68; letter-spacing:1px;">スタンプラリー</div>
   </div>
 
-  <!-- ========= הלילה ========= -->
-  <div style="position:relative; margin:22px 20px 0; display:flex; align-items:center; gap:12px;
-    background:rgba(24,34,44,0.5); border:1px solid rgba(143,168,180,0.13); border-radius:16px; padding:14px 16px; backdrop-filter:blur(9px);">
-    <div style="flex-grow:1;">
-      <div style="font-size:0.66rem; color:#6f8894; letter-spacing:1.5px; font-weight:300;">הלילה</div>
-      <div style="font-size:0.98rem; font-weight:400; color:#e4ecf0; margin-top:3px;">Nagi Stay</div>
-    </div>
-    <div style="display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%;
-      background:rgba(143,168,180,0.10); border:1px solid rgba(143,168,180,0.22);">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#bdd2db" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>
-    </div>
-  </div>
-
-  <!-- ========= ניווט תחתון ========= -->
+  <!-- ═══════════ ניווט + טורי ═══════════ -->
+  <svg viewBox="0 0 390 92" preserveAspectRatio="none" style="position:absolute; bottom:0; right:0; width:390px; height:92px; pointer-events:none; opacity:.55;">
+    <g fill="#c1303f" opacity="0.5">
+      <path d="M168,92 L168,40 L176,40 L176,92 Z M214,92 L214,40 L222,40 L222,92 Z
+               M156,32 C180,22 210,22 234,32 L234,40 C210,31 180,31 156,40 Z
+               M163,50 L227,50 L227,56 L163,56 Z"/>
+    </g>
+  </svg>
   <div style="position:absolute; bottom:0; right:0; width:390px; height:70px;
-    background:linear-gradient(transparent, rgba(8,12,17,0.92) 42%); display:flex; align-items:flex-end; padding:0 10px 14px;">
-    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#e4ecf0;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e4ecf0" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/><circle cx="12" cy="15" r="1.8" fill="#e4ecf0" stroke="none"/></svg>
-      <span style="font-size:0.6rem; font-weight:400; letter-spacing:0.5px;">היום</span>
+    background:linear-gradient(transparent, rgba(13,18,32,0.95) 46%); display:flex; align-items:flex-end; padding:0 8px 12px;">
+    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:#e8b64c;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#e8b64c" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/><circle cx="12" cy="15" r="1.9" fill="#e8b64c" stroke="none"/></svg>
+      <span style="font-size:0.61rem; font-weight:700;">היום</span>
     </div>
-    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#5c7480;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5c7480" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.3"/><circle cx="18" cy="18" r="2.3"/><path d="M6 8.3v4.2a4 4 0 0 0 4 4h4"/></svg>
-      <span style="font-size:0.6rem; font-weight:300;">מסלול</span>
+    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:#7d7466;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#7d7466" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v4.1a4 4 0 0 0 4 4h4"/></svg>
+      <span style="font-size:0.61rem;">מסלול</span>
     </div>
-    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#5c7480;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5c7480" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="17" height="12" rx="3"/><path d="M3.5 10.5h17"/></svg>
-      <span style="font-size:0.6rem; font-weight:300;">ארנק</span>
+    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:#7d7466;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#7d7466" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="17" height="12" rx="3"/><path d="M3.5 10.5h17"/></svg>
+      <span style="font-size:0.61rem;">ארנק</span>
     </div>
-    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#5c7480;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5c7480" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5l2 2 3.5-3.5M4 16.5l2 2 3.5-3.5M13 7.5h7M13 16.5h7"/></svg>
-      <span style="font-size:0.6rem; font-weight:300;">משימות</span>
+    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:#7d7466;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#7d7466" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5l2 2 3.5-3.5M4 16.5l2 2 3.5-3.5M13 7.5h7M13 16.5h7"/></svg>
+      <span style="font-size:0.61rem;">משימות</span>
     </div>
-    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#5c7480;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5c7480" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5.5H4v10h5l3 3 3-3h5z"/></svg>
-      <span style="font-size:0.6rem; font-weight:300;">יפנית</span>
+    <div style="flex-grow:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:#7d7466;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#7d7466" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5.5H4v10h5l3 3 3-3h5z"/></svg>
+      <span style="font-size:0.61rem;">יפנית</span>
     </div>
   </div>
+
+  <!-- קודאמה שני, מציץ מבין גגות הכפר -->
+  <svg viewBox="0 0 34 46" style="position:absolute; right:150px; top:300px; width:21px; height:28px; opacity:.9; animation:bob 6.5s ease-in-out infinite 1.4s;">
+    <g style="animation:rattle 9s ease-in-out infinite 2s; transform-origin:17px 16px;">
+      <ellipse cx="17" cy="15" rx="10.5" ry="11.5" fill="#dde5db"/>
+      <ellipse cx="13" cy="13" rx="2.1" ry="2.4" fill="#1a2228"/>
+      <ellipse cx="21" cy="12.6" rx="1.9" ry="2.2" fill="#1a2228"/>
+      <ellipse cx="17" cy="19.5" rx="2.2" ry="2.7" fill="#1a2228"/>
+    </g>
+    <path d="M13.5,26 L13,44 L21,44 L20.5,26 Z" fill="#d2dbd0"/>
+  </svg>
 </div>
 </x-dc>
-<script data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":1080}}'>
 class Component extends DCLogic {}
 </script>
 </body>
