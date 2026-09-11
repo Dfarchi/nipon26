@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0e14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>היום · NIPON26</title>
+<link rel="stylesheet" href="styles.css?v=20260911d">
+<style>
+/* ===== ערכות: לילה / יום. הרקע הוא שכבה אחת שאפשר להחליף בתמונה. ===== */
+:root{
+  --sky1:#16203c; --sky2:#1d3348; --sky3:#234049; --skyEnd:#0d1220;
+  --ink:#f2ece0; --dim:#b8a894; --soft:#c5a888;
+  --card:rgba(30,42,52,.78); --line:rgba(197,168,136,.16);
+  --hot:#e8b64c; --warn:#f08a5d; --ok:#7fd0a0;
+}
+body.is-day{
+  --sky1:#8fc4dd; --sky2:#bcd9e4; --sky3:#e4d8c0; --skyEnd:#f3ece0;
+  --ink:#2a2119; --dim:#6f6152; --soft:#8a7458;
+  --card:rgba(255,252,246,.86); --line:rgba(120,95,62,.18);
+  --hot:#c8621f; --warn:#c04a2a; --ok:#3f8a5c;
+}
+html,body{margin:0;padding:0}
+body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Tahoma,sans-serif;
+  line-height:1.65;min-height:100vh;transition:background .6s}
+.scene{position:fixed;top:0;right:0;left:0;height:58vh;max-height:430px;z-index:0;pointer-events:none;
+  background:linear-gradient(175deg,var(--sky1) 0%,var(--sky2) 40%,var(--sky3) 66%,var(--skyEnd) 100%);
+  transition:background .6s}
+.scene svg{position:absolute;bottom:0;right:0;width:100%}
+.art{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0}
+.page{position:relative;z-index:1;padding:14px 18px 96px;max-width:520px;margin:0 auto}
+.topline{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--soft)}
+.brand{font-weight:800;letter-spacing:2.5px;font-size:.82rem;color:var(--hot)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 7px currentColor}
+.lede{padding-top:clamp(150px,34vh,250px)}
+.kicker{font-size:.73rem;color:var(--soft);letter-spacing:1px}
+.dnum{font-size:3rem;font-weight:800;letter-spacing:-1px;line-height:1;text-shadow:0 3px 18px rgba(0,0,0,.35)}
+body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
+.row{display:flex;align-items:flex-end;gap:11px;margin-top:2px;flex-wrap:wrap}
+.city{font-size:1.05rem;font-weight:700}
+.jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;
+  backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,.28);margin-top:14px}
+.card.now{border-color:color-mix(in srgb,var(--hot) 45%,transparent)}
+.lbl{font-size:.7rem;letter-spacing:2px;font-weight:700;color:var(--hot);display:flex;align-items:center;gap:8px}
+.lbl i{flex:1;height:1px;background:var(--line);display:block}
+.big{font-size:1.35rem;font-weight:800}
+.t{font-size:1.02rem;font-weight:700;margin-top:5px}
+.d{font-size:.85rem;color:var(--dim);margin-top:3px}
+.note{margin-top:11px;padding:10px 12px;border-radius:12px;font-size:.83rem;display:flex;gap:9px;align-items:flex-start}
+.note.w{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
+.steps{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.step{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:13px;background:var(--card);border:1px solid var(--line)}
+.step b{font-size:.85rem;color:var(--soft);min-width:42px}
+.step span{flex:1;font-size:.92rem}
+.pip{width:7px;height:7px;border-radius:50%;flex:none}
+.acts{display:flex;gap:10px;margin-top:14px}
+.cloud{position:relative;flex:1;height:58px;border:0;background:none;padding:0;cursor:pointer;font-family:inherit}
+.cloud svg{position:absolute;inset:0;width:100%;height:58px}
+.cloud span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:.88rem;font-weight:700;color:#fff6e8;padding-bottom:2px}
+.cloud.g span{color:var(--ink)}
+.nav{position:fixed;bottom:0;right:0;left:0;z-index:5;display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  background:color-mix(in srgb,var(--skyEnd) 92%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(10px)}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:.61rem;text-decoration:none}
+.nav a.on{color:var(--hot);font-weight:700}
+.pre{text-align:center;padding:22px 0 4px}
+.pre .n{font-size:2.6rem;font-weight:800;color:var(--hot);line-height:1}
+.pick{position:fixed;bottom:calc(64px + env(safe-area-inset-bottom));left:8px;z-index:6;max-width:44vw;
+  background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:9px;
+  padding:4px 7px;font-size:.66rem;font-family:inherit;opacity:.75}
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene">
+  <div class="art" id="art"></div>
+  <svg viewBox="0 0 390 180" preserveAspectRatio="none" style="height:180px">
+    <defs>
+      <filter id="paint" x="-15%" y="-15%" width="130%" height="130%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.013 0.03" numOctaves="4" seed="7" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="13"/><feGaussianBlur stdDeviation="1.6"/>
+      </filter>
+      <linearGradient id="r1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--ridge)" stop-opacity=".45"/><stop offset="100%" stop-color="var(--ridge)" stop-opacity="0"/></linearGradient>
+      <linearGradient id="r2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--ridge2)" stop-opacity=".8"/><stop offset="100%" stop-color="var(--ridge2)" stop-opacity="0"/></linearGradient>
+    </defs>
+    <path filter="url(#paint)" fill="url(#r1)" d="M-30,74 C12,58 32,18 60,34 C88,50 106,10 140,28 C170,44 192,22 216,40 C246,62 264,14 298,32 C328,48 352,26 420,54 L420,180 L-30,180 Z"/>
+    <path filter="url(#paint)" fill="url(#r2)" d="M-30,116 C20,100 46,60 78,78 C112,96 130,48 164,68 C198,88 218,58 250,80 C284,102 308,62 342,82 C374,100 398,88 420,96 L420,180 L-30,180 Z"/>
+  </svg>
+  <svg viewBox="0 0 390 76" preserveAspectRatio="none" style="height:76px" id="village"></svg>
+</div>
+
+<div class="page">
+  <div class="topline">
+    <span class="dot" id="netDot"></span><span id="netTxt">מסונכרן</span>
+    <span style="flex:1"></span><span class="brand">NIPON26</span>
+  </div>
+  <div id="main"></div>
+</div>
+
+<nav class="nav">
+  <a class="on" href="today.html"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/><circle cx="12" cy="15" r="1.9" fill="currentColor" stroke="none"/></svg>היום</a>
+  <a href="itinerary.html"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v4.1a4 4 0 0 0 4 4h4"/></svg>מסלול</a>
+  <a href="documents.html"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6.5" width="17" height="12" rx="3"/><path d="M3.5 10.5h17"/></svg>ארנק</a>
+  <a href="decisions.html"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5l2 2 3.5-3.5M4 16.5l2 2 3.5-3.5M13 7.5h7M13 16.5h7"/></svg>משימות</a>
+  <a href="budget.html"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9h6M9 12h6M12 9v8"/></svg>תקציב</a>
+</nav>
+
+<select class="pick" id="pick" title="לבחור יום (לפיתוח)"></select>
+
+<script src="data.js?v=20260911d"></script>
+<script src="today.js?v=20260911d"></script>
+<script src="pwa.js?v=20260911d"></script>
+</body>
+</html>
