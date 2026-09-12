@@ -126,14 +126,81 @@ window.App = (function () {
     let tick = false;
     const run = () => {
       const y = window.scrollY || 0;
+      const skyL = document.querySelector('.scene .l-sky');
+      const chars = document.querySelector('.scene .l-chars');
+      if (skyL) skyL.style.transform = `translateY(${y * 0.06}px)`;
       if (far)  far.style.transform  = `translateY(${y * 0.12}px)`;
       if (near) near.style.transform = `translateY(${y * 0.26}px)`;
       if (vil)  vil.style.transform  = `translateY(${y * 0.42}px)`;
+      if (chars) chars.style.transform = `translateY(${y * 0.42}px)`;
       sky.style.opacity = String(Math.max(0.25, 1 - y / 520));
       tick = false;
     };
     addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(run); } }, { passive: true });
     run();
+  }
+
+  // ---- כוכבים: מיקומים קבועים, לא אקראיים — אחרת הם קופצים בכל רינדור ----
+  const STARS = [[8,14],[17,7],[24,20],[31,10],[39,17],[46,6],[54,22],[61,12],
+                 [68,8],[74,19],[82,11],[89,21],[94,9],[13,25],[35,27],[57,29],[79,26],[21,13]];
+
+  // ---- שכבת שמיים: שמש/ירח, כוכבים, עננים, ציפורים ----
+  function skyLayer() {
+    const A = window.ART || {};
+    if (theme === 'night') {
+      const stars = STARS.map(([x, y], i) =>
+        `<i class="star" style="left:${x}%;top:${y}%;animation-delay:${(i % 7) * .7}s"></i>`).join('');
+      return `<div class="l-sky">${stars}
+        <div class="orb" style="left:14%;top:9%">${A.moon ? A.moon(54) : ''}</div></div>`;
+    }
+    return `<div class="l-sky">
+      <div class="orb" style="left:16%;top:7%">${A.sun ? A.sun(62) : ''}</div>
+      <div class="drift d1">${cloudSVG('var(--skyCloud)')}</div>
+      <div class="drift d2">${cloudSVG('var(--skyCloud)')}</div>
+      <svg class="birds" viewBox="0 0 60 20" width="54">
+        <g fill="none" stroke="var(--bird)" stroke-width="1.4" stroke-linecap="round">
+          <path d="M4,9 q4,-4 8,0 q4,-4 8,0"/><path d="M24,15 q3,-3 6,0 q3,-3 6,0"/>
+          <path d="M40,6 q2.6,-2.6 5.2,0 q2.6,-2.6 5.2,0"/></g></svg></div>`;
+  }
+
+  // ---- דמויות: החתולות של הבית, ומי שעל הגג ----
+  // mode מגיע ממזג האוויר, ומשנה תנוחה ואביזרים.
+  function charLayer(mode) {
+    const A = window.ART || {};
+    if (!A.cat) return '<div class="l-chars"></div>';
+    const wet = mode === 'rain', cold = mode === 'snow';
+    const night = theme === 'night';
+
+    // בגשם החתולות מסתתרות מתחת למטרייה; בקור הן מתכרבלות; בלילה הן ישנות.
+    const curl = night || cold;
+    const morgana = A.cat({ coat: 'var(--cat1)', pose: curl ? 'curl' : 'sit', w: curl ? 34 : 27, delay: 0 });
+    const baltrkis = A.cat({ coat: 'var(--cat2)', pose: curl ? 'curl' : 'sit', w: curl ? 31 : 25, delay: 2.3 });
+
+    let h = '<div class="l-chars">';
+
+    // חוט פנסים כמו במאצורי. הפנסים תלויים עליו במקום לרחף:
+    // הקשת היא בזייה ריבועית, והגובה של כל פנס מחושב מהנקודה שבה הוא נתלה.
+    if (night) {
+      h += `<svg class="wire" viewBox="0 0 100 12" preserveAspectRatio="none">
+        <path d="M0,0 Q50,12 100,0" fill="none" stroke="var(--wire)" stroke-width=".7"/></svg>`;
+      [[18, 12, 0], [40, 10, 1.1], [62, 13, .5], [84, 11, 1.7]].forEach(([pct, w, dly]) => {
+        const t = pct / 100, dist = 68 - 24 * t * (1 - t);   // מרחק החוט מתחתית הסצנה
+        h += `<div class="ch" style="left:${pct}%;bottom:${(dist - w * 30 / 18).toFixed(1)}px">
+          ${A.lantern({ w: w, delay: dly })}</div>`;
+      });
+    }
+
+    // החתולות יושבות על רכסי הגגות שכבר קיימים ב-l-village:
+    // גג 258,35 → 39px מהתחתית · גג 86,38 → 36px · גג 356,38 → 36px
+    h += `<div class="ch" style="left:66.2%;bottom:38px">
+      ${wet ? `<div class="brolly">${A.umbrella(30)}</div>` : ''}${morgana}
+      ${cold ? '<i class="snowcap"></i>' : ''}</div>`;
+    h += `<div class="ch" style="left:22%;bottom:35px">${baltrkis}</div>`;
+    h += night
+      ? `<div class="ch" style="left:91.3%;bottom:35px">${A.ninja(24)}</div>`
+      : `<div class="ch walk" style="left:6%;bottom:2px">${A.traveler(26)}</div>`;
+    h += '</div>';
+    return h;
   }
 
   // ---- ציור הסצנה ----
@@ -142,7 +209,7 @@ window.App = (function () {
     document.body.classList.toggle('is-day', theme === 'day');
     const mt = document.querySelector('meta[name=theme-color]');
     if (mt) mt.content = theme === 'day' ? '#f3ece0' : '#0b0e14';
-    host.innerHTML = `<div class="art"></div><div class="fx" id="fx"></div>
+    host.innerHTML = `<div class="art"></div>${skyLayer()}<div class="fx" id="fx"></div>
       <svg class="l-far" viewBox="0 0 390 150" preserveAspectRatio="none" style="height:150px">
         <defs>
           <filter id="pt" x="-15%" y="-15%" width="130%" height="130%">
@@ -174,7 +241,20 @@ window.App = (function () {
           <rect x="340" y="60" width="8" height="11" rx="1.5"/><rect x="362" y="60" width="8" height="11" rx="1.5"/>
           <rect x="124" y="64" width="7" height="9" rx="1.5"/><rect x="300" y="64" width="7" height="9" rx="1.5"/>
         </g>
-      </svg>`;
+      </svg>
+      ${charLayer('')}<div class="haze" id="haze"></div>`;
+  }
+
+  // ---- עדכון הדמויות והאובך כשמזג האוויר מתברר ----
+  function decorate(mode) {
+    const host = document.getElementById('scene');
+    if (!host) return;
+    const old = host.querySelector('.l-chars');
+    if (old) old.outerHTML = charLayer(mode);
+    const haze = document.getElementById('haze');
+    if (haze) haze.classList.toggle('on', mode === 'mist');
+    // שמש בוהקת באמצע גשם נראית כמו באג. מעוננים = מעמעמים את גוף השמיים.
+    host.classList.toggle('overcast', mode === 'rain' || mode === 'snow' || mode === 'mist');
   }
 
   function cloudSVG(fill) {
@@ -211,10 +291,14 @@ window.App = (function () {
     const phase = (T.dayPhase && T.days) ? (T.dayPhase[T.days[dayIndex()].st] ?? 0) : 0;
     const fx = document.getElementById('fx');
     const forced = q.get('wx');
-    if (forced) return particles(fx, forced);
-    particles(fx, theme === 'day' ? 'leaves' : 'clear');   // ברירת מחדל מיידית
-    weather(phase, m => particles(fx, theme === 'night' && m === 'leaves' ? 'clear' : m));
+    if (forced) { particles(fx, forced); decorate(forced); return; }
+    const first = theme === 'day' ? 'leaves' : 'clear';
+    particles(fx, first); decorate(first);              // ברירת מחדל מיידית
+    weather(phase, m => {
+      const mode = theme === 'night' && m === 'leaves' ? 'clear' : m;
+      particles(fx, mode); decorate(mode);
+    });
   }
 
-  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, dl, cloudSVG, boot, today0, firstDay, particles };
+  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, dl, cloudSVG, boot, today0, firstDay, particles, decorate };
 })();

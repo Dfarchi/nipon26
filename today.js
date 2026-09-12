@@ -25,8 +25,8 @@
   let h = '';
   if (A.beforeTrip) {
     const n = Math.round((A.firstDay - A.today0) / 864e5);
-    h += `<div style="text-align:center;padding:18px 0 2px"><div class="kicker">עד ההמראה</div>
-      <div style="font-size:2.6rem;font-weight:800;color:var(--hot);line-height:1">${n}</div>
+    h += `<div class="countdown"><div class="kicker">עד ההמראה</div>
+      <div class="n">${n}</div>
       <div class="d">ימים · אל על LY91 · 13 אוק׳ 19:45</div></div>`;
   }
   h += `<div class="head"${A.beforeTrip ? ' style="padding-top:clamp(30px,8vh,70px)"' : ''}>
@@ -84,7 +84,8 @@
         ${(a.l || []).length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">` +
           a.l.map(x => `<a class="chip" href="${x.u}" target="_blank" rel="noopener" style="text-decoration:none">${A.esc(x.t)}</a>`).join('') +
           `</div>` : ''}
-      </div>`).join('') : `<div class="d" style="text-align:center;padding:10px 0">יום פנוי — בלי פעילויות מתוכננות</div>`) +
+      </div>`).join('') : `<div class="empty">${(window.ART && ART.onigiri) ? ART.onigiri({ w: 58 }) : ''}
+        <div class="d">יום פנוי — בלי פעילויות מתוכננות</div></div>`) +
     `</div></div>`;
 
   document.getElementById('main').innerHTML = h;

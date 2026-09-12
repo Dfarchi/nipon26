@@ -5,6 +5,14 @@
   --card:rgba(30,42,52,.80); --line:rgba(197,168,136,.16);
   --hot:#e8b64c; --warn:#f08a5d; --ok:#7fd0a0; --hi:#c1303f;
   --ridge:#4a6478; --ridge2:#26394a; --roof:#18232e; --lit:#f0a94e; --tree:#1d2b28;
+  /* איור: לילה */
+  --cat1:#33414f; --cat2:#8d7a63; --catInner:#c98089; --catEye:#f0c05a;
+  --figure:#1e2a38; --skyCloud:#2a3b52; --bird:#3b4f66; --wire:#4a5a6b;
+  --moon:#e8e2cf; --moonCrater:#b3ab95; --sun:#ffcf6b; --sunCore:#ffdf9a;
+  --lantern:#e8734a; --lanternGlow:#ff9b52; --lanternRib:#8c3b1e;
+  --umbrella:#c1303f; --umbrellaRib:#e8dcc4;
+  --torii:#a8362f; --rice:#f4efe4; --riceEdge:#d8cdb8; --nori:#2b3b33;
+  --noriFace:#f4efe4; --blush:#e08a72; --salmon:#e8845c; --salmonStripe:#f6c4ab;
 }
 body.is-day{
   --sky1:#8fc4dd; --sky2:#bcd9e4; --sky3:#e4d8c0; --skyEnd:#f3ece0;
@@ -12,6 +20,14 @@ body.is-day{
   --card:rgba(255,252,246,.88); --line:rgba(120,95,62,.18);
   --hot:#c8621f; --warn:#c04a2a; --ok:#3f8a5c; --hi:#b3372c;
   --ridge:#7f9bb0; --ridge2:#5d7f95; --roof:#6b5a48; --lit:#a8906e; --tree:#5c7a4a;
+  /* איור: יום */
+  --cat1:#3f3730; --cat2:#c9a274; --catInner:#e59aa0; --catEye:#4a7f4f;
+  --figure:#5a4a3a; --skyCloud:#ffffff; --bird:#7d8fa0; --wire:#8d7f6b;
+  --moon:#e8e2cf; --moonCrater:#b3ab95; --sun:#ffc44d; --sunCore:#fff0c2;
+  --lantern:#e8734a; --lanternGlow:#ff9b52; --lanternRib:#8c3b1e;
+  --umbrella:#c1303f; --umbrellaRib:#f6f1e6;
+  --torii:#c0453a; --rice:#fffaf0; --riceEdge:#e0d5bf; --nori:#3a4a3f;
+  --noriFace:#fffaf0; --blush:#e8907a; --salmon:#f0906a; --salmonStripe:#ffd6bd;
 }
 html,body{margin:0;padding:0;direction:rtl;text-align:right}
 body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Tahoma,sans-serif;
@@ -19,12 +35,23 @@ body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Ta
 .scene{position:fixed;top:0;right:0;left:0;height:44vh;max-height:340px;z-index:0;pointer-events:none;
   background:linear-gradient(175deg,var(--sky1) 0%,var(--sky2) 40%,var(--sky3) 66%,var(--skyEnd) 100%);transition:background .6s}
 .scene .art{position:absolute;inset:0;background-size:cover;background-position:center}
-.scene svg{position:absolute;bottom:0;right:0;width:100%}
+/* רק שכבות הרקע נמתחות לרוחב — לא כל svg בסצנה, אחרת החתולות נמתחות איתן */
+.scene > svg{position:absolute;bottom:0;right:0;width:100%}
 .page{position:relative;z-index:1;padding:14px 16px 92px;max-width:560px;margin:0 auto}
 .topline{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--soft)}
 .brand{font-weight:800;letter-spacing:2.5px;font-size:.82rem;color:var(--hot)}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 7px currentColor}
 .head{padding-top:clamp(90px,22vh,170px)}
+/* יורד אל מתחת לפס האיור, כדי שהסצנה תישאר שלמה מעליו ולא ייווצר טשטוש על הכפר */
+.countdown{text-align:center;padding:14px 18px 12px;border-radius:20px;
+  margin-top:calc(min(44vh,340px) - 46px);
+  background:color-mix(in srgb,var(--skyEnd) 72%,transparent);
+  border:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.countdown .n{font-size:2.6rem;font-weight:800;color:var(--hot);line-height:1;
+  text-shadow:0 3px 16px color-mix(in srgb,var(--skyEnd) 70%,transparent)}
+/* צ׳יפ בדיקה זמני — מוודא שעדכונים מגיעים למכשיר. להסיר כשמאשרים. */
+.ping{display:inline-block;margin:2px 0 0;padding:4px 12px;border-radius:99px;font-size:.72rem;
+  font-weight:700;color:#fff6e8;background:color-mix(in srgb,var(--hi) 88%,transparent)}
 .kicker{font-size:.73rem;color:var(--soft);letter-spacing:1px}
 .h1{font-size:2.1rem;font-weight:800;letter-spacing:-.5px;line-height:1.1}
 .dnum{font-size:3rem;font-weight:800;letter-spacing:-1px;line-height:1;text-shadow:0 3px 18px rgba(0,0,0,.35)}
@@ -33,7 +60,8 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .city{font-size:1.05rem;font-weight:700}
 .jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:.85rem}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;
-  backdrop-filter:blur(10px);box-shadow:0 12px 34px rgba(0,0,0,.24);margin-top:12px}
+  backdrop-filter:blur(10px);box-shadow:0 12px 34px rgba(0,0,0,.24);margin-top:12px;
+  transition:transform .18s ease,border-color .18s ease}
 .card.now{border-color:color-mix(in srgb,var(--hot) 45%,transparent)}
 .card.alert{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
 .lbl{font-size:.7rem;letter-spacing:2px;font-weight:700;color:var(--hot);display:flex;align-items:center;gap:8px;margin-bottom:8px}
@@ -46,7 +74,10 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .note.w{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
 .note.g{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
 .steps{display:flex;flex-direction:column;gap:7px}
-.step{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:13px;background:var(--card);border:1px solid var(--line)}
+.step{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:13px;background:var(--card);
+  border:1px solid var(--line);transition:transform .16s ease,border-color .16s ease}
+a.step:active,.card[data-todo]:active,a[data-dec]:active{transform:scale(.985)}
+a.step,a[data-dec]{-webkit-tap-highlight-color:transparent}
 .step b{font-size:.85rem;color:var(--soft);min-width:44px}
 .step span{flex:1;font-size:.92rem}
 .pip{width:7px;height:7px;border-radius:50%;flex:none}
@@ -54,6 +85,12 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .chip.hot{color:var(--hot);border-color:color-mix(in srgb,var(--hot) 42%,transparent)}
 .chip.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 42%,transparent)}
 .chip.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 42%,transparent)}
+a.chip{padding:4px 11px;color:var(--soft);background:color-mix(in srgb,var(--hot) 8%,transparent);
+  transition:background .16s ease,color .16s ease}
+a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var(--ink)}
+/* מצב ריק — איור במקום שורת טקסט בודדת */
+.empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 0 14px;opacity:.9}
+.empty svg{display:block}
 .acts{display:flex;gap:10px;margin-top:14px}
 .cloud{position:relative;flex:1;height:58px;border:0;background:none;padding:0;cursor:pointer;font-family:inherit}
 .cloud svg{position:absolute;inset:0;width:100%;height:58px}
@@ -70,13 +107,67 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .nav{position:fixed;bottom:0;right:0;left:0;z-index:5;display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));
   background:color-mix(in srgb,var(--skyEnd) 94%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(12px)}
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:.61rem;text-decoration:none}
+.nav a{position:relative;padding:5px 0 3px;transition:color .18s ease}
 .nav a.on{color:var(--hot);font-weight:700}
+.nav a.on::before{content:'';position:absolute;inset:0 12% auto;height:100%;border-radius:12px;
+  background:color-mix(in srgb,var(--hot) 11%,transparent);z-index:-1}
 .pick{position:fixed;bottom:calc(62px + env(safe-area-inset-bottom));left:8px;z-index:6;max-width:44vw;
   background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:9px;
   padding:4px 7px;font-size:.66rem;font-family:inherit;opacity:.75}
 .scene .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.scene .l-far,.scene .l-village{will-change:transform}
+.scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{will-change:transform}
+
+/* ===== שכבת שמיים ===== */
+.l-sky{position:absolute;inset:0;overflow:hidden}
+.l-sky .orb{position:absolute;line-height:0;transition:opacity 1s}
+.scene.overcast .l-sky .orb{opacity:.18}
+.scene.overcast .l-sky .drift{opacity:.85}
+.scene.overcast .l-sky .birds{opacity:0}
+.art-sun{animation:glow 9s ease-in-out infinite}
+.art-moon{animation:glow 12s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.9}50%{opacity:1}}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;
+  box-shadow:0 0 4px #fff;animation:twinkle 4.5s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.22;transform:scale(.8)}50%{opacity:.95;transform:scale(1.15)}}
+.l-sky .drift{position:absolute;line-height:0;opacity:.5}
+.l-sky .drift svg{width:120px;height:44px}
+.l-sky .d1{top:16%;animation:drift 68s linear infinite}
+.l-sky .d2{top:31%;transform:scale(.72);animation:drift 96s linear infinite -30s}
+@keyframes drift{0%{left:-24%}100%{left:112%}}
+.l-sky .birds{position:absolute;top:23%;left:58%;opacity:.5;animation:soar 44s linear infinite}
+@keyframes soar{0%{transform:translate(14vw,6px)}100%{transform:translate(-90vw,-14px)}}
+
+/* ===== דמויות על הגגות ===== */
+.l-chars{position:absolute;right:0;left:0;bottom:0;height:74px}
+.l-chars .ch{position:absolute;transform:translateX(-50%);line-height:0}
+.l-chars .wire{position:absolute;right:0;left:0;bottom:56px;width:100%;height:12px;opacity:.9}
+.art-cat,.art-fig,.art-lantern{overflow:visible}
+.art-cat .tail{transform-box:view-box;transform-origin:29px 32px;animation:sway 3.4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(12deg)}}
+.art-cat .blink{transform-box:fill-box;transform-origin:center;animation:blink 6.5s infinite}
+@keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.08)}}
+.breathe{transform-origin:center bottom;animation:breathe 4.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.art-fig .ribbon{transform-box:view-box;transform-origin:20px 8px;animation:sway 2.8s ease-in-out infinite}
+.art-lantern{animation:hang 5.2s ease-in-out infinite;transform-origin:top center}
+@keyframes hang{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}
+.l-chars .walk{animation:stroll 54s linear infinite}
+@keyframes stroll{0%{left:-8%}100%{left:104%}}
+.l-chars .brolly{position:absolute;bottom:20px;left:50%;transform:translateX(-46%);line-height:0}
+.l-chars .snowcap{position:absolute;top:2px;left:50%;transform:translateX(-50%);
+  width:16px;height:6px;border-radius:8px 8px 3px 3px;background:#f2f6f8;opacity:.92}
+
+/* אובך: מצב ערפל, לא שגיאה */
+.scene .haze{position:absolute;inset:0;opacity:0;transition:opacity 1.2s;
+  background:linear-gradient(transparent 32%,color-mix(in srgb,var(--skyEnd) 62%,#c9d6dd) 100%)}
+.scene .haze.on{opacity:1}
+
 @keyframes fall{0%{transform:translateY(-40px) rotate(0);opacity:0}
   10%{opacity:.8}88%{opacity:.8}100%{transform:translateY(46vh) rotate(340deg);opacity:0}}
 @keyframes drop{0%{transform:translateY(-30px);opacity:0}10%{opacity:.7}100%{transform:translateY(46vh);opacity:0}}
-@media (prefers-reduced-motion:reduce){.scene .fx{display:none}.scene .l-far,.scene .l-village{transform:none !important}}
+@media (prefers-reduced-motion:reduce){
+  .scene .fx{display:none}
+  .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{transform:none !important}
+  .art-sun,.art-moon,.star,.drift,.birds,.art-cat .tail,.art-cat .blink,.breathe,
+  .art-fig .ribbon,.art-lantern,.l-chars .walk{animation:none !important}
+}
