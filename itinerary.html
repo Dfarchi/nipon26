@@ -2,87 +2,26 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b0e14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>מסלול · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=20260911f">
-<style>
-  .stage-card { display:flex; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--border);
-    border-radius:14px; padding:16px 18px; margin-bottom:12px; transition:.15s; cursor:pointer; }
-  .stage-card:hover { border-color:var(--accent); transform:translateY(-2px); }
-  .stage-dot { flex:none; width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-    font-weight:800; font-size:1.05rem; color:#fff; }
-  .stage-meta { flex:1; min-width:0; }
-  .stage-title { font-weight:700; font-size:1.05rem; }
-  .stage-sub { color:var(--dim); font-size:0.82rem; margin-top:2px; }
-  .stage-p { color:var(--muted); font-size:0.88rem; margin-top:5px; line-height:1.5; }
-  .stage-go { flex:none; color:var(--dim); font-size:1.3rem; }
-  .parked-h { margin:30px 0 10px; color:var(--gold); font-size:1.05rem; font-weight:700;
-    border-bottom:1px solid var(--border); padding-bottom:6px; }
-  .stage-card.parked { opacity:0.7; border-style:dashed; }
-  .stage-card.parked:hover { opacity:1; }
-</style>
+<title>מסלול · NIPON26</title>
+<link rel="stylesheet" href="app.css?v=20260911g">
 </head>
 <body>
-<div class="topbar"><div class="wrap">
-  <a class="tab" href="site.html">🏠 שער</a>
-  <a class="tab" href="decisions.html">🧭 החלטות</a>
-  <a class="tab active" href="itinerary.html">🗓️ מסלול</a>
-  <a class="tab" href="budget.html">💴 תקציב</a>
-  <a class="tab" href="transit.html">🚇 תחבורה</a>
-  <a class="tab" href="documents.html">📂 מסמכים</a>
-  <span class="brand">🍁 NIPON26</span>
-</div></div>
-
-<div class="hero" style="padding-bottom:10px">
-  <h1 style="font-size:2.2rem">🗓️ המסלול</h1>
-  <div class="sub"><span id="nStages">—</span> שלבים · צפון→דרום · לחצו על שלב כדי לפתוח מפה + יום-ביום</div>
+<div class="scene" id="scene"></div>
+<div class="page">
+  <div class="topline"><span class="dot" id="netDot"></span><span id="netTxt">מסונכרן</span>
+    <span style="flex:1"></span><span class="brand">NIPON26</span></div>
+  <div id="main"></div>
 </div>
+<nav class="nav" id="nav"></nav>
 
-<div class="wrap">
-  <div id="stages"></div>
-  <div id="parked"></div>
-  <div class="callout" style="margin-top:18px">
-    📌 טיוטה. בכל שלב יש מפה עם התחנות ולינקים, ויום-ביום מפורט (מתמלא בהדרגה — כרגע קנסאי וטוקיו מלאים).
-  </div>
-</div>
-
-<footer>🍁 NIPON26 · המסלול מתעדכן לפי ההחלטות 🍁</footer>
-<script src="data.js?v=20260911f"></script>
-<script>
-  const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
-  const stages = document.getElementById('stages');
-  const parkedWrap = document.getElementById('parked');
-  let parkedHtml = '';
-
-  (TRIP.phases||[]).forEach((p, i) => {
-    const color = PHASE_COLORS[i % PHASE_COLORS.length];
-    const label = (p.h.match(/שלב\s*([\d.]+)/) || [,'•'])[1];
-    const title = (p.h.split('·')[1] || p.h).trim();
-    const card = `<a class="stage-card ${p.parked?'parked':''}" href="stage.html?s=${i}">
-        <span class="stage-dot" style="background:${color}">${label}</span>
-        <span class="stage-meta">
-          <span class="stage-title">${title}</span>
-          <div class="stage-sub">${p.when} · ${p.nights}</div>
-          <div class="stage-p">${p.p||''}</div>
-        </span>
-        <span class="stage-go">←</span>
-      </a>`;
-    if(p.parked) parkedHtml += card;
-    else stages.insertAdjacentHTML('beforeend', card);
-  });
-
-  const nEl=document.getElementById('nStages');
-  if(nEl) nEl.textContent=(TRIP.phases||[]).filter(p=>!p.parked).length;
-
-  if(parkedHtml){
-    parkedWrap.innerHTML = '<div class="parked-h">❓ בסימן שאלה — לא בתוכנית כרגע</div>' + parkedHtml;
-  }
-</script>
-<script src="delight.js?v=20260911f"></script>
-<script src="pwa.js?v=20260911f"></script>
+<script src="data.js?v=20260911g"></script>
+<script src="app.js?v=20260911g"></script>
+<script src="itinerary.js?v=20260911g"></script>
+<script src="pwa.js?v=20260911g"></script>
 </body>
 </html>
