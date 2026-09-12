@@ -17,12 +17,12 @@
   let h = `<div class="head"><div class="kicker">הכל שמור במכשיר</div><div class="h1">הארנק</div></div>`;
 
   // ---- כרטיס להראות לנהג ----
-  if (cur && (cur.f.addr || cur.f.phone)) {
+  if (cur && (cur.f.addr || cur.f.phone || (T.stayAddr || {})[cur.n])) {
     h += `<div class="lbl" style="margin-top:16px">להראות לנהג<i></i><span class="jp" style="color:var(--soft)">タクシー</span></div>
       <div class="tcard">
         <div class="ask jp">ここまでお願いします</div>
         <div class="nm jp">${A.esc(cur.n).replace(/^[^—·]*[—·]\s*/, '')}</div>
-        ${cur.f.addr ? `<div class="ad jp">${cur.f.addr}</div>` : ''}
+        ${cur.f.addr || (T.stayAddr || {})[cur.n] ? `<div class="ad jp">${A.esc(cur.f.addr || T.stayAddr[cur.n])}</div>` : ''}
         ${cur.f.phone ? `<div class="ph">${cur.f.phone}</div>` : ''}
       </div>
       <div class="d" style="margin-top:6px;text-align:center">בהיר בכוונה — זה המסך היחיד שזר קורא</div>`;

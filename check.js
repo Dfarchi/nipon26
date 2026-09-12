@@ -80,6 +80,12 @@ live.forEach((p, i) => /^שלב \d+ /.test(p.h) && +p.h.match(/\d+/)[0] === i + 
   ? null : fail(`"${p.h}": מספור השלב לא תואם את מקומו ברשימה (${i + 1})`));
 if (!bad) ok('מספור השלבים רציף');
 
+console.log('=== כתובת ניווט לכל לינה ===');
+const noAddr = (T.budget.booked || []).filter(b => !(T.stayAddr || {})[b.n]);
+noAddr.length
+  ? noAddr.forEach(b => fail(`"${b.n}": אין כתובת ב-STAY_ADDR — כפתור הניווט ייפול לחיפוש עיר כללי`))
+  : ok(`כל ${(T.budget.booked || []).length} הלינות מזוהות לכתובת מדויקת`);
+
 console.log('=== מחרוזת מטמון (?v=) זהה בכל ה-HTML ===');
 const fs = require('fs');
 const vers = new Set();

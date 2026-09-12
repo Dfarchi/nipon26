@@ -54,13 +54,20 @@
       ${f.addr ? `<div class="jp" style="margin-top:5px;font-size:.92rem">${f.addr}</div>` : ''}</div>`;
   }
 
-  const dest = encodeURIComponent((latin || city || '') + ' Japan');
+  // יעד הניווט, מהמדויק לכללי. אין יעד מדויק — אין כפתור: עדיף בלי, מאשר
+  // לשלוח את שניכם לחיפוש "טוקיו" כללי כשאתם עומדים ברחוב.
   const a0 = acts[0];
-  const navLink = a0 && (a0.l || []).find(x => /🧭|מסלול/.test(x.t || ''));
-  const navHref = navLink ? navLink.u : `https://www.google.com/maps/search/?api=1&query=${dest}`;
+  const navLink = (acts.map(a => (a.l || []).find(x => /🧭|מסלול/.test(x.t || ''))).find(Boolean))
+    || (a0 && (a0.l || []).find(x => /🗺️/.test(x.t || '')));
+  const stayAddr = stay && ((T.stayAddr || {})[stay.n] || A.factsFor(stay.n).addr || '');
+  const cityQ = latin || jp || '';
+  const navHref = navLink ? navLink.u
+    : stayAddr ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(stayAddr)
+    : cityQ ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cityQ + ' Japan')
+    : '';
   h += `<div class="acts">
-    <button class="cloud" onclick="location.href='${navHref}'">
-      ${A.cloudSVG('var(--hi)')}<span>ניווט</span></button>
+    ${navHref ? `<button class="cloud" onclick="location.href='${navHref}'">
+      ${A.cloudSVG('var(--hi)')}<span>ניווט</span></button>` : ''}
     <button class="cloud g" id="fullDayBtn">
       ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>היום המלא</span></button></div>`;
 
