@@ -8,6 +8,7 @@
   /* איור: לילה */
   --cat1:#33414f; --cat2:#8d7a63; --catInner:#c98089; --catEye:#f0c05a;
   --figure:#1e2a38; --skyCloud:#2a3b52; --bird:#3b4f66; --wire:#4a5a6b;
+  --vignette:rgba(0,0,0,.28);
   --moon:#e8e2cf; --moonCrater:#b3ab95; --sun:#ffcf6b; --sunCore:#ffdf9a;
   --lantern:#e8734a; --lanternGlow:#ff9b52; --lanternRib:#8c3b1e;
   --umbrella:#c1303f; --umbrellaRib:#e8dcc4;
@@ -23,6 +24,7 @@ body.is-day{
   /* איור: יום */
   --cat1:#3f3730; --cat2:#c9a274; --catInner:#e59aa0; --catEye:#4a7f4f;
   --figure:#5a4a3a; --skyCloud:#ffffff; --bird:#7d8fa0; --wire:#8d7f6b;
+  --vignette:rgba(96,74,48,.13);
   --moon:#e8e2cf; --moonCrater:#b3ab95; --sun:#ffc44d; --sunCore:#fff0c2;
   --lantern:#e8734a; --lanternGlow:#ff9b52; --lanternRib:#8c3b1e;
   --umbrella:#c1303f; --umbrellaRib:#f6f1e6;
@@ -116,6 +118,23 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
   padding:4px 7px;font-size:.66rem;font-family:inherit;opacity:.75}
 .scene .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{will-change:transform}
+
+
+/* ===== נייר וואשי: הגרעין שמפריד בין "ציור שטוח" לבין הדפס =====
+   רעש פרקטלי שנוצר פעם אחת ומרוצף כרקע, לא פילטר חי על כל הסצנה —
+   feTurbulence על שטח מלא הוא יקר מדי בטלפון. */
+.scene::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22170%22%20height%3D%22170%22%3E%3Cfilter%20id%3D%22n%22%20x%3D%220%22%20y%3D%220%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.85%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22170%22%20height%3D%22170%22%20filter%3D%22url(%23n)%22%2F%3E%3C%2Fsvg%3E");background-size:170px 170px;
+  opacity:.10;mix-blend-mode:overlay}
+body.is-day .scene::after{opacity:.09;mix-blend-mode:multiply}
+/* וינייטה עדינה — נותנת עומק לשמיים במקום משטח אחיד */
+.scene::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(125% 85% at 50% 6%,transparent 55%,var(--vignette) 100%)}
+/* הכרטיס לנהג הוא עצם נייר — מקבל את אותו גרעין, חזק יותר */
+.tcard::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22170%22%20height%3D%22170%22%3E%3Cfilter%20id%3D%22n%22%20x%3D%220%22%20y%3D%220%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.85%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22170%22%20height%3D%22170%22%20filter%3D%22url(%23n)%22%2F%3E%3C%2Fsvg%3E");background-size:150px 150px;
+  opacity:.18;mix-blend-mode:multiply}
+.tcard > *{position:relative;z-index:1}
 
 /* ===== שכבת שמיים ===== */
 .l-sky{position:absolute;inset:0;overflow:hidden}
