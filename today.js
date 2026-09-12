@@ -55,13 +55,38 @@
   }
 
   const dest = encodeURIComponent((latin || city || '') + ' Japan');
+  const a0 = acts[0];
+  const navLink = a0 && (a0.l || []).find(x => /🧭|מסלול/.test(x.t || ''));
+  const navHref = navLink ? navLink.u : `https://www.google.com/maps/search/?api=1&query=${dest}`;
   h += `<div class="acts">
-    <button class="cloud" onclick="location.href='https://www.google.com/maps/search/?api=1&query=${dest}'">
+    <button class="cloud" onclick="location.href='${navHref}'">
       ${A.cloudSVG('var(--hi)')}<span>ניווט</span></button>
-    <button class="cloud g" onclick="location.href='stage.html?s=${T.dayPhase[cur.st] ?? 0}'">
+    <button class="cloud g" id="fullDayBtn">
       ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>היום המלא</span></button></div>`;
 
+  h += `<div id="fullDayWrap" hidden style="margin-top:16px">
+    <div class="lbl q">כל הפעילויות היום<i></i></div>
+    <div class="steps" style="margin-top:8px">` +
+    (acts.length ? acts.map(a => `
+      <div class="card" style="padding:12px 14px">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="t" style="flex:1">${a.ic || ''} ${A.esc(a.t)}</div>
+          <i class="pip" style="background:${crowd(a.cr)}"></i>
+        </div>
+        ${a.d ? `<div class="d" style="margin-top:5px;line-height:1.5">${A.esc(a.d)}</div>` : ''}
+        ${(a.l || []).length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">` +
+          a.l.map(x => `<a class="chip" href="${x.u}" target="_blank" rel="noopener" style="text-decoration:none">${A.esc(x.t)}</a>`).join('') +
+          `</div>` : ''}
+      </div>`).join('') : `<div class="d" style="text-align:center;padding:10px 0">יום פנוי — בלי פעילויות מתוכננות</div>`) +
+    `</div></div>`;
+
   document.getElementById('main').innerHTML = h;
+
+  document.getElementById('fullDayBtn').onclick = () => {
+    const w = document.getElementById('fullDayWrap');
+    w.hidden = !w.hidden;
+    if (!w.hidden) w.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const pick = document.getElementById('pick');
   pick.innerHTML = T.days.map((d, i) => `<option value="${i}"${i === idx ? ' selected' : ''}>${i + 1}. ${String(d.t).slice(0, 20)}</option>`).join('');

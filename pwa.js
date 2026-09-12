@@ -24,14 +24,26 @@
     else document.addEventListener('DOMContentLoaded', () => document.body.appendChild(bar), { once: true });
   }
 
-  // חיווי "אין רשת" — לא מודאל, רק פס דק שלא חוסם כלום
+  // חיווי "אין רשת" — לא שגיאה, מצב מתוכנן: מה עדיין עובד ומתי סונכרן לאחרונה
+  const SYNC_KEY = 'nipon26_last_sync';
+  if (navigator.onLine) localStorage.setItem(SYNC_KEY, String(Date.now()));
+
   const bar = document.createElement('div');
-  bar.textContent = '⚡ אין רשת — מוצג המידע השמור';
   bar.style.cssText = 'position:fixed;bottom:0;right:0;left:0;z-index:300;padding:7px 14px;' +
     'background:#1f2937;color:#9aa6b8;font-size:0.8rem;text-align:center;' +
     "font-family:'Segoe UI',Tahoma,sans-serif;transform:translateY(100%);transition:.3s";
-  const show = () => { bar.style.transform = navigator.onLine ? 'translateY(100%)' : 'translateY(0)'; };
-  window.addEventListener('online', show);
+  const show = () => {
+    if (navigator.onLine) { bar.style.transform = 'translateY(100%)'; return; }
+    let when = '';
+    const t = +localStorage.getItem(SYNC_KEY);
+    if (t) {
+      const d = new Date(t), pad = n => String(n).padStart(2, '0');
+      when = ` · סונכרן לאחרונה ${pad(d.getDate())}.${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    bar.textContent = `⚡ אין רשת — מוצג המידע השמור${when}`;
+    bar.style.transform = 'translateY(0)';
+  };
+  window.addEventListener('online', () => { localStorage.setItem(SYNC_KEY, String(Date.now())); show(); });
   window.addEventListener('offline', show);
   document.addEventListener('DOMContentLoaded', () => { document.body.appendChild(bar); show(); });
 })();

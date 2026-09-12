@@ -2,60 +2,26 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b0e14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>מסמכים · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=20260912b">
+<title>מסמכים · NIPON26</title>
+<link rel="stylesheet" href="app.css?v=20260912c">
 </head>
 <body>
-<div class="topbar"><div class="wrap">
-  <a class="tab" href="site.html">🏠 שער</a>
-  <a class="tab" href="decisions.html">🧭 החלטות</a>
-  <a class="tab" href="itinerary.html">🗓️ מסלול</a>
-  <a class="tab" href="budget.html">💴 תקציב</a>
-  <a class="tab" href="transit.html">🚇 תחבורה</a>
-  <a class="tab active" href="documents.html">📂 מסמכים</a>
-  <span class="brand">🍁 NIPON26</span>
-</div></div>
-
-<div class="hero" style="padding-bottom:10px">
-  <h1 style="font-size:2.2rem">📂 מסמכי הטיול</h1>
-  <div class="sub">מקור האמת — מקושר ישירות לגוגל דרייב</div>
+<div class="scene" id="scene"></div>
+<div class="page">
+  <div class="topline"><span class="dot" id="netDot"></span><span id="netTxt">מסונכרן</span>
+    <span style="flex:1"></span><span class="brand">NIPON26</span></div>
+  <div id="main"></div>
 </div>
+<nav class="nav" id="nav"></nav>
 
-<div class="wrap">
-  <div style="display:grid; gap:12px;" id="docs"></div>
-
-  <div class="sec-h" style="margin-top:26px"><h2 style="font-size:1.2rem">♨️ מקורות שימושיים</h2><div class="line"></div></div>
-  <div style="display:grid; gap:12px;" id="resources"></div>
-
-  <div class="callout" style="margin-top:18px">
-    💡 ערכו במסמכים בדרייב מכל מכשיר (גם מהטלפון). כשתרצו שהקלסר יתעדכן — אמרו לי "תעדכן את האתר לפי הדרייב".
-  </div>
-</div>
-
-<footer>🍁 NIPON26 · כל הקבצים מסונכרנים מהדרייב 🍁</footer>
-<script src="data.js?v=20260912b"></script>
-<script>
-  const c = document.getElementById('docs');
-  TRIP.docs.forEach(d => {
-    const a = document.createElement('a');
-    a.className = 'doc'; a.href = d.url; a.target = '_blank'; a.rel = 'noopener';
-    a.innerHTML = `<div class="ic">${d.ic}</div><div class="meta"><div class="t">${d.t}</div><div class="d">${d.d}</div></div><div class="go">↗</div>`;
-    c.appendChild(a);
-  });
-  const rc = document.getElementById('resources');
-  (TRIP.resources || []).forEach(d => {
-    const a = document.createElement('a');
-    a.className = 'doc'; a.href = d.url; a.target = '_blank'; a.rel = 'noopener';
-    a.innerHTML = `<div class="ic">${d.ic}</div><div class="meta"><div class="t">${d.t}</div><div class="d">${d.d}</div></div><div class="go">↗</div>`;
-    rc.appendChild(a);
-  });
-</script>
-<script src="delight.js?v=20260912b"></script>
-<script src="pwa.js?v=20260912b"></script>
+<script src="data.js?v=20260912c"></script>
+<script src="app.js?v=20260912c"></script>
+<script src="documents.js?v=20260912c"></script>
+<script src="pwa.js?v=20260912c"></script>
 </body>
 </html>

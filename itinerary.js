@@ -41,9 +41,10 @@
       h += `<div class="steps" style="margin-top:10px">` + byPhase[i].map(({ d, i: di }) => {
         const m = String(d.t).match(/^(\d{1,2}\.\d{1,2})\s*—\s*(.*)$/);
         const isToday = di === idx;
-        return `<div class="step"${isToday ? ' style="border-color:color-mix(in srgb,var(--hot) 45%,transparent)"' : ''}>
+        const style = 'text-decoration:none;color:inherit' + (isToday ? ';border-color:color-mix(in srgb,var(--hot) 45%,transparent)' : '');
+        return `<a class="step" href="today.html?d=${di}" style="${style}">
           <b>${m ? m[1] : ''}</b><span>${A.esc(clip(m ? m[2] : String(d.t), 46))}</span>
-          ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</div>`;
+          ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</a>`;
       }).join('') + `</div>`;
     }
     h += `</div></div>`;

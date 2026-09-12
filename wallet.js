@@ -29,8 +29,9 @@
   }
 
   // ---- דדליינים קרובים ----
-  const deadlines = booked.map(b => ({ b, d: A.dl(b.f.free) })).filter(x => x.d && x.d.days >= 0)
-    .sort((a, b) => a.d.days - b.d.days).slice(0, 3);
+  const allDeadlines = booked.map(b => ({ b, d: A.dl(b.f.free) })).filter(x => x.d && x.d.days >= 0)
+    .sort((a, b) => a.d.days - b.d.days);
+  const deadlines = allDeadlines.slice(0, 3);
   if (deadlines.length) {
     h += `<div class="lbl" style="margin-top:20px">ביטול חינם — מה שנסגר קרוב<i></i></div>`;
     deadlines.forEach(({ b, d }) => {
@@ -39,6 +40,10 @@
         <span>${A.esc(b.n)}</span>
         <span class="chip ${cls}">${d.days === 0 ? 'היום' : d.days === 1 ? 'מחר' : 'בעוד ' + d.days + ' ימים'}</span></div>`;
     });
+    if (allDeadlines.length) {
+      h += `<div class="acts" style="margin-top:10px"><button class="cloud g" id="icsBtn">
+        ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>הוסיפו ליומן (.ics)</span></button></div>`;
+    }
   }
 
   // ---- כל הלינות ----
@@ -65,4 +70,34 @@
     });
   }
   document.getElementById('main').innerHTML = h;
+
+  const icsBtn = document.getElementById('icsBtn');
+  if (icsBtn) icsBtn.onclick = () => downloadICS(allDeadlines);
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function icsDate(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
+  function icsEsc(s) { return String(s).replace(/([,;])/g, '\\$1').replace(/\n/g, '\\n'); }
+
+  function downloadICS(list) {
+    const stamp = icsDate(new Date()) + 'T000000Z';
+    const events = list.map(({ b, d }) => {
+      const next = new Date(d.date); next.setDate(next.getDate() + 1);
+      return ['BEGIN:VEVENT',
+        `UID:${b.n.replace(/\s+/g, '')}-${icsDate(d.date)}@nipon26`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART;VALUE=DATE:${icsDate(d.date)}`,
+        `DTEND;VALUE=DATE:${icsDate(next)}`,
+        `SUMMARY:${icsEsc('ביטול חינם עד — ' + b.n)}`,
+        `DESCRIPTION:${icsEsc(b.n + ' · ' + b.d)}`,
+        'END:VEVENT'].join('\r\n');
+    });
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//NIPON26//Trip//HE', 'CALSCALE:GREGORIAN']
+      .concat(events).concat('END:VCALENDAR').join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'nipon26-deadlines.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
 })();
