@@ -17,48 +17,76 @@
   const curPhase = T.dayPhase[T.days[idx].st];
   const title = h => h.replace(/^\s*שלב\s*[\d.]+\s*·?\s*/, '').trim();
 
-  let h = `<div class="head"><div class="kicker">${active.length} שלבים · ${T.days.length} ימים</div>
-    <div class="h1">המסלול</div></div>`;
+  // מצב הפתיחה נשמר במכשיר: אם פתחת שלב, הלכת ליום וחזרת — הוא עדיין פתוח.
+  const KEY = 'nipon26_phases_v1';
+  let open = null;
+  // ריק שנשמר בכוונה הוא לא "מעולם לא נשמר" — אחרת קיפול של הכל היה נפתח ברענון
+  try { const raw = localStorage.getItem(KEY); if (raw) open = new Set(JSON.parse(raw)); } catch (e) {}
+  if (!open) open = new Set([curPhase]);                 // ברירת מחדל: רק הנוכחי
+  const saveOpen = () => { try { localStorage.setItem(KEY, JSON.stringify([...open])); } catch (e) {} };
 
-  h += `<div style="position:relative;margin-top:18px;padding-right:20px">
-    <div style="position:absolute;right:6px;top:6px;bottom:6px;width:2px;border-radius:2px;
-      background:linear-gradient(var(--hi),var(--hot),var(--ok))"></div>`;
+  function draw() {
+    let h = `<div class="head"><div class="kicker">${active.length} שלבים · ${T.days.length} ימים</div>
+      <div class="h1">המסלול</div></div>`;
 
-  active.forEach(({ p, i }) => {
-    const isCur = i === curPhase;
-    h += `<div style="position:relative;padding-bottom:14px">
-      <div style="position:absolute;right:-17px;top:5px;width:${isCur ? 14 : 10}px;height:${isCur ? 14 : 10}px;
-        border-radius:50%;background:var(--hot);border:2px solid var(--skyEnd)${isCur ? ';box-shadow:0 0 0 3px color-mix(in srgb,var(--hot) 30%,transparent)' : ''}"></div>
-      <div class="card"${isCur ? ' style="border-color:color-mix(in srgb,var(--hot) 45%,transparent)"' : ''}>
-        <div style="display:flex;align-items:baseline;gap:8px">
-          <div class="t" style="flex:1">${A.esc(title(p.h))}</div>
-          ${isCur ? '<span class="chip hot">כאן עכשיו</span>' : `<div class="d" style="margin:0">${A.esc(p.when)}</div>`}
-        </div>
-        <div class="d" style="margin-top:4px">${A.esc(p.nights)}</div>
-        <div class="d" style="margin-top:6px;line-height:1.6">${A.esc(clip(p.p, isCur ? 260 : 130))}</div>`;
+    h += `<div style="position:relative;margin-top:18px;padding-right:20px">
+      <div style="position:absolute;right:6px;top:6px;bottom:6px;width:2px;border-radius:2px;
+        background:linear-gradient(var(--hi),var(--hot),var(--ok))"></div>`;
 
-    if (isCur && byPhase[i]) {
-      h += `<div class="steps" style="margin-top:10px">` + byPhase[i].map(({ d, i: di }) => {
-        const m = String(d.t).match(/^(\d{1,2}\.\d{1,2})\s*—\s*(.*)$/);
-        const isToday = di === idx;
-        const style = 'text-decoration:none;color:inherit' + (isToday ? ';border-color:color-mix(in srgb,var(--hot) 45%,transparent)' : '');
-        return `<a class="step" href="today.html?d=${di}" style="${style}">
-          <b>${m ? m[1] : ''}</b><span>${A.esc(clip(m ? m[2] : String(d.t), 46))}</span>
-          ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</a>`;
-      }).join('') + `</div>`;
-    }
-    h += `</div></div>`;
-  });
-  h += `</div>`;
+    active.forEach(({ p, i }) => {
+      const isCur = i === curPhase;
+      const isOpen = open.has(i);
+      const days = byPhase[i] || [];
+      h += `<div style="position:relative;padding-bottom:14px">
+        <div style="position:absolute;right:-17px;top:5px;width:${isCur ? 14 : 10}px;height:${isCur ? 14 : 10}px;
+          border-radius:50%;background:var(--hot);border:2px solid var(--skyEnd)${isCur ? ';box-shadow:0 0 0 3px color-mix(in srgb,var(--hot) 30%,transparent)' : ''}"></div>
+        <div class="card"${isCur ? ' style="border-color:color-mix(in srgb,var(--hot) 45%,transparent)"' : ''}>
+          <button class="exp" data-ph="${i}" aria-expanded="${isOpen}">
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <div class="t" style="flex:1">${A.esc(title(p.h))}</div>
+              ${isCur ? '<span class="chip hot">כאן עכשיו</span>' : `<div class="d" style="margin:0">${A.esc(p.when)}</div>`}
+            </div>
+            <div class="d" style="margin-top:4px">${A.esc(p.nights)}</div>
+          </button>`;
 
-  if (parked.length) {
-    h += `<div class="lbl q" style="margin-top:22px">בסימן שאלה<i></i></div>`;
-    parked.forEach(({ p }) => {
-      h += `<div class="card" style="margin-top:8px;opacity:.7">
-        <div class="t">${A.esc(p.h.replace(/^אופציה\s*·\s*/, ''))}</div>
-        <div class="d" style="margin-top:4px">${A.esc(clip(p.p, 160))}</div></div>`;
+      if (isOpen) {
+        h += `<div class="ph-body">
+          <div class="d" style="margin-top:8px;line-height:1.6">${A.esc(p.p)}</div>`;
+        if (days.length) {
+          h += `<div class="steps" style="margin-top:10px">` + days.map(({ d, i: di }) => {
+            const m = String(d.t).match(/^(\d{1,2}\.\d{1,2})\s*—\s*(.*)$/);
+            const isToday = di === idx;
+            const style = 'text-decoration:none;color:inherit' + (isToday ? ';border-color:color-mix(in srgb,var(--hot) 45%,transparent)' : '');
+            return `<a class="step" href="today.html?d=${di}" style="${style}">
+              <b>${m ? m[1] : ''}</b><span>${A.esc(clip(m ? m[2] : String(d.t), 46))}</span>
+              ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</a>`;
+          }).join('') + `</div>`;
+        }
+        h += `</div>`;
+      }
+      h += `</div></div>`;
     });
+    h += `</div>`;
+
+    if (parked.length) {
+      h += `<div class="lbl q" style="margin-top:22px">בסימן שאלה<i></i></div>`;
+      parked.forEach(({ p }) => {
+        h += `<div class="card" style="margin-top:8px;opacity:.7">
+          <div class="t">${A.esc(p.h.replace(/^אופציה\s*·\s*/, ''))}</div>
+          <div class="d" style="margin-top:4px">${A.esc(clip(p.p, 160))}</div></div>`;
+      });
+    }
+
+    document.getElementById('main').innerHTML = h;
   }
 
-  document.getElementById('main').innerHTML = h;
+  draw();
+
+  document.getElementById('main').addEventListener('click', e => {
+    const b = e.target.closest('.exp');
+    if (!b) return;
+    const i = +b.dataset.ph;
+    if (open.has(i)) open.delete(i); else open.add(i);
+    saveOpen(); draw();
+  });
 })();

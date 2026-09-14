@@ -2,7 +2,7 @@
    קליפה: cache-first (מהיר, עובד אופליין).
    trip.json: network-first (תוכן הטיול זז כל יום — רוצים את הטרי, עם נפילה לעותק).
    מארחים חיצוניים (leaflet, אריחי מפה): לא נוגעים — הם לא זמינים אופליין ממילא. */
-const V = '20260914e';
+const V = '20260914h';
 const SHELL = 'nipon26-shell-' + V;
 const DATA  = 'nipon26-data-' + V;
 

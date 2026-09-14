@@ -120,6 +120,18 @@ a.step,a[data-dec],.card[data-todo]{-webkit-tap-highlight-color:transparent}
 .chip.warn{color:var(--warn)}
 .chip.ok{color:var(--ok)}
 
+/* כותרת מתקפלת — שברון שמסתובב במקום להצביע קדימה.
+   ההבדל מכוון: שברון לצד = "ייקח אותך למקום אחר", שברון למטה = "ייפתח כאן". */
+.exp{display:block;width:100%;background:none;border:0;padding:0 26px 0 0;
+  font:inherit;color:inherit;text-align:right;cursor:pointer;position:relative;
+  -webkit-tap-highlight-color:transparent}
+.exp::after{content:'';position:absolute;right:4px;top:7px;width:7px;height:7px;
+  border-left:2px solid var(--soft);border-bottom:2px solid var(--soft);
+  transform:rotate(-45deg);transition:transform .22s ease;opacity:.75}
+.exp[aria-expanded="true"]::after{transform:rotate(135deg)}
+.exp:active{opacity:.65}
+@media (prefers-reduced-motion:reduce){.exp::after{transition:none}}
+
 /* גלולה — רק כשאפשר ללחוץ. */
 a.chip{padding:4px 11px;border-radius:99px;color:var(--soft);
   border:1px solid color-mix(in srgb,var(--hot) 32%,transparent);
