@@ -58,7 +58,7 @@ window.App = (function () {
   // שניכם פותחים את אותה כתובת ואין התחברות, אז אין דרך לדעת מי זה —
   // חוץ מלשאול פעם אחת ולזכור במכשיר. מדלגים? פשוט לא פונים בשם.
   const WHO_KEY = 'nipon26_who';
-  const PEOPLE = { yuval: 'יובל', shir: 'שיר' };
+  const PEOPLE = { yuval: 'יובל', shir: 'שירשה' };
   const who = () => { try { return localStorage.getItem(WHO_KEY) || ''; } catch (e) { return ''; } };
   const setWho = v => { try { localStorage.setItem(WHO_KEY, v); } catch (e) {} };
 
@@ -140,8 +140,15 @@ window.App = (function () {
     snow:   { n: 26, cls: 'snow',  min: 3,  max: 6,  dur: [7, 14] },
     mist:   { n: 0 }, clear: { n: 0 }
   };
-  const LEAF = '<path d="M11,0 L13.4,6 L19,3.4 L16.4,9.4 L22,11.6 L16.4,14 L19,19.6 L13.4,17 L11,23 L8.6,17 L3,19.6 L5.6,14 L0,11.6 L5.6,9.4 L3,3.4 L8.6,6 Z"/>';
-  const LEAF_COL = ['#d4622f', '#e0a03a', '#c1303f', '#b8541f'];
+  // 紅葉 momiji — חמישה אונות וגבעול. מה שהיה כאן קודם הוא כוכב בן שמונה
+  // קצוות, ולכן "שלכת" נקראה כניצוצות כתומים ולא כעלים נופלים.
+  const LEAF = '<path d="M12,1 L13.7,8 L20.6,5.2 L16,11.8 L22,15 L14.6,15.2 L17.2,21.2 ' +
+    'L12.7,16.6 L12.7,23 L11.3,23 L11.3,16.6 L6.8,21.2 L9.4,15.2 L2,15 L8,11.8 ' +
+    'L3.4,5.2 L10.3,8 Z"/>';
+  // בלילה העלים כהים. אותם פיגמנטים, מעומעמים — עלה שנופל מול שמי לילה
+  // ומואר כמו ביום קורא כמדבקה.
+  const LEAF_COL_DAY   = ['#d4622f', '#e0a03a', '#c1303f', '#b8541f'];
+  const LEAF_COL_NIGHT = ['#7e3a1c', '#8a6122', '#73202a', '#6b3212'];
 
   function particles(host, mode) {
     const cfg = PARTICLE[mode] || PARTICLE.leaves;
@@ -153,9 +160,11 @@ window.App = (function () {
       const size = rnd(cfg.min, cfg.max), dur = rnd(cfg.dur[0], cfg.dur[1]);
       if (mode === 'leaves') {
         el.setAttribute('viewBox', '0 0 22 24');
-        el.innerHTML = `<g fill="${LEAF_COL[i % LEAF_COL.length]}">${LEAF}</g>`;
+        const LC = theme === 'night' ? LEAF_COL_NIGHT : LEAF_COL_DAY;
+        el.innerHTML = `<g fill="${LC[i % LC.length]}">${LEAF}</g>`;
         el.style.cssText = `position:absolute;width:${size}px;right:${rnd(-2, 100)}%;opacity:.75;
           animation:fall ${dur}s linear ${rnd(0, dur)}s infinite`;
+        el.style.opacity = theme === 'night' ? '.62' : '.75';
       } else if (mode === 'rain') {
         el.style.cssText = `position:absolute;width:${size}px;height:${rnd(12, 22)}px;right:${rnd(-2, 100)}%;
           background:linear-gradient(transparent,rgba(180,210,230,.55));border-radius:2px;
@@ -448,6 +457,10 @@ window.App = (function () {
     const brand = document.querySelector('.brand'), ch = SEAL[page];
     if (brand && ch) { brand.className = 'seal'; brand.textContent = ch; brand.title = 'NIPON26'; }
     scene(document.getElementById('scene'));
+    if (!document.querySelector('.bloom')) {
+      const bl = document.createElement('div'); bl.className = 'bloom';
+      document.body.insertBefore(bl, document.body.firstChild);
+    }
     nav(document.getElementById('nav'), page);
     net();
     parallax();
@@ -455,11 +468,10 @@ window.App = (function () {
     const fx = document.getElementById('fx');
     const forced = q.get('wx');
     if (forced) { particles(fx, forced); decorate(forced); return; }
-    const first = theme === 'day' ? 'leaves' : 'clear';
+    const first = 'leaves';
     particles(fx, first); decorate(first);              // ברירת מחדל מיידית
     weather(phase, m => {
-      const mode = theme === 'night' && m === 'leaves' ? 'clear' : m;
-      particles(fx, mode); decorate(mode);
+      particles(fx, m); decorate(m);
     });
   }
 

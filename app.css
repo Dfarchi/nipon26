@@ -66,6 +66,19 @@ body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Ta
 .scene > svg{position:absolute;bottom:0;right:-28px;width:calc(100% + 56px)}
 /* width:auto כאן היה מחזיר את הרוחב האינטרינזי של ה-viewBox (390px) ומזיז
    את השכבה במקום להרחיב אותה — לכן רוחב מפורש ולא left+right. */
+/* זוהר חם מאחורי הכותרת. לאתר הישן היה בלום כזה מתחת ל"יפן 2026", וזה
+   רוב ההבדל באווירה: בלי מקור אור התוכן צף על משטח שטוח. */
+.bloom{position:fixed;inset:0 0 auto;height:78vh;z-index:0;pointer-events:none;
+  background:radial-gradient(58% 42% at 50% 34%,
+    color-mix(in srgb,var(--hot) 22%,transparent) 0%,
+    color-mix(in srgb,var(--hi) 10%,transparent) 42%,
+    transparent 72%);
+  opacity:.8;mix-blend-mode:screen}
+body.is-day .bloom{mix-blend-mode:multiply;opacity:.24;
+  background:radial-gradient(58% 42% at 50% 34%,
+    color-mix(in srgb,var(--hot) 26%,transparent) 0%,
+    transparent 70%)}
+
 .page{position:relative;z-index:1;padding:14px 16px 92px;max-width:560px;margin:0 auto}
 .topline{display:flex;align-items:center;gap:8px;font-size:var(--fs-micro);color:var(--soft);line-height:1}
 .brand{font-weight:800;letter-spacing:.18em;font-size:var(--fs-meta);color:var(--hot);line-height:1}
@@ -437,3 +450,21 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 
 /* ספרות ברוחב אחיד: מייצב את עמודת השעות ומונע ריצוד במספר הגדול */
 .step b,.dnum,.countdown .n,.chip{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* מחשבון ין→שקל. שני שדות שמזינים זה את זה, בלי כפתור "חשב". */
+.fxc{padding:13px 14px}
+.fxrow{display:flex;align-items:center;gap:10px}
+.fxrow label{flex:1;display:flex;align-items:center;gap:7px;background:var(--well);
+  border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.fxrow label span{color:var(--soft);font-size:var(--fs-lead);font-weight:700}
+.fxrow input{flex:1;width:100%;min-width:0;background:none;border:0;outline:none;
+  font:inherit;font-size:var(--fs-sub);font-weight:800;color:var(--ink);
+  font-variant-numeric:tabular-nums;text-align:start}
+.fxrow input::placeholder{color:var(--soft);font-weight:400;opacity:.7}
+.fxrow > b{color:var(--soft);font-size:var(--fs-lead)}
+.fxq{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.fxq .chip{border:1px solid color-mix(in srgb,var(--hot) 32%,transparent);
+  background:color-mix(in srgb,var(--hot) 8%,transparent);color:var(--ink);
+  padding:5px 11px;border-radius:99px;font:inherit;font-size:var(--fs-micro);
+  font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fxq .chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent)}
