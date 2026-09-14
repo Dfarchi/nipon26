@@ -121,7 +121,7 @@ window.App = (function () {
   // והנטייה נאספות למצב אחד ונכתבות יחד, בפריים אחד.
   const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const MOTION = { y: 0, tx: 0, ty: 0 };
-  let LAYERS = null, ticking = false;
+  let LAYERS = null, ticking = false, lastOp = 1;
 
   // עומק לכל שכבה: [בורר, מקדם גלילה, טווח נטייה בפיקסלים]
   const DEPTH = [
@@ -146,11 +146,18 @@ window.App = (function () {
       if (el) el.style.transform =
         `translate3d(${(MOTION.tx * t).toFixed(2)}px,${(y * s + MOTION.ty * t).toFixed(2)}px,0)`;
     });
-    sc.style.opacity = String(Math.max(0.25, 1 - y / 520));
+    // אטימות מקוונטטת: ל-.scene יש שני pseudo-elements עם mix-blend-mode פרושים
+    // על כל השטח, ושינוי אטימות על ההורה מקבץ את כל הערימה לשכבה אחת. בקפיצות
+    // של 0.02 העין לא מבחינה, והקיבוץ מחדש קורה פי עשרה פחות.
+    const op = Math.max(0.25, 1 - y / 520);
+    if (Math.abs(op - lastOp) > 0.02 || (y === 0) !== (lastOp === 1)) {
+      lastOp = op; sc.style.opacity = op.toFixed(2);
+    }
     if (!REDUCE) {
-      // הסצנה מתקרבת מעט בגלילה. קטן בכוונה — היא position:fixed ברוחב מלא,
-      // וקנה מידה נדיב יגלוש מהמסך לפני שהוא ייראה כעומק.
-      sc.style.transform = `scale(${(1 + Math.min(y, 400) / 8000).toFixed(4)})`;
+      // ה-zoom יושב על השכבות ולא על .scene: scale על ההורה מאלץ ראסטריזציה
+      // מחדש של ה-blend ושל feTurbulence שב-.l-far, בכל פריים.
+      const z = (1 + Math.min(y, 400) / 2600).toFixed(4);
+      els.forEach(([el], n) => { if (el && n >= 2) el.style.scale = z; });
       // הכותרת נגררת אחרי הדף, אחרת הכל נע כגוש אחד ואין עומק בטקסט
       if (head) head.style.transform = `translateY(${(y * 0.1).toFixed(2)}px)`;
     }
@@ -204,6 +211,9 @@ window.App = (function () {
     const els = [].slice.call(root.querySelectorAll(RV))
       // כותרת המסך מקבלת transform מצינור התנועה — שתי כתיבות לאותה תכונה נאבקות
       .filter(el => !el.closest('.head'))
+      // שורות בתוך גוף שלב מנוהלות על ידי .just-open. הן בגובה אפס כשהשלב
+      // מקופל, IntersectionObserver לא יורה עליהן, והן היו נתקעות שקופות.
+      .filter(el => !el.closest('.ph-body'))
       // שורה בתוך כרטיס שנכנס תיכנס יחד איתו; אין צורך להנפיש פעמיים
       .filter(el => !el.parentElement || !el.parentElement.closest(RV) || el.matches('.step'));
     if (!els.length) return;

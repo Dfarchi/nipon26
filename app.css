@@ -1,8 +1,13 @@
 /* ===== NIPON26 app — שכבת האפליקציה. שתי ערכות, לפי שעה. ===== */
 :root{
+  /* עקומות. חוק אחד: חריגה מעבר ליעד מותרת רק בסוף מחווה שהאצבע יזמה —
+     בכניסה אוטומטית העין קוראת אותה כתיקון יישור, לא כתנופה. */
+  --e-out:cubic-bezier(.16,.84,.34,1);
+  --e-soft:cubic-bezier(.22,.61,.36,1);
+  --e-spring:cubic-bezier(.34,1.26,.48,1);
   --sky1:#16203c; --sky2:#1d3348; --sky3:#234049; --skyEnd:#0d1220;
   --ink:#f2ece0; --dim:#b8a894; --soft:#c5a888;
-  --card:rgba(30,42,52,.80); --line:rgba(197,168,136,.16);
+  --card:rgba(30,42,52,.93); --line:rgba(197,168,136,.16);
   --hot:#e8b64c; --warn:#f08a5d; --ok:#7fd0a0; --hi:#c1303f;
   --ridge:#4a6478; --ridge2:#26394a; --roof:#18232e; --lit:#f0a94e; --tree:#1d2b28;
   /* איור: לילה */
@@ -20,7 +25,7 @@
 body.is-day{
   --sky1:#8fc4dd; --sky2:#bcd9e4; --sky3:#e4d8c0; --skyEnd:#f3ece0;
   --ink:#2a2119; --dim:#6f6152; --soft:#8a7458;
-  --card:rgba(255,252,246,.88); --line:rgba(120,95,62,.18);
+  --card:rgba(255,252,246,.95); --line:rgba(120,95,62,.18);
   --hot:#c8621f; --warn:#c04a2a; --ok:#3f8a5c; --hi:#b3372c;
   --ridge:#7f9bb0; --ridge2:#5d7f95; --roof:#6b5a48; --lit:#a8906e; --tree:#5c7a4a;
   /* איור: יום */
@@ -70,9 +75,9 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .city{font-size:1.05rem;font-weight:700}
 .jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:.85rem}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;
-  backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.16);margin-top:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.16);margin-top:12px;
   transition:transform .18s ease,border-color .18s ease}
-.card.now{border-color:color-mix(in srgb,var(--hot) 45%,transparent)}
+.card.now{backdrop-filter:blur(10px);border-color:color-mix(in srgb,var(--hot) 45%,transparent)}
 .card.alert{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
 .lbl{font-size:.7rem;letter-spacing:2px;font-weight:700;color:var(--hot);display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .lbl.q{color:var(--soft)}
@@ -84,6 +89,41 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .note.w{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
 .note.g{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
 .steps{display:flex;flex-direction:column;gap:7px}
+
+/* ===== שינוי מצב במקום =====
+   טיק של צ׳קבוקס לא בונה מסך מחדש — הוא מחליף מחלקה. אם סימון מזיז דברים,
+   המוח קורא "המסך נבנה מחדש"; אם הוא מתמצק במקום, המוח קורא "המצב השתנה". */
+.chip.flag{opacity:0;transform:scale(.8);transform-origin:100% 50%;
+  transition:opacity 180ms var(--e-out),transform 220ms var(--e-spring)}
+.is-done .chip.flag{opacity:1;transform:none}
+a.step.is-done{opacity:.5}
+a.step,.card[data-todo]{transition:transform .16s ease,border-color .16s ease,opacity 220ms var(--e-out)}
+
+/* אפשרות בחירה: ה-pip הוא הפקד, וה-CSS מחזיק את מצבו */
+.pip.box{width:14px;height:14px;border:2px solid var(--dim);background:none;
+  transition:background 180ms var(--e-out),border-color 180ms var(--e-out),transform 220ms var(--e-spring)}
+.is-picked .pip.box{border-color:var(--ok);background:var(--ok);transform:scale(1.18)}
+a.step.opt.is-picked{border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+
+/* ===== פריסת שלב =====
+   grid-template-rows הוא אנימציית layout ולא compositor, וזו חריגה מודעת:
+   החלופה — לקפוץ לגובה מיידית — מזיזה בבת אחת את כל מה שמתחת, וזו בדיוק
+   הקפיצה שנקראת "כאילו טענתי מחדש". תת-עץ אחד, עד 20 שורות, 300ms. */
+.ph-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows 300ms var(--e-soft)}
+.ph-body > div{overflow:hidden;min-height:0}
+.card.open .ph-body{grid-template-rows:1fr}
+
+/* הימים נכנסים בזה אחר זה — רק בפתיחה יזומה. מצב ברירת המחדל גלוי,
+   כך ששום תקלה באנימציה לא יכולה להשאיר תוכן מוסתר. */
+@keyframes rowIn{from{opacity:0;transform:translate3d(22px,0,0)}to{opacity:1;transform:none}}
+.card.just-open .ph-body .step{animation:rowIn 340ms var(--e-out) both;
+  animation-delay:calc(var(--i,0) * 38ms)}
+
+@media (prefers-reduced-motion:reduce){
+  .ph-body{transition:none}
+  .card.just-open .ph-body .step{animation:none}
+  .chip.flag,.pip.box{transition:none}
+}
 
 /* ===== כניסות =====
    מצב ההתחלה: בחוץ ושקוף. ה-easing עובר מעט את היעד וחוזר, כדי שהבלוק

@@ -39,11 +39,11 @@
       h += `<div class="lbl" style="margin-top:16px">דדליין קרוב<i></i></div>`;
       urgent.forEach(i => {
         const cls = i.dl.days <= 2 ? 'warn' : i.dl.days <= 7 ? 'hot' : '';
-        h += `<div class="card alert" style="margin-top:8px;padding:13px 15px" data-todo="${A.esc(i.n)}">
+        h += `<div class="card alert${done(i.n) ? ' is-done' : ''}" style="margin-top:8px;padding:13px 15px" data-todo="${A.esc(i.n)}">
           <div style="display:flex;gap:9px;align-items:baseline">
             <span class="chip ${cls}">${days(i.dl.days)}</span>
             <div class="d" style="margin:0;flex:1">${i.n}</div>
-            ${done(i.n) ? '<span class="chip ok">בוצע</span>' : ''}</div>
+            <span class="chip ok flag">בוצע</span></div>
           <div class="t" style="margin-top:6px;font-size:.95rem">${clip(A.esc(i.q), 150)}</div>
           <div class="steps" style="margin-top:8px">` +
           i.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.esc(x.t)}</span></div>`).join('') +
@@ -61,9 +61,9 @@
           <div class="steps" style="margin-top:10px">` +
           (i.o || []).map((o, k) => {
             const isPicked = picked.includes(k);
-            return `<a class="step" data-dec="${A.esc(i.n)}" data-i="${k}" data-multi="${i.multi || 0}"
-              style="cursor:pointer;text-decoration:none;color:inherit${isPicked ? ';border-color:color-mix(in srgb,var(--ok) 45%,transparent)' : ''}">
-              <i class="pip" style="border:2px solid ${isPicked ? 'var(--ok)' : 'var(--dim)'};background:${isPicked ? 'var(--ok)' : 'none'};width:14px;height:14px"></i>
+            return `<a class="step opt${isPicked ? ' is-picked' : ''}" data-dec="${A.esc(i.n)}" data-i="${k}" data-multi="${i.multi || 0}"
+              style="cursor:pointer;text-decoration:none;color:inherit">
+              <i class="pip box"></i>
               <span>${A.esc(o.t)}</span>${i.rec === k ? '<span class="chip hot">מומלץ</span>' : ''}</a>`;
           }).join('') +
           `</div></div>`;
@@ -72,11 +72,11 @@
 
     h += `<div class="lbl q" style="margin-top:22px">משימות<i></i><span class="d">${rest.length}</span></div>`;
     rest.forEach(i => {
-      h += `<a class="step" data-todo="${A.esc(i.n)}" style="margin-top:7px;align-items:flex-start;cursor:pointer;text-decoration:none;color:inherit${done(i.n) ? ';opacity:.5' : ''}">
+      h += `<a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="margin-top:7px;align-items:flex-start;cursor:pointer;text-decoration:none;color:inherit">
         <b style="min-width:34px;font-size:.72rem">${i.n}</b>
         <span style="font-size:.88rem">${clip(A.esc(i.q), 150)}</span>
         ${i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : ''}
-        ${done(i.n) ? '<span class="chip ok">בוצע</span>' : ''}</a>`;
+        <span class="chip ok flag">בוצע</span></a>`;
     });
 
     h += `<div class="acts"><button class="cloud g" onclick="location.href='decisions.html'">
@@ -86,6 +86,19 @@
   }
 
   render();
+
+  // טיק לא בונה את המסך מחדש. בדקתי את התלות: urgent ו-rest נגזרים אך ורק
+  // מ-due, ו-store לא משפיע על שום מיון או חלוקה — כלומר סימון משנה תצוגה
+  // בלבד. innerHTML מלא כאן היה הורס 151 אלמנטים, מקפיץ את הגלילה, והורג
+  // את האלמנט שהאצבע עליו באמצע הלחיצה.
+  const sel = v => `[data-todo="${CSS.escape(v)}"]`;
+  const paintTodo = n => document.querySelectorAll(sel(n))
+    .forEach(el => el.classList.toggle('is-done', done(n)));
+  const paintDec = n => {
+    const picked = chosen(n);
+    document.querySelectorAll(`[data-dec="${CSS.escape(n)}"]`)
+      .forEach(el => el.classList.toggle('is-picked', picked.includes(+el.dataset.i)));
+  };
 
   document.getElementById('main').addEventListener('click', e => {
     const dec = e.target.closest('[data-dec]');
@@ -100,14 +113,14 @@
         store[n] = (store[n] === i) ? undefined : i;
         if (store[n] === undefined) delete store[n];
       }
-      save(); render();
+      save(); paintDec(n);
       return;
     }
     const todo = e.target.closest('[data-todo]');
     if (todo) {
       const n = todo.dataset.todo;
       if (done(n)) delete store[n]; else store[n] = true;
-      save(); render();
+      save(); paintTodo(n);
     }
   });
 })();

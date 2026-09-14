@@ -40,7 +40,7 @@
       h += `<div style="position:relative;padding-bottom:14px">
         <div style="position:absolute;right:-17px;top:5px;width:${isCur ? 14 : 10}px;height:${isCur ? 14 : 10}px;
           border-radius:50%;background:var(--hot);border:2px solid var(--skyEnd)${isCur ? ';box-shadow:0 0 0 3px color-mix(in srgb,var(--hot) 30%,transparent)' : ''}"></div>
-        <div class="card"${isCur ? ' style="border-color:color-mix(in srgb,var(--hot) 45%,transparent)"' : ''}>
+        <div class="card${isOpen ? ' open' : ''}"${isCur ? ' style="border-color:color-mix(in srgb,var(--hot) 45%,transparent)"' : ''}>
           <button class="exp" data-ph="${i}" aria-expanded="${isOpen}">
             <div style="display:flex;align-items:baseline;gap:8px">
               <div class="t" style="flex:1">${A.esc(title(p.h))}</div>
@@ -49,20 +49,20 @@
             <div class="d" style="margin-top:4px">${A.esc(p.nights)}</div>
           </button>`;
 
-      if (isOpen) {
-        h += `<div class="ph-body">
+      {
+        h += `<div class="ph-body"><div>
           <div class="d" style="margin-top:8px;line-height:1.6">${A.esc(p.p)}</div>`;
         if (days.length) {
-          h += `<div class="steps" style="margin-top:10px">` + days.map(({ d, i: di }) => {
+          h += `<div class="steps" style="margin-top:10px">` + days.map(({ d, i: di }, k) => {
             const m = String(d.t).match(/^(\d{1,2}\.\d{1,2})\s*—\s*(.*)$/);
             const isToday = di === idx;
             const style = 'text-decoration:none;color:inherit' + (isToday ? ';border-color:color-mix(in srgb,var(--hot) 45%,transparent)' : '');
-            return `<a class="step" href="today.html?d=${di}" style="${style}">
+            return `<a class="step" href="today.html?d=${di}" style="--i:${k};${style}">
               <b>${m ? m[1] : ''}</b><span>${A.esc(clip(m ? m[2] : String(d.t), 46))}</span>
               ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</a>`;
           }).join('') + `</div>`;
         }
-        h += `</div>`;
+        h += `</div></div>`;
       }
       h += `</div></div>`;
     });
@@ -78,24 +78,26 @@
     }
 
     document.getElementById('main').innerHTML = h;
-    // בטעינה הכל נכנס לפי גלילה. בפתיחת שלב רק הימים שנחשפו קופצים —
-    // draw() בונה מחדש את כל המסך, והנפשה של הכל בכל לחיצה היא רעש.
-    if (just == null) A.reveal(document.getElementById('main'));
-    else A.reveal(document.querySelector(`.exp[data-ph="${just}"]`)
-      ?.closest('.card')?.querySelector('.ph-body'), { now: true });
+    A.reveal(document.getElementById('main'));
   }
 
-  let just = null;
-  draw();
+  draw();   // פעם אחת. 45 שורות הן זולות; בנייה מחדש בכל לחיצה היא לא.
 
   document.getElementById('main').addEventListener('click', e => {
     const b = e.target.closest('.exp');
     if (!b) return;
-    const i = +b.dataset.ph;
+    const i = +b.dataset.ph, card = b.closest('.card');
     const opening = !open.has(i);
     if (opening) open.add(i); else open.delete(i);
     saveOpen();
-    just = opening ? i : -1;      // -1 = קיפול, אין מה להנפיש
-    draw();
+    b.setAttribute('aria-expanded', String(opening));
+    card.classList.toggle('open', opening);
+    // הימים נכנסים בזה אחר זה רק בפתיחה יזומה, לא בקיפול ולא בטעינה
+    if (opening) {
+      card.classList.remove('just-open');
+      void card.offsetWidth;              // מאלץ reflow כדי שהאנימציה תירה שוב
+      card.classList.add('just-open');
+      setTimeout(() => card.classList.remove('just-open'), 1200);
+    }
   });
 })();
