@@ -37,18 +37,26 @@
 
     if (urgent.length) {
       h += `<div class="lbl" style="margin-top:16px">דדליין קרוב<i></i></div>`;
-      urgent.forEach(i => {
-        const cls = i.dl.days <= 2 ? 'warn' : i.dl.days <= 7 ? 'hot' : '';
-        h += `<div class="card alert${done(i.n) ? ' is-done' : ''}" style="margin-top:8px;padding:13px 15px" data-todo="${A.esc(i.n)}">
-          <div style="display:flex;gap:9px;align-items:baseline">
-            <span class="chip ${cls}">${days(i.dl.days)}</span>
-            <div class="d" style="margin:0;flex:1">${i.n}</div>
-            <span class="chip ok flag">בוצע</span></div>
-          <div class="t" style="margin-top:6px">${clip(A.esc(i.q), 150)}</div>
-          <div class="steps well">` +
-          i.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.esc(x.t)}</span></div>`).join('') +
-          `</div></div>`;
-      });
+      // רק הקרוב ביותר הוא כרטיס. שלושה כרטיסי התראה זהים פירושם ששום אחד
+      // מהם הוא לא התשובה ל"מה לעשות עכשיו" — עוצמה קיימת רק מול שקט.
+      const lead = urgent[0], near = urgent.slice(1);
+      const cls = lead.dl.days <= 2 ? 'warn' : lead.dl.days <= 7 ? 'hot' : '';
+      h += `<div class="card alert${done(lead.n) ? ' is-done' : ''}" style="margin-top:8px;padding:13px 15px" data-todo="${A.esc(lead.n)}">
+        <div style="display:flex;gap:9px;align-items:baseline">
+          <span class="chip ${cls} lead">${days(lead.dl.days)}</span>
+          <div class="d" style="margin:0;flex:1">${lead.n}</div>
+          <span class="chip ok flag">בוצע</span></div>
+        <div class="t" style="margin-top:6px">${clip(A.esc(lead.q), 150)}</div>
+        <div class="steps well">` +
+        lead.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.esc(x.t)}</span></div>`).join('') +
+        `</div></div>`;
+      if (near.length) {
+        h += `<div class="well" style="margin-top:8px">` + near.map(i => `
+          <a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="cursor:pointer;text-decoration:none;color:inherit">
+            <b>${i.dl.d}</b><span>${clip(A.esc(i.q), 80)}</span>
+            <span class="chip">${days(i.dl.days)}</span>
+            <span class="chip ok flag">בוצע</span></a>`).join('') + `</div>`;
+      }
     }
 
     if (openDec.length) {

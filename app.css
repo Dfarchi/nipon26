@@ -150,6 +150,9 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
   .step.day::after{transition:none}
 }
 
+/* הדדליין הקרוב ביותר הוא הקול הרם במסך הזה */
+.chip.lead{font-size:var(--fs-sub);letter-spacing:0}
+
 /* ===== כרטיסיית הזמנה ===== */
 .card.bk{overflow:hidden}
 .bkh{padding:12px 14px}

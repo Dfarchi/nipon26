@@ -34,7 +34,7 @@
 
     h += `<div style="position:relative;margin-top:18px;padding-right:20px">
       <div style="position:absolute;right:6px;top:6px;bottom:6px;width:2px;border-radius:2px;
-        background:linear-gradient(var(--hi),var(--hot),var(--ok))"></div>`;
+        background:linear-gradient(var(--soft),var(--hot),var(--ok))"></div>`;
 
     active.forEach(({ p, i }) => {
       const isCur = i === curPhase;
