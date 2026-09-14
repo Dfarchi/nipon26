@@ -116,28 +116,79 @@ window.App = (function () {
     }
   }
 
-  // ===== פארלקס: כל שכבה זזה בקצב אחר בגלילה =====
-  function parallax() {
-    const sky   = document.querySelector('.scene');
-    const far   = document.querySelector('.scene .l-far');
-    const near  = document.querySelector('.scene .l-near');
-    const vil   = document.querySelector('.scene .l-village');
-    if (!sky) return;
-    let tick = false;
-    const run = () => {
-      const y = window.scrollY || 0;
-      const skyL = document.querySelector('.scene .l-sky');
-      const chars = document.querySelector('.scene .l-chars');
-      if (skyL) skyL.style.transform = `translateY(${y * 0.06}px)`;
-      if (far)  far.style.transform  = `translateY(${y * 0.12}px)`;
-      if (near) near.style.transform = `translateY(${y * 0.26}px)`;
-      if (vil)  vil.style.transform  = `translateY(${y * 0.42}px)`;
-      if (chars) chars.style.transform = `translateY(${y * 0.42}px)`;
-      sky.style.opacity = String(Math.max(0.25, 1 - y / 520));
-      tick = false;
+  // ===== תנועה: גלילה ונטייה, צינור אחד =====
+  // שתי מערכות שכותבות transform לאותה שכבה דורסות זו את זו, אז הגלילה
+  // והנטייה נאספות למצב אחד ונכתבות יחד, בפריים אחד.
+  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MOTION = { y: 0, tx: 0, ty: 0 };
+  let LAYERS = null, ticking = false;
+
+  // עומק לכל שכבה: [בורר, מקדם גלילה, טווח נטייה בפיקסלים]
+  const DEPTH = [
+    ['.l-sky',     0.06,  4],
+    ['.l-far',     0.12,  9],
+    ['.l-village', 0.42, 16],
+    ['.l-chars',   0.42, 20]
+  ];
+
+  // נקרא גם אחרי decorate(), שמחליף את .l-chars ומשאיר הפניה מתה
+  function cacheLayers() {
+    const sc = document.querySelector('.scene');
+    LAYERS = sc ? { sc, head: document.querySelector('.head'),
+                    els: DEPTH.map(([s, a, b]) => [sc.querySelector(s), a, b]) } : null;
+  }
+
+  function frame() {
+    ticking = false;
+    if (!LAYERS) return;
+    const { sc, head, els } = LAYERS, y = MOTION.y;
+    els.forEach(([el, s, t]) => {
+      if (el) el.style.transform =
+        `translate3d(${(MOTION.tx * t).toFixed(2)}px,${(y * s + MOTION.ty * t).toFixed(2)}px,0)`;
+    });
+    sc.style.opacity = String(Math.max(0.25, 1 - y / 520));
+    if (!REDUCE) {
+      // הסצנה מתקרבת מעט בגלילה. קטן בכוונה — היא position:fixed ברוחב מלא,
+      // וקנה מידה נדיב יגלוש מהמסך לפני שהוא ייראה כעומק.
+      sc.style.transform = `scale(${(1 + Math.min(y, 400) / 8000).toFixed(4)})`;
+      // הכותרת נגררת אחרי הדף, אחרת הכל נע כגוש אחד ואין עומק בטקסט
+      if (head) head.style.transform = `translateY(${(y * 0.1).toFixed(2)}px)`;
+    }
+  }
+
+  const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+
+  // ---- נטייה: הפארלקס של הטלפון. אין כאן עכבר, יש ג׳ירוסקופ. ----
+  function tiltLayer() {
+    const DOE = window.DeviceOrientationEvent;
+    if (!DOE || REDUCE) return;
+    let live = false;
+    const handle = e => {
+      const g = e.gamma, b = e.beta;      // gamma: שמאל/ימין · beta: קדימה/אחורה
+      if (g == null || b == null) return;
+      const cl = (v, n) => Math.max(-1, Math.min(1, v / n));
+      MOTION.tx = cl(g, 28);
+      MOTION.ty = cl(b - 45, 40) * 0.5;   // 45° = איך שמחזיקים טלפון בפועל
+      schedule();
     };
-    addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(run); } }, { passive: true });
-    run();
+    const begin = () => { if (!live) { live = true; addEventListener('deviceorientation', handle, { passive: true }); } };
+    if (typeof DOE.requestPermission === 'function') {
+      // iOS 13+ נותן חיישנים רק מתוך מגע של המשתמש. בלי מגע הבקשה נדחית בשקט,
+      // ולכן היא תלויה במגע הראשון ולא ברגע הטעינה.
+      const ask = () => DOE.requestPermission().then(r => { if (r === 'granted') begin(); }).catch(() => {});
+      addEventListener('touchend', ask, { once: true });
+      addEventListener('click', ask, { once: true });
+    } else {
+      begin();
+    }
+  }
+
+  function parallax() {
+    cacheLayers();
+    if (!LAYERS) return;
+    addEventListener('scroll', () => { MOTION.y = window.scrollY || 0; schedule(); }, { passive: true });
+    tiltLayer();
+    frame();
   }
 
   // ---- כוכבים: מיקומים קבועים, לא אקראיים — אחרת הם קופצים בכל רינדור ----
@@ -250,7 +301,7 @@ window.App = (function () {
     const host = document.getElementById('scene');
     if (!host) return;
     const old = host.querySelector('.l-chars');
-    if (old) old.outerHTML = charLayer(mode);
+    if (old) { old.outerHTML = charLayer(mode); cacheLayers(); }
     const haze = document.getElementById('haze');
     if (haze) haze.classList.toggle('on', mode === 'mist');
     // שמש בוהקת באמצע גשם נראית כמו באג. מעוננים = מעמעמים את גוף השמיים.
