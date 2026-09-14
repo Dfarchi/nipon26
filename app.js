@@ -343,12 +343,16 @@ window.App = (function () {
 
     // החתולות יושבות על רכסי הגגות שכבר קיימים ב-l-village:
     // גג 258,35 → 39px מהתחתית · גג 86,38 → 36px · גג 356,38 → 36px
-    h += `<div class="ch" style="left:66.2%;bottom:38px">
+    // המושבים מגיעים מהסצנה שנבנתה, לא ממספרים בקוד: הגגות זזים בכל יום.
+    // ההמרה: left = x/3.9%  ·  bottom = 74 − y  (מקור: l-chars ב-bottom:30 וגובה 74)
+    const st = (SCENE && SCENE.seats) || [{ x: 258, y: 36 }, { x: 86, y: 39 }, { x: 356, y: 39 }];
+    const at = s => `left:${(s.x / 3.9).toFixed(1)}%;bottom:${(74 - s.y).toFixed(1)}px`;
+    h += `<div class="ch" style="${at(st[0])}">
       ${wet ? `<div class="brolly">${A.umbrella(30)}</div>` : ''}${morgana}
       ${cold ? '<i class="snowcap"></i>' : ''}</div>`;
-    h += `<div class="ch" style="left:22%;bottom:35px">${baltrkis}</div>`;
+    h += `<div class="ch" style="${at(st[1])}">${baltrkis}</div>`;
     h += night
-      ? `<div class="ch" style="left:91.3%;bottom:35px">${A.ninja(24)}</div>`
+      ? `<div class="ch" style="${at(st[2])}">${A.ninja(24)}</div>`
       : `<div class="ch walk" style="left:6%;bottom:2px">${A.traveler(26)}</div>`;
     h += '</div>';
     return h;
@@ -398,158 +402,261 @@ window.App = (function () {
       <g fill="var(--tree)"><path d="M214,74 L214,63 L217,63 L217,74 Z M204,63 Q215,38 226,63 Z"/></g>`;
   }
 
-  // ===== ערים =====
-  // מחולל אחד, ציון דרך אחד לכל עיר. ההבדל בין טוקיו לאוסקה הוא לא בניין
-  // אחר — הוא הצללית שאי אפשר לטעות בה, והצפיפות סביבה.
-  const winGrid = (x, y, cols, rows, seed) => {
-    let g = '';
-    for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++)
-      if ((c * 3 + r * 5 + seed) % 7 > 1) g += win(x + 3.5 + c * 6, y + 4 + r * 6, 3.4, 3.8);
-    return g;
-  };
-  const neon = (x, y, h, col) => `<rect x="${x}" y="${y}" width="4.5" height="${h}" rx="1.4" fill="${col}"/>`;
+  // ===== הנוף =====
+  // נבנה מחדש בכל יום מזרע קבוע: אותו יום → אותה סצנה תמיד, יום אחר →
+  // פריסה אחרת. אותו אזור לא נראה זהה שבוע ברציפות, ובלי אקראיות שקופצת
+  // בכל רינדור. החתולות כבר לא מעוגנות למספרים קשיחים אלא לגגות שנוצרו,
+  // ולכן הגגות חופשיים לזוז.
+  function rng(seed) {
+    let a = (seed * 2654435761) >>> 0;
+    return () => { a = (a + 0x6D2B79F5) >>> 0;
+      let t = a; t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
 
-  // 東京タワー — סבכה מתחדדת עם שתי פלטפורמות
-  const towerTokyo = (cx) => `<g fill="var(--torii)">
-    <path d="M${cx - 13},74 L${cx - 4},20 L${cx + 4},20 L${cx + 13},74 L${cx + 8},74 L${cx},30 L${cx - 8},74 Z"/>
-    <path d="M${cx - 9},50 L${cx + 9},50 L${cx + 9},53 L${cx - 9},53 Z"/>
-    <path d="M${cx - 6},36 L${cx + 6},36 L${cx + 6},39 L${cx - 6},39 Z"/>
-    <path d="M${cx - 1},20 L${cx - 1},9 L${cx + 1},9 L${cx + 1},20 Z"/></g>
-    <circle cx="${cx}" cy="7" r="2" fill="var(--hot)"/>`;
+  const winTint = r => r < .18 ? 'var(--tvlit)' : 'var(--lit)';
 
-  // 通天閣 — נמוך, רחב, עם כתר מואר
-  const towerOsaka = (cx) => `<g fill="var(--roof)">
-    <path d="M${cx - 11},74 L${cx - 5},34 L${cx + 5},34 L${cx + 11},74 Z"/>
-    <path d="M${cx - 8},32 L${cx + 8},32 L${cx + 6},26 L${cx - 6},26 Z"/>
-    <path d="M${cx - 1.4},26 L${cx - 1.4},17 L${cx + 1.4},17 L${cx + 1.4},26 Z"/></g>
-    <g fill="var(--hot)"><circle cx="${cx}" cy="15" r="3"/>
-    <path d="M${cx - 7},28 L${cx + 7},28 L${cx + 7},30.5 L${cx - 7},30.5 Z"/></g>`;
-
-  // 五重塔
-  const pagoda = (cx, base, top) => {
-    let g = `<path d="M${cx - 1.6},${base} L${cx - 1.6},${top} L${cx + 1.6},${top} L${cx + 1.6},${base} Z"/>`;
-    for (let i = 0; i < 5; i++) {
-      const y = top + 4 + i * ((base - top - 4) / 5), w = 7 + i * 2.6;
-      g += `<path d="M${cx - w},${y + 3.4} Q${cx - w + 2},${y} ${cx - w + 4},${y - .6} L${cx},${y - 3} ` +
-           `L${cx + w - 4},${y - .6} Q${cx + w - 2},${y} ${cx + w},${y + 3.4} Z"/>`;
+  // רשת חלונות עם כמה כבויים וכמה בגוון מסך
+  const grid = (x, y, w, h, R) => {
+    let g = '', cols = Math.max(1, Math.floor((w - 5) / 6)), rows = Math.max(1, Math.floor((h - 6) / 6));
+    for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) {
+      const v = R();
+      if (v < .32) continue;
+      g += `<rect x="${(x + 3.5 + c * 6).toFixed(1)}" y="${(y + 4 + r * 6).toFixed(1)}" ` +
+           `width="3.4" height="3.8" rx="1" fill="${winTint(v)}"/>`;
     }
     return g;
   };
 
-  // 名古屋城 — טירה עם שלוש קומות גג ושאצ׳יהוקו זהוב
-  const castle = (cx) => `<g fill="var(--plaster)">
-    <rect x="${cx - 17}" y="46" width="34" height="28" rx="1"/>
-    <rect x="${cx - 12}" y="32" width="24" height="12" rx="1"/></g>
-    <g fill="var(--tile)">
-      <path d="M${cx - 24},48 Q${cx - 18},41 ${cx - 12},39 L${cx},36 L${cx + 12},39 Q${cx + 18},41 ${cx + 24},48 Z"/>
-      <path d="M${cx - 17},34 Q${cx - 12},28 ${cx - 7},26 L${cx},24 L${cx + 7},26 Q${cx + 12},28 ${cx + 17},34 Z"/>
-    </g>
-    <g fill="var(--hot)"><path d="M${cx - 5},24 q2,-5 5,-5 q3,0 5,5 Z"/></g>`;
+  // מכל מים על הגג — הפרט שהופך גוש למבנה עירוני
+  const tank = (x, y) => `<path d="M${x},${y} L${x},${y - 5} L${x + 9},${y - 5} L${x + 9},${y} Z
+    M${x + 1.5},${y} L${x + 1.5},${y + 3} M${x + 7},${y} L${x + 7},${y + 3}"
+    stroke="var(--roof)" stroke-width="1.4" fill="var(--roof)"/>`;
 
-  function cityBase(landmark, opts) {
-    const o = opts || {};
-    const tall = o.tall !== false;
-    return `${GROUND}
-      <g fill="var(--roof)" class="plate">
-        <path d="M-6,74 L-6,${tall ? 30 : 44} L16,${tall ? 30 : 44} L16,74 Z"/>
-        <path d="M22,74 L22,${tall ? 12 : 40} L44,${tall ? 12 : 40} L44,74 Z"/>
-        <path d="M50,74 L50,48 L70,48 L70,74 Z"/>
-        <path d="M72,74 L72,36 L100,36 L100,74 Z"/>
-        <path d="M106,74 L106,${tall ? 20 : 42} L128,${tall ? 20 : 42} L128,74 Z"/>
-        <path d="M134,74 L134,52 L162,52 L162,74 Z"/>
-        <path d="M198,74 L198,46 L222,46 L222,74 Z"/>
-        <path d="M228,74 L228,35 L288,35 L288,74 Z"/>
-        <path d="M320,74 L320,50 L340,50 L340,74 Z"/>
-        <path d="M344,74 L344,37 L370,37 L370,74 Z"/>
-        <path d="M376,74 L376,${tall ? 24 : 44} L398,${tall ? 24 : 44} L398,74 Z"/>
-      </g>
-      ${landmark}
-      <g fill="var(--lit)" opacity=".82">
-        ${winGrid(22, tall ? 12 : 40, 3, tall ? 10 : 5, 0)}${winGrid(72, 36, 4, 6, 2)}
-        ${winGrid(106, tall ? 20 : 42, 3, tall ? 8 : 5, 4)}${winGrid(198, 46, 3, 4, 1)}
-        ${winGrid(228, 35, 9, 6, 3)}${winGrid(344, 37, 4, 6, 5)}
-        ${winGrid(376, tall ? 24 : 44, 3, tall ? 8 : 4, 6)}
-      </g>
-      ${(o.neons || []).map(([x, y, h, c]) => neon(x, y, h, c)).join('')}`;
-  }
+  // עמוד חשמל עם כבלים — הדבר הכי יפני בכל רחוב, ואף פעם לא בתמונות
+  const pole = (x, h) => `<g stroke="var(--wire)" stroke-width=".9" fill="none" opacity=".75">
+    <path d="M${x},74 L${x},${74 - h}"/>
+    <path d="M${x - 5},${74 - h + 4} L${x + 5},${74 - h + 4}"/>
+    <path d="M${x - 4},${74 - h + 9} L${x + 4},${74 - h + 9}"/></g>`;
 
-  const tokyoSVG = () => cityBase(towerTokyo(175), {
-    neons: [[52, 52, 18, 'var(--torii)'], [324, 54, 15, 'var(--hot)']] });
+  // עץ: אורן בשכבות אופקיות, או עץ עגול. הפטרייה הקודמת לא נראתה יפנית.
+  const treeAt = (tx, th, R) => {
+    const base = 74 - th * .42;
+    let s = `<path d="M${(tx - 1.3).toFixed(1)},74 L${(tx - 1.3).toFixed(1)},${base.toFixed(1)} ` +
+            `L${(tx + 1.3).toFixed(1)},${base.toFixed(1)} L${(tx + 1.3).toFixed(1)},74 Z"/>`;
+    if (R() < .5) {
+      for (let i = 0; i < 3; i++) {
+        const y = 74 - th * (.5 + i * .24), hw = th * (.44 - i * .11);
+        s += `<path d="M${(tx - hw).toFixed(1)},${y.toFixed(1)} Q${tx.toFixed(1)},${(y - th * .2).toFixed(1)} ` +
+             `${(tx + hw).toFixed(1)},${y.toFixed(1)} Q${tx.toFixed(1)},${(y + th * .06).toFixed(1)} ` +
+             `${(tx - hw).toFixed(1)},${y.toFixed(1)} Z"/>`;
+      }
+      return s;
+    }
+    return s + `<path d="M${(tx - th * .42).toFixed(1)},${base.toFixed(1)} Q${tx.toFixed(1)},${(74 - th * 1.4).toFixed(1)} ` +
+               `${(tx + th * .42).toFixed(1)},${base.toFixed(1)} Z"/>`;
+  };
 
-  const osakaSVG = () => cityBase(towerOsaka(175), { tall: false,
-    neons: [[52, 52, 18, 'var(--torii)'], [60, 54, 14, 'var(--hot)'],
-            [140, 56, 14, 'var(--torii)'], [206, 50, 20, 'var(--hot)'],
-            [324, 54, 16, 'var(--torii)'], [332, 56, 13, 'var(--hot)']] });
+  // ---- קומת הרחוב ----
+  // הפס שמתחת לבניינים היה ריק. אלה הדברים שבאמת עומדים ברחוב יפני,
+  // בקנה מידה גדול יותר מהבניינים כי הם קרובים יותר.
+  const vending = x => `<rect x="${x}" y="70" width="17" height="26" rx="1.4" fill="var(--roof)"/>
+    <rect x="${x + 2}" y="72.4" width="13" height="13.5" rx="1" fill="var(--tvlit)" opacity=".8"/>
+    <rect x="${x + 2}" y="88" width="13" height="3" rx="1" fill="var(--lit)"/>
+    <rect x="${x + 2}" y="92.4" width="5" height="2" rx=".8" fill="var(--wire)" opacity=".6"/>`;
 
-  const nagoyaSVG = () => cityBase(castle(175), { tall: false,
-    neons: [[52, 54, 15, 'var(--hot)']] });
+  const toro = x => `<g fill="var(--tile)">
+    <path d="M${x - 7},96 L${x + 7},96 L${x + 6},92 L${x - 6},92 Z"/>
+    <path d="M${x - 3},92 L${x - 3},83 L${x + 3},83 L${x + 3},92 Z"/>
+    <path d="M${x - 8.5},82.4 L${x + 8.5},82.4 L${x + 5},76.5 L${x - 5},76.5 Z"/>
+    <path d="M${x - 1.4},76.5 L${x - 1.4},72.6 L${x + 1.4},72.6 L${x + 1.4},76.5 Z"/></g>
+    <rect x="${x - 3.6}" y="76.8" width="7.2" height="5.4" rx=".6" fill="var(--lit)" opacity=".95"/>`;
 
-  function kyotoSVG() {
-    // קיוטו היא לא סקייליין — היא מאצ׳יה, כורה, ופגודה.
-    return `${GROUND}
-      <g fill="var(--plaster)">
-        <rect x="112" y="50" width="40" height="24" rx="1"/><rect x="300" y="54" width="34" height="20" rx="1"/>
-      </g>
-      <g fill="var(--tile)" class="plate">
-        <path d="M16,74 L16,54 L46,54 L46,74 Z"/>${tileRoof(31, 44, 21, 10)}
-        <path d="M66,74 L66,50 L106,50 L106,74 Z"/>${tileRoof(86, 36, 28, 14)}
-        <path d="M172,74 L172,58 L204,58 L204,74 Z"/>${tileRoof(188, 48, 22, 10)}
-        <path d="M232,74 L232,52 L284,52 L284,74 Z"/>${tileRoof(258, 35, 33, 17)}
-        ${tileRoof(317, 46, 22, 8)}
-        <path d="M352,74 L352,56 L386,56 L386,74 Z"/>${tileRoof(369, 44, 24, 12)}
-      </g>
-      <g fill="var(--torii)">${pagoda(150, 74, 20)}</g>
-      <g fill="var(--tile)" opacity=".9"><path d="M120,60 h24 v1.4 h-24 Z M120,65 h24 v1.4 h-24 Z"/></g>
-      <g fill="var(--lit)" opacity=".92">
-        ${win(22, 61, 7, 8)}${win(34, 61, 7, 8)}${win(74, 58, 8, 9)}${win(90, 58, 8, 9)}
-        ${win(178, 63, 7, 7)}${win(192, 63, 7, 7)}${win(240, 58, 9, 11)}${win(262, 58, 9, 11)}
-        ${win(358, 62, 7, 8)}${win(374, 62, 7, 8)}
-      </g>
-      <g fill="var(--tree)"><path d="M214,74 L214,64 L217,64 L217,74 Z M205,64 Q215,42 225,64 Z"/></g>`;
-  }
+  // חנות עם נורן: הפתח הכהה מאחור הוא מה שהופך שלושה פסים אדומים לדלת
+  const norenAt = x => `<rect x="${x - 2}" y="74" width="30" height="22" rx="1" fill="var(--roof)"/>
+    <rect x="${x - 4}" y="72.6" width="34" height="3" rx="1" fill="var(--tile)"/>
+    <rect x="${x + 1}" y="78" width="24" height="18" fill="var(--tile)"/>
+    <g fill="var(--torii)"><rect x="${x + 1.6}" y="78" width="6.8" height="11" rx=".6"/>
+    <rect x="${x + 9.6}" y="78" width="6.8" height="11" rx=".6"/>
+    <rect x="${x + 17.6}" y="78" width="6.8" height="11" rx=".6"/></g>
+    <rect x="${x + 1}" y="76.8" width="24" height="1.4" fill="var(--tile)"/>`;
 
-  function mountainSVG() {
-    // 合掌造り: גגות תלולים לשלג, וצפיפות עצים גבוהה.
-    const gassho = (cx, peak, half) =>
-      `<path d="M${cx - half},74 L${cx},${peak} L${cx + half},74 Z"/>`;
-    return `${GROUND}
-      <g fill="var(--tile)" class="plate">
-        ${gassho(86, 36, 28)}${gassho(258, 35, 30)}${gassho(356, 38, 25)}
-        ${gassho(150, 52, 20)}${gassho(310, 55, 17)}
-      </g>
-      <g fill="var(--lit)" opacity=".9">
-        ${win(80, 62, 8, 9)}${win(252, 60, 9, 10)}${win(351, 64, 7, 7)}${win(145, 65, 7, 6)}
-      </g>
-      <g fill="var(--torii)">
-        <path d="M112,74 L112,52 L115,52 L115,74 Z M134,74 L134,52 L137,52 L137,74 Z"/>
-        <path d="M106,48 L143,48 L140,44 L109,44 Z"/><path d="M108,54 L141,54 L141,56 L108,56 Z"/>
-      </g>
+  // מכונת משקאות, פנס אבן ונורן — שלושה דברים שרואים ביפן כל יום
+  const STREET = { tokyo: [vending, vending, norenAt], osaka: [vending, norenAt, vending],
+                   nagoya: [vending, norenAt, toro], kyoto: [toro, norenAt, toro],
+                   village: [toro, norenAt, toro], mountain: [toro, toro, norenAt] };
+
+  // הכביש: פס בהיר שמפריד בין הבתים לקדמה, אחרת הכל צף על מישור אחד
+  const ROAD = '<path fill="var(--wire)" opacity=".13" d="M-30,84 C90,81 200,86 300,82 L420,84 L420,104 L-30,104 Z"/>';
+
+  const tileRoof2 = (cx, y, half, drop) =>
+    `<path d="M${cx - half - 4},${y + drop} Q${cx - half},${y + drop - 3} ${cx - half + 3},${y + drop - 4} ` +
+    `L${cx},${y} L${cx + half - 3},${y + drop - 4} Q${cx + half},${y + drop - 3} ${cx + half + 4},${y + drop} Z"/>`;
+
+  // ---- ציוני דרך ----
+  const LM = {
+    tokyo: cx => `<g fill="var(--torii)">
+      <path d="M${cx - 13},74 L${cx - 4},20 L${cx + 4},20 L${cx + 13},74 L${cx + 8},74 L${cx},30 L${cx - 8},74 Z"/>
+      <path d="M${cx - 9},50 L${cx + 9},50 L${cx + 9},53 L${cx - 9},53 Z"/>
+      <path d="M${cx - 6},36 L${cx + 6},36 L${cx + 6},39 L${cx - 6},39 Z"/>
+      <path d="M${cx - 1},20 L${cx - 1},9 L${cx + 1},9 L${cx + 1},20 Z"/></g>
+      <circle cx="${cx}" cy="7" r="2" fill="var(--hot)"/>`,
+    osaka: cx => `<g fill="var(--roof)">
+      <path d="M${cx - 11},74 L${cx - 5},34 L${cx + 5},34 L${cx + 11},74 Z"/>
+      <path d="M${cx - 8},32 L${cx + 8},32 L${cx + 6},26 L${cx - 6},26 Z"/>
+      <path d="M${cx - 1.4},26 L${cx - 1.4},17 L${cx + 1.4},17 L${cx + 1.4},26 Z"/></g>
+      <g fill="var(--hot)"><circle cx="${cx}" cy="15" r="3"/>
+      <path d="M${cx - 7},28 L${cx + 7},28 L${cx + 7},30.5 L${cx - 7},30.5 Z"/></g>`,
+    nagoya: cx => `<g fill="var(--plaster)">
+      <rect x="${cx - 17}" y="46" width="34" height="28" rx="1"/>
+      <rect x="${cx - 12}" y="32" width="24" height="12" rx="1"/></g>
       <g fill="var(--tile)">
-        <path d="M316,74 L316,54 L348,54 L348,74 Z"/>
-        <path d="M304,55 Q312,47 318,45 L332,41 L346,45 Q352,47 360,55 Z"/>
-        <path d="M330,41 L330,33 L334,33 L334,41 Z"/><path d="M322,33 Q332,27 342,33 Z"/>
-      </g>
-      <g fill="var(--lit)" opacity=".9">${win(326, 60, 9, 10)}</g>
-      <g fill="var(--tree)">
-        <path d="M22,74 L22,58 L25,58 L25,74 Z M10,58 Q23,26 36,58 Z"/>
-        <path d="M46,74 L46,62 L48,62 L48,74 Z M37,62 Q47,38 57,62 Z"/>
-        <path d="M196,74 L196,60 L199,60 L199,74 Z M185,60 Q197,32 209,60 Z"/>
-        <path d="M218,74 L218,64 L220,64 L220,74 Z M210,64 Q219,44 228,64 Z"/>
-        <path d="M290,74 L290,63 L292,63 L292,74 Z M281,63 Q291,40 301,63 Z"/>
-        <path d="M382,74 L382,61 L385,61 L385,74 Z M371,61 Q383,34 395,61 Z"/>
-      </g>`;
+        <path d="M${cx - 24},48 Q${cx - 18},41 ${cx - 12},39 L${cx},36 L${cx + 12},39 Q${cx + 18},41 ${cx + 24},48 Z"/>
+        <path d="M${cx - 17},34 Q${cx - 12},28 ${cx - 7},26 L${cx},24 L${cx + 7},26 Q${cx + 12},28 ${cx + 17},34 Z"/></g>
+      <g fill="var(--hot)"><path d="M${cx - 5},24 q2,-5 5,-5 q3,0 5,5 Z"/></g>`,
+    kyoto: cx => { let g = `<path d="M${cx - 10},74 L${cx - 10},70 L${cx + 10},70 L${cx + 10},74 Z"/>`;
+      // חמש קומות. בין גג לגג יש קיר — בלי זה זה נראה כמו עץ אשוח.
+      for (let i = 0; i < 5; i++) { const y = 26 + i * 9.2, w = 6.4 + i * 2.2;
+        g += `<path d="M${cx - w + 2},${y + 8.2} L${cx - w + 2},${y + 3.2} L${cx + w - 2},${y + 3.2} ` +
+             `L${cx + w - 2},${y + 8.2} Z"/>` +
+             `<path d="M${cx - w - 2.6},${y + 3.4} Q${cx - w},${y + .4} ${cx - w + 3},${y - .4} L${cx},${y - 2.4} ` +
+             `L${cx + w - 3},${y - .4} Q${cx + w},${y + .4} ${cx + w + 2.6},${y + 3.4} Z"/>`; }
+      // סורין — הצריח והטבעות שבראש כל פגודה
+      g += `<path d="M${cx - .9},26 L${cx - .9},11 L${cx + .9},11 L${cx + .9},26 Z"/>`;
+      for (let i = 0; i < 4; i++) g += `<path d="M${cx - 3},${14 + i * 2.7} L${cx + 3},${14 + i * 2.7} ` +
+        `L${cx + 3},${15 + i * 2.7} L${cx - 3},${15 + i * 2.7} Z"/>`;
+      return `<g fill="var(--torii)">${g}</g>`; },
+    torii: cx => `<g fill="var(--torii)">
+      <path d="M${cx - 19},74 L${cx - 19},44 L${cx - 15},44 L${cx - 15},74 Z
+               M${cx + 15},74 L${cx + 15},44 L${cx + 19},44 L${cx + 19},74 Z"/>
+      <path d="M${cx - 28},34 Q${cx},41 ${cx + 28},34 L${cx + 27},38 Q${cx},44.5 ${cx - 27},38 Z"/>
+      <path d="M${cx - 24},46 L${cx + 24},46 L${cx + 24},49 L${cx - 24},49 Z"/>
+      <path d="M${cx - 2},40 L${cx - 2},46 L${cx + 2},46 L${cx + 2},40 Z"/></g>`
+  };
+
+  // ---- פרופיל לכל אזור ----
+  const PROFILE = {
+    tokyo:    { lm: 'tokyo',  n: [9, 11], hi: [14, 46], flat: 1, tank: .5, pole: 2, tree: 0, neon: 2 },
+    osaka:    { lm: 'osaka',  n: [9, 12], hi: [34, 56], flat: 1, tank: .6, pole: 3, tree: 0, neon: 5 },
+    nagoya:   { lm: 'nagoya', n: [8, 10], hi: [38, 58], flat: 1, tank: .35, pole: 2, tree: 1, neon: 1 },
+    kyoto:    { lm: 'kyoto',  n: [7, 9],  hi: [44, 58], flat: 0, tank: 0, pole: 2, tree: 2, neon: 0 },
+    village:  { lm: 'torii',  n: [6, 8],  hi: [46, 60], flat: 0, tank: 0, pole: 1, tree: 2, neon: 0 },
+    mountain: { lm: 'torii',  n: [5, 7],  hi: [36, 56], flat: 0, gassho: 1, tank: 0, pole: 0, tree: 6, neon: 0 }
+  };
+
+  // ---- בניית הסצנה ----
+  function buildScene(kind, seed) {
+    const P = PROFILE[kind], R = rng(seed);
+    const pick = ([a, b]) => a + R() * (b - a);
+    const n = Math.round(pick(P.n));
+
+    // פריסה: רוחבים ומרווחים משתנים, ואז נרמול לרוחב המלא
+    const slots = [];
+    let w = [], gap = [];
+    for (let i = 0; i < n; i++) { w.push(26 + R() * 34); gap.push(4 + R() * 14); }
+    const total = w.reduce((a, b) => a + b, 0) + gap.reduce((a, b) => a + b, 0);
+    const k = 450 / total;
+    let x = -30;
+    for (let i = 0; i < n; i++) {
+      const bw = w[i] * k, top = pick(P.hi);
+      slots.push({ x, w: bw, top });
+      x += bw + gap[i] * k;
+    }
+
+    // ציון הדרך נכנס לפער הרחב ביותר שנמצא בתוך המסגרת הנראית — לא בקצה,
+    // שם הוא נחתך, ולא מתחת לבניין, שם הוא נבלע.
+    let lmX = 195, bestGap = -1;
+    for (let i = 1; i < slots.length; i++) {
+      const g0 = slots[i - 1].x + slots[i - 1].w, g1 = slots[i].x, mid = (g0 + g1) / 2;
+      if (mid < 92 || mid > 298) continue;
+      const score = (g1 - g0) * (1 - Math.abs(mid - 195) / 260);
+      if (score > bestGap) { bestGap = score; lmX = mid; }
+    }
+
+    // שורה אחורית — עומק. קטנה, כהה, בלי חלונות.
+    let back = '<g fill="var(--land)" opacity=".55">';
+    for (let i = 0; i < 7; i++) {
+      const bx = -20 + i * 62 + R() * 26, bw = 30 + R() * 30, by = 48 + R() * 12;
+      back += `<path d="M${bx.toFixed(1)},74 L${bx.toFixed(1)},${by.toFixed(1)} ` +
+              `L${(bx + bw).toFixed(1)},${by.toFixed(1)} L${(bx + bw).toFixed(1)},74 Z"/>`;
+    }
+    back += '</g>';
+
+    let body = '', lights = '', extra = '';
+    const perch = [];
+    slots.forEach((s, i) => {
+      const cx = s.x + s.w / 2;
+      if (P.gassho) {
+        body += `<path d="M${s.x.toFixed(1)},74 L${cx.toFixed(1)},${s.top.toFixed(1)} ` +
+                `L${(s.x + s.w).toFixed(1)},74 Z"/>`;
+        lights += `<rect x="${(cx - 4).toFixed(1)}" y="${(s.top + 22).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>`;
+      } else if (P.flat) {
+        body += `<path d="M${s.x.toFixed(1)},74 L${s.x.toFixed(1)},${s.top.toFixed(1)} ` +
+                `L${(s.x + s.w).toFixed(1)},${s.top.toFixed(1)} L${(s.x + s.w).toFixed(1)},74 Z"/>`;
+        lights += grid(s.x, s.top, s.w, 74 - s.top, R);
+        if (R() < P.tank) extra += tank(cx - 4.5, s.top);
+      } else {
+        const wallTop = s.top + 12;
+        body += `<path d="M${(s.x + 3).toFixed(1)},74 L${(s.x + 3).toFixed(1)},${wallTop.toFixed(1)} ` +
+                `L${(s.x + s.w - 3).toFixed(1)},${wallTop.toFixed(1)} L${(s.x + s.w - 3).toFixed(1)},74 Z"/>` +
+                tileRoof2(cx, s.top, s.w / 2 - 2, 12);
+        lights += `<rect x="${(cx - 9).toFixed(1)}" y="${(wallTop + 5).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>` +
+                  `<rect x="${(cx + 1).toFixed(1)}" y="${(wallTop + 5).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>`;
+      }
+      // מועמד למושב: גג שלא נחתך בקצה ולא מתחת לציון הדרך
+      if (cx > 44 && cx < 348 && Math.abs(cx - lmX) > 34) perch.push({ x: cx, y: s.top });
+    });
+
+    for (let i = 0; i < P.pole; i++) extra += pole(30 + R() * 330, 34 + R() * 16);
+    for (let i = 0; i < P.neon; i++)
+      extra += `<rect x="${(20 + R() * 350).toFixed(1)}" y="${(46 + R() * 10).toFixed(1)}" width="4.5" ` +
+               `height="${(12 + R() * 12).toFixed(1)}" rx="1.4" fill="${R() < .5 ? 'var(--torii)' : 'var(--hot)'}"/>`;
+    // עצים נכנסים לפערים שבין הבניינים, ונצבעים לפני הבניינים כדי שגג
+    // יסתיר עץ ולא להפך. קודם הם נחתו על הגגות ונראו כמו מדבקות.
+    const gaps = [];
+    for (let i = 1; i < slots.length; i++) {
+      const g0 = slots[i - 1].x + slots[i - 1].w, g1 = slots[i].x;
+      if (g1 - g0 > 6) gaps.push({ x: (g0 + g1) / 2, w: g1 - g0 });
+    }
+    gaps.sort((a, b) => b.w - a.w);
+    let trees = '';
+    for (let i = 0; i < P.tree; i++) {
+      const g = gaps[i % Math.max(1, gaps.length)];
+      const tx = g && Math.abs(g.x - lmX) > 26 ? g.x : 14 + R() * 362;
+      trees += treeAt(tx, 20 + R() * 16, R);
+    }
+
+    // קומת הרחוב — שלושה עצמים, פרוסים על שליש־שליש־שליש
+    let street = '';
+    (STREET[kind] || STREET.village).forEach((fn, i) => {
+      street += fn(26 + i * 122 + R() * 70);
+    });
+
+    // שלושה מושבים, מפוזרים: שמאל, אמצע, ימין
+    perch.sort((a, b) => a.x - b.x);
+    const seat = i => perch.length ? perch[Math.min(perch.length - 1, Math.round(i * (perch.length - 1)))] : { x: 195, y: 40 };
+    const seats = [seat(.68), seat(.2), seat(.95)];
+
+    const fill = P.gassho || !P.flat ? 'var(--tile)' : 'var(--roof)';
+    return {
+      svg: `${GROUND}${back}<g fill="var(--tree)">${trees}</g>` +
+           `<g fill="${fill}" class="plate">${body}</g>${LM[P.lm](lmX)}` +
+           `<g opacity=".9">${lights}</g>${ROAD}${extra}${street}`,
+      seats
+    };
   }
 
   // איזה נוף. נגזר מבלוק הלינה של היום — הוא השדה הנקי היחיד שאומר איפה אתם.
+  let SCENE = null;
   function villageSVG() {
     const st = (T.days && T.days[dayIndex()] || {}).st || '';
     const kind = /טוקיו/.test(st) ? 'tokyo' : /אוסקה/.test(st) ? 'osaka'
                : /קיוטו/.test(st) ? 'kyoto' : /נגויה/.test(st) ? 'nagoya'
                : /אלפים|קויאסאן/.test(st) ? 'mountain' : 'village';
-    const body = { tokyo: tokyoSVG, osaka: osakaSVG, kyoto: kyotoSVG,
-                   nagoya: nagoyaSVG, mountain: mountainSVG, village: villageSVG_ }[kind]();
+    SCENE = buildScene(kind, dayIndex() + 1);
     return `<svg class="l-village" data-kind="${kind}" viewBox="0 0 390 104"
-      preserveAspectRatio="none" style="height:104px">${body}</svg>`;
+      preserveAspectRatio="none" style="height:104px">${SCENE.svg}</svg>`;
   }
 
   // ---- ציור הסצנה ----
