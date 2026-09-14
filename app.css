@@ -65,7 +65,7 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .city{font-size:1.05rem;font-weight:700}
 .jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:.85rem}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;
-  backdrop-filter:blur(10px);box-shadow:0 12px 34px rgba(0,0,0,.24);margin-top:12px;
+  backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.16);margin-top:12px;
   transition:transform .18s ease,border-color .18s ease}
 .card.now{border-color:color-mix(in srgb,var(--hot) 45%,transparent)}
 .card.alert{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
@@ -79,18 +79,51 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .note.w{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
 .note.g{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
 .steps{display:flex;flex-direction:column;gap:7px}
-.step{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:13px;background:var(--card);
-  border:1px solid var(--line);transition:transform .16s ease,border-color .16s ease}
-a.step:active,.card[data-todo]:active,a[data-dec]:active{transform:scale(.985)}
-a.step,a[data-dec]{-webkit-tap-highlight-color:transparent}
+
+/* ===== אפשרות פעולה: צורה אחת = התנהגות אחת =====
+   מה שהיה כאן קודם: card, step ו-chip שימשו גם ללחיץ וגם למידע, בעיצוב זהה
+   לחלוטין. ההיזון החוזר היחיד היה כיווץ של 1.5% בזמן הלחיצה — כלומר גילית
+   שמשהו לחיץ רק אחרי שניסית, ושמשהו לא לחיץ רק אחרי שלא קרה כלום.
+   הכלל עכשיו: מיכל מורם = אפשר ללחוץ · שטוח = מידע בלבד. */
+
+/* שורת מידע — שטוחה. בלי מסגרת, בלי רקע, בלי צל. */
+.step{display:flex;align-items:center;gap:11px;padding:7px 2px;
+  background:none;border:0;border-radius:0}
 .step b{font-size:.85rem;color:var(--soft);min-width:44px}
 .step span{flex:1;font-size:.92rem}
+
+/* שורה לחיצה — מיכל מורם. */
+a.step,button.step{padding:10px 13px;border-radius:13px;background:var(--card);
+  border:1px solid var(--line);transition:transform .16s ease,border-color .16s ease}
+
+/* שורה שמובילה למקום אחר — גם שברון. ב-RTL "קדימה" הוא שמאלה.
+   אין שברון? אין לאן ללכת. זה מה שהופך את כלל הניווט של NOTES
+   ("אין יעד מדויק? אין כפתור") למשהו שרואים בעין. */
+a.step[href]{position:relative;padding-left:30px}
+a.step[href]::after{content:'';position:absolute;left:13px;top:50%;width:7px;height:7px;
+  border-left:2px solid var(--soft);border-bottom:2px solid var(--soft);
+  transform:translateY(-50%) rotate(45deg);opacity:.7}
+
+/* פקד עם מצב (בחירה, סימון בוצע) — מיכל בלי שברון: ה-pip הוא הסימן,
+   והוא לא מוביל לשום מקום אלא משנה מצב במקום. */
+.card[data-todo]{cursor:pointer}
+a.step:active,.card[data-todo]:active,a[data-dec]:active{transform:scale(.985)}
+a.step,a[data-dec],.card[data-todo]{-webkit-tap-highlight-color:transparent}
+
 .pip{width:7px;height:7px;border-radius:50%;flex:none}
-.chip{display:inline-block;font-size:.7rem;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
-.chip.hot{color:var(--hot);border-color:color-mix(in srgb,var(--hot) 42%,transparent)}
-.chip.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 42%,transparent)}
-.chip.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 42%,transparent)}
-a.chip{padding:4px 11px;color:var(--soft);background:color-mix(in srgb,var(--hot) 8%,transparent);
+
+/* תווית — לא גלולה. צורת גלולה היא הסימן הכי חזק ל"תלחץ עליי" במובייל,
+   והיא שמורה מעכשיו ללינקים בלבד. תווית היא צבע וטיפוגרפיה. */
+.chip{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.4px;
+  padding:0;border:0;background:none;border-radius:0;color:var(--dim)}
+.chip.hot{color:var(--hot)}
+.chip.warn{color:var(--warn)}
+.chip.ok{color:var(--ok)}
+
+/* גלולה — רק כשאפשר ללחוץ. */
+a.chip{padding:4px 11px;border-radius:99px;color:var(--soft);
+  border:1px solid color-mix(in srgb,var(--hot) 32%,transparent);
+  background:color-mix(in srgb,var(--hot) 8%,transparent);
   transition:background .16s ease,color .16s ease}
 a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var(--ink)}
 /* מצב ריק — איור במקום שורת טקסט בודדת */
