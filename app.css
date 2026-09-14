@@ -15,7 +15,7 @@
   /* שלוש שכבות טקסט שנבדלות בבהירות ולא בגוון: הבחנת גוון ב-13px, על
      טקסטורת נייר, בשמש — לא קיימת. הפרש L* של כ-15 בכל מדרגה. */
   --ink:#f4eee2; --dim:#c3b6a4; --soft:#9a9083;
-  --card:rgba(30,42,52,.93); --well:#141d27;
+  --card:#1e2a34; --cardGlass:rgba(30,42,52,.82); --well:#141d27;
   --line:rgba(197,168,136,.16); --rule:rgba(197,168,136,.34);
   --hot:#eab94f; --warn:#f2906a; --ok:#7fd0a0; --hi:#c1303f;
   --onHi:#fff6e8; --onHot:#1d2833; --key:var(--hot);
@@ -38,7 +38,7 @@ body.is-day{
   /* הנייר ירד מ-#f3ece0 לחם ועמוק יותר. זה גם מה שפותר את הקונטרסט:
      רקע כהה יותר נותן לפיגמנטים מרווח להישאר רוויים במקום להיכבות. */
   --ink:#241d15; --dim:#4a3e30; --soft:#6f614c;
-  --card:rgba(253,246,232,.95); --well:#f4ebd8;
+  --card:#fdf6e8; --cardGlass:rgba(253,246,232,.8); --well:#f4ebd8;
   --line:rgba(120,95,62,.20); --rule:rgba(120,95,62,.38);
   --hot:#9a4a10; --warn:#a83a22; --ok:#2c6a45; --hi:#a8322a;
   --onHi:#fff6e8; --onHot:#fdf6e8; --key:var(--hot);
@@ -124,7 +124,8 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
   transition:transform .18s ease,border-color .18s ease}
 /* 墨板 — לוח המפתח. בהדפס עץ קו המתאר נדפס ראשון והצבעים נוחתים בתוכו.
    הכרטיס הרם ביותר מקבל קו ולא צל: הדפס לא מטיל צל, הוא המשטח. */
-.card.now{backdrop-filter:blur(10px);border:2px solid var(--key);box-shadow:none}
+.card.now{background:var(--cardGlass);backdrop-filter:blur(14px) saturate(1.1);
+  border:2px solid var(--key);box-shadow:none}
 .card.alert{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
 .lbl{font-size:var(--fs-meta);letter-spacing:.06em;font-weight:700;line-height:1.2;color:var(--hot);display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .lbl.q{color:var(--soft)}
@@ -347,7 +348,7 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
 .tcard .ad{font-size:var(--fs-sub);color:#2c261e;line-height:1.45;margin-top:3px}
 .tcard .ph{font-size:var(--fs-sub);font-weight:600;margin-top:11px;padding-top:11px;border-top:1px solid #ddd4c6}
 .nav{position:fixed;bottom:0;right:0;left:0;z-index:5;display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));
-  background:color-mix(in srgb,var(--skyEnd) 94%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(12px)}
+  background:color-mix(in srgb,var(--skyEnd) 97%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(16px)}
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:var(--fs-micro);line-height:1;text-decoration:none}
 .nav a{position:relative;padding:5px 0 3px;transition:color .18s ease}
 .nav a.on{color:var(--hot);font-weight:700}
@@ -355,7 +356,7 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
   background:color-mix(in srgb,var(--hot) 11%,transparent);z-index:-1}
 .pick{font-size:var(--fs-micro);position:fixed;bottom:calc(62px + env(safe-area-inset-bottom));left:8px;z-index:6;max-width:44vw;
   background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:9px;
-  padding:4px 7px;font-family:inherit;opacity:.75}
+  padding:4px 7px;font-family:inherit;color:var(--soft)}
 .scene .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{will-change:transform}
 
