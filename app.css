@@ -20,7 +20,7 @@
   --hot:#eab94f; --warn:#f2906a; --ok:#7fd0a0; --hi:#c1303f;
   --onHi:#fff6e8; --onHot:#1d2833; --key:var(--hot);
   --ridge:#4a6478; --ridge2:#26394a; --roof:#18232e; --lit:#f0a94e; --tree:#1d2b28;
-  --land:#141f27;
+  --land:#141f27; --plaster:#cfc8b8; --tile:#0e161f;
   /* איור: לילה */
   --cat1:#33414f; --cat2:#8d7a63; --catInner:#c98089; --catEye:#f0c05a;
   --figure:#1e2a38; --skyCloud:#2a3b52; --bird:#3b4f66; --wire:#4a5a6b;
@@ -43,7 +43,7 @@ body.is-day{
   --hot:#9a4a10; --warn:#a83a22; --ok:#2c6a45; --hi:#a8322a;
   --onHi:#fff6e8; --onHot:#fdf6e8; --key:var(--hot);
   --ridge:#7f9bb0; --ridge2:#5d7f95; --roof:#6b5a48; --lit:#a8906e; --tree:#5c7a4a;
-  --land:#8a9a6a;
+  --land:#8a9a6a; --plaster:#f6f1e4; --tile:#33393f;
   /* איור: יום */
   --cat1:#3f3730; --cat2:#c9a274; --catInner:#e59aa0; --catEye:#4a7f4f;
   --figure:#5a4a3a; --skyCloud:#ffffff; --bird:#7d8fa0; --wire:#8d7f6b;

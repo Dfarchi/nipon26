@@ -354,6 +354,111 @@ window.App = (function () {
     return h;
   }
 
+  // ===== הכפר =====
+  // אותם מיקומי פסגה בשלוש הווריאנטות (x≈86, 258, 356), כי החתולות יושבות
+  // עליהן במיקומים קבועים ב-charLayer. שינוי כאן בלי לשמור עליהם = חתולה
+  // שמרחפת באוויר.
+  const GROUND = '<path fill="var(--land)" d="M-30,70 C60,63 120,73 190,67 C250,62 300,72 360,65 ' +
+    'C390,62 410,67 420,65 L420,104 L-30,104 Z"/>';
+
+  // חלון מואר — הצורה החוזרת בשלוש הווריאנטות
+  const win = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="1.2"/>`;
+
+  // גג רעפים: קו שחור עם מעוף קל בקצוות, כמו 瓦屋根
+  const tileRoof = (cx, y, half, drop) =>
+    `<path d="M${cx - half - 4},${y + drop} Q${cx - half},${y + drop - 3} ${cx - half + 3},${y + drop - 4} ` +
+    `L${cx},${y} L${cx + half - 3},${y + drop - 4} Q${cx + half},${y + drop - 3} ${cx + half + 4},${y + drop} Z"/>`;
+
+  function townSVG() {
+    // 町家 ו-蔵: קיר טיח לבן, גג רעפים שחור, ותורי ארגמן. אדום־שחור־לבן.
+    return `${GROUND}
+      <g fill="var(--torii)">
+        <path d="M8,74 L8,50 L11,50 L11,74 Z M28,74 L28,50 L31,50 L31,74 Z"/>
+        <path d="M2,46 L37,46 L34,42 L5,42 Z"/><path d="M4,52 L35,52 L35,54 L4,54 Z"/>
+      </g>
+      <g fill="var(--plaster)">
+        <rect x="52" y="48" width="42" height="26" rx="1"/>
+        <rect x="300" y="52" width="38" height="22" rx="1"/>
+      </g>
+      <g fill="var(--tile)" class="plate">
+        ${tileRoof(73, 38, 30, 11)}${tileRoof(319, 44, 27, 9)}
+        <path d="M120,74 L120,56 L152,56 L152,74 Z"/>${tileRoof(136, 47, 22, 9)}
+        <path d="M232,74 L232,52 L284,52 L284,74 Z"/>${tileRoof(258, 35, 34, 17)}
+        <path d="M356,74 L356,56 L384,56 L384,74 Z"/>${tileRoof(370, 44, 22, 12)}
+        <path d="M172,74 L172,60 L206,60 L206,74 Z"/>${tileRoof(189, 50, 24, 10)}
+      </g>
+      <g fill="var(--tile)" opacity=".9">
+        <path d="M60,60 h26 v1.4 h-26 Z M60,65 h26 v1.4 h-26 Z"/>
+        <path d="M306,60 h26 v1.4 h-26 Z M306,65 h26 v1.4 h-26 Z"/>
+      </g>
+      <g fill="var(--lit)" opacity=".92">
+        ${win(126, 62, 8, 9)}${win(140, 62, 8, 9)}${win(240, 58, 9, 11)}${win(262, 58, 9, 11)}
+        ${win(362, 62, 7, 8)}${win(178, 65, 7, 7)}${win(194, 65, 7, 7)}
+      </g>
+      <g fill="var(--tree)"><path d="M214,74 L214,63 L217,63 L217,74 Z M204,63 Q215,38 226,63 Z"/></g>`;
+  }
+
+  function citySVG() {
+    // מגדלים בגבהים משתנים ורשת חלונות. הפסגות נשמרות כמדרגות גג שטוחות.
+    const grid = (x, y, w, h, cols, rows) => {
+      let g = '';
+      for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++)
+        if ((c + r * 3) % 4 !== 1) g += win(x + 4 + c * 7, y + 5 + r * 7, 4, 4.5);
+      return g;
+    };
+    return `${GROUND}
+      <g fill="var(--roof)" class="plate">
+        <path d="M6,74 L6,44 L34,44 L34,74 Z"/>
+        <path d="M44,74 L44,56 L74,56 L74,74 Z"/>
+        <path d="M78,74 L78,35 L112,35 L112,74 Z"/>
+        <path d="M120,74 L120,50 L158,50 L158,74 Z"/>
+        <path d="M168,74 L168,60 L200,60 L200,74 Z"/>
+        <path d="M212,74 L212,46 L240,46 L240,74 Z"/>
+        <path d="M244,74 L244,35 L274,35 L274,74 Z"/>
+        <path d="M282,74 L282,54 L316,54 L316,74 Z"/>
+        <path d="M326,74 L326,38 L386,38 L386,74 Z"/>
+      </g>
+      <g fill="var(--torii)">
+        <path d="M252,35 L252,22 L254,22 L254,35 Z"/><circle cx="253" cy="20" r="2.4"/>
+      </g>
+      <g fill="var(--lit)" opacity=".8">
+        ${grid(6, 44, 28, 30, 3, 4)}${grid(78, 35, 34, 39, 4, 5)}${grid(120, 50, 38, 24, 4, 3)}
+        ${grid(212, 46, 28, 28, 3, 4)}${grid(244, 35, 30, 39, 3, 5)}${grid(326, 38, 60, 36, 7, 5)}
+      </g>`;
+  }
+
+  function mountainSVG() {
+    // 合掌造り: גגות תלולים לשלג, וצפיפות עצים גבוהה.
+    const gassho = (cx, peak, half) =>
+      `<path d="M${cx - half},74 L${cx},${peak} L${cx + half},74 Z"/>`;
+    return `${GROUND}
+      <g fill="var(--tile)" class="plate">
+        ${gassho(86, 36, 28)}${gassho(258, 35, 30)}${gassho(356, 38, 25)}
+        ${gassho(150, 52, 20)}${gassho(310, 55, 17)}
+      </g>
+      <g fill="var(--lit)" opacity=".9">
+        ${win(80, 62, 8, 9)}${win(252, 60, 9, 10)}${win(351, 64, 7, 7)}${win(145, 65, 7, 6)}
+      </g>
+      <g fill="var(--tree)">
+        <path d="M22,74 L22,58 L25,58 L25,74 Z M10,58 Q23,26 36,58 Z"/>
+        <path d="M46,74 L46,62 L48,62 L48,74 Z M37,62 Q47,38 57,62 Z"/>
+        <path d="M196,74 L196,60 L199,60 L199,74 Z M185,60 Q197,32 209,60 Z"/>
+        <path d="M218,74 L218,64 L220,64 L220,74 Z M210,64 Q219,44 228,64 Z"/>
+        <path d="M290,74 L290,63 L292,63 L292,74 Z M281,63 Q291,40 301,63 Z"/>
+        <path d="M382,74 L382,61 L385,61 L385,74 Z M371,61 Q383,34 395,61 Z"/>
+      </g>`;
+  }
+
+  // איזה נוף. נגזר מבלוק הלינה של היום — הוא השדה הנקי היחיד שאומר איפה אתם.
+  function villageSVG() {
+    const st = (T.days && T.days[dayIndex()] || {}).st || '';
+    const kind = /טוקיו|אוסקה|נגויה/.test(st) ? 'city'
+               : /אלפים|קויאסאן/.test(st) ? 'mountain' : 'town';
+    const body = kind === 'city' ? citySVG() : kind === 'mountain' ? mountainSVG() : townSVG();
+    return `<svg class="l-village" data-kind="${kind}" viewBox="0 0 390 104"
+      preserveAspectRatio="none" style="height:104px">${body}</svg>`;
+  }
+
   // ---- ציור הסצנה ----
   function scene(host) {
     const r = document.documentElement.style;
@@ -374,28 +479,7 @@ window.App = (function () {
         <path filter="url(#pt)" fill="url(#g1)" d="M-30,62 C12,48 32,14 60,28 C88,42 106,8 140,24 C170,38 192,18 216,34 C246,52 264,12 298,27 C328,40 352,22 420,45 L420,150 L-30,150 Z"/>
         <path filter="url(#pt)" fill="url(#g2)" d="M-30,98 C20,84 46,50 78,66 C112,82 130,40 164,58 C198,75 218,49 250,68 C284,87 308,52 342,70 C374,85 398,75 420,82 L420,150 L-30,150 Z"/>
       </svg>
-      <svg class="l-village" viewBox="0 0 390 104" preserveAspectRatio="none" style="height:104px">
-        <!-- הקרקע: הכפר עומד על רכס ולא מרחף בתחתית המסגרת, כך שמה שנחתך
-             מתחת לכרטיסים הוא ההר ולא חצי בית. -->
-        <path fill="var(--land)" d="M-30,70 C60,63 120,73 190,67 C250,62 300,72 360,65 C390,62 410,67 420,65 L420,104 L-30,104 Z"/>
-        <g fill="var(--roof)" class="plate">
-          <path d="M18,74 L18,40 L24,40 L24,74 Z"/><path d="M4,44 L38,44 L32,38 L10,38 Z"/>
-          <path d="M2,54 L40,54 L33,47 L9,47 Z"/><path d="M0,66 L42,66 L34,57 L8,57 Z"/>
-          <path d="M62,74 L62,50 L86,38 L110,50 L110,74 Z"/><path d="M112,74 L112,56 L134,45 L156,56 L156,74 Z"/>
-          <path d="M232,74 L232,48 L258,35 L284,48 L284,74 Z"/><path d="M286,74 L286,58 L306,48 L326,58 L326,74 Z"/>
-          <path d="M328,74 L328,52 L356,38 L384,52 L384,74 Z"/>
-        </g>
-        <g fill="var(--tree)" class="plate">
-          <path d="M178,74 L178,60 L182,60 L182,74 Z M164,60 Q180,28 196,60 Z"/>
-          <path d="M206,74 L206,64 L209,64 L209,74 Z M196,64 Q207,40 218,64 Z"/>
-        </g>
-        <g fill="var(--lit)" opacity=".92">
-          <rect x="70" y="60" width="8" height="11" rx="1.5"/><rect x="92" y="60" width="8" height="11" rx="1.5"/>
-          <rect x="244" y="58" width="9" height="13" rx="1.5"/><rect x="264" y="58" width="9" height="13" rx="1.5"/>
-          <rect x="340" y="60" width="8" height="11" rx="1.5"/><rect x="362" y="60" width="8" height="11" rx="1.5"/>
-          <rect x="124" y="64" width="7" height="9" rx="1.5"/><rect x="300" y="64" width="7" height="9" rx="1.5"/>
-        </g>
-      </svg>
+      ${villageSVG()}
       ${charLayer('')}<div class="haze" id="haze"></div>`;
   }
 
