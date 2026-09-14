@@ -191,6 +191,50 @@ window.App = (function () {
     frame();
   }
 
+  // ===== כניסות: הבלוקים מגיעים למקומם, לא נמצאים בו =====
+  // מה שנכנס לתצוגה נכנס גם לתמונה — מהצד ומעט מלמטה, בהשהיה מדורגת.
+  // .rv מוחל מ-JS בלבד: אם הסקריפט נופל, התוכן פשוט מוצג ולא נעלם.
+  // בסוף המעבר שתי המחלקות מוסרות, כדי שלא יישאר transform תלוי על
+  // כרטיס שיש לו transform משלו בלחיצה.
+  const RV = '.card,.tcard,.step,.lbl,.acts,.countdown,.empty';
+
+  function reveal(root, opt) {
+    if (!root) return;
+    const o = opt || {};
+    const els = [].slice.call(root.querySelectorAll(RV))
+      // כותרת המסך מקבלת transform מצינור התנועה — שתי כתיבות לאותה תכונה נאבקות
+      .filter(el => !el.closest('.head'))
+      // שורה בתוך כרטיס שנכנס תיכנס יחד איתו; אין צורך להנפיש פעמיים
+      .filter(el => !el.parentElement || !el.parentElement.closest(RV) || el.matches('.step'));
+    if (!els.length) return;
+    if (REDUCE || !window.IntersectionObserver) return;
+
+    els.forEach(el => el.classList.add('rv'));
+    const fire = (el, i) => {
+      el.style.transitionDelay = Math.min(i, 9) * 55 + 'ms';
+      requestAnimationFrame(() => el.classList.add('in'));
+      const clean = () => { el.classList.remove('rv', 'in'); el.style.transitionDelay = ''; };
+      // דווקא על transform: הוא הארוך מבין השניים, והאטימות שמסיימת לפניו
+      // הייתה קוטעת את התנועה באמצע אילו ניקינו על האירוע הראשון שמגיע
+      el.addEventListener('transitionend', function h(e) {
+        if (e.propertyName !== 'transform') return;
+        el.removeEventListener('transitionend', h); clean();
+      });
+      setTimeout(clean, 1600);   // רשת ביטחון: transitionend לא נורה על אלמנט מוסתר
+    };
+    if (o.now) { els.forEach(fire); return; }
+
+    let seen = 0;
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        fire(e.target, seen++);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
+    els.forEach(el => io.observe(el));
+  }
+
   // ---- כוכבים: מיקומים קבועים, לא אקראיים — אחרת הם קופצים בכל רינדור ----
   const STARS = [[8,14],[17,7],[24,20],[31,10],[39,17],[46,6],[54,22],[61,12],
                  [68,8],[74,19],[82,11],[89,21],[94,9],[13,25],[35,27],[57,29],[79,26],[21,13]];
@@ -351,5 +395,5 @@ window.App = (function () {
     });
   }
 
-  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, dl, cloudSVG, boot, today0, firstDay, particles, decorate };
+  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, dl, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

@@ -70,6 +70,7 @@
     });
   }
   document.getElementById('main').innerHTML = h;
+  A.reveal(document.getElementById('main'));
 
   const icsBtn = document.getElementById('icsBtn');
   if (icsBtn) icsBtn.onclick = () => downloadICS(allDeadlines);

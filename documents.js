@@ -21,4 +21,5 @@
     💡 ערכו במסמכים בדרייב מכל מכשיר. כשתרצו שהקלסר יתעדכן — תגידו לי "תעדכן את האתר לפי הדרייב".</div>`;
 
   document.getElementById('main').innerHTML = h;
+  A.reveal(document.getElementById('main'));
 })();

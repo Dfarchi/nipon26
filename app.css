@@ -85,6 +85,18 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .note.g{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
 .steps{display:flex;flex-direction:column;gap:7px}
 
+/* ===== כניסות =====
+   מצב ההתחלה: בחוץ ושקוף. ה-easing עובר מעט את היעד וחוזר, כדי שהבלוק
+   ייראה כאילו נחת במקום ולא כאילו הוחלק לשם. */
+.rv{opacity:0;transform:translate3d(var(--rvx,26px),10px,0);
+  transition:opacity .42s cubic-bezier(.22,1,.36,1),transform .52s cubic-bezier(.34,1.4,.64,1)}
+.rv.in{opacity:1;transform:none}
+/* שורות ותוויות מגיעות מהצד בלבד — הן צרות, ותנועה אנכית עליהן קופצת */
+.step.rv,.lbl.rv{--rvx:32px;transform:translate3d(var(--rvx),0,0)}
+@media (prefers-reduced-motion:reduce){
+  .rv,.rv.in{opacity:1;transform:none;transition:none}
+}
+
 /* ===== אפשרות פעולה: צורה אחת = התנהגות אחת =====
    מה שהיה כאן קודם: card, step ו-chip שימשו גם ללחיץ וגם למידע, בעיצוב זהה
    לחלוטין. ההיזון החוזר היחיד היה כיווץ של 1.5% בזמן הלחיצה — כלומר גילית

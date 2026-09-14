@@ -89,6 +89,7 @@
     `</div></div>`;
 
   document.getElementById('main').innerHTML = h;
+  A.reveal(document.getElementById('main'));
 
   document.getElementById('fullDayBtn').onclick = () => {
     const w = document.getElementById('fullDayWrap');

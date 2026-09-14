@@ -78,15 +78,24 @@
     }
 
     document.getElementById('main').innerHTML = h;
+    // בטעינה הכל נכנס לפי גלילה. בפתיחת שלב רק הימים שנחשפו קופצים —
+    // draw() בונה מחדש את כל המסך, והנפשה של הכל בכל לחיצה היא רעש.
+    if (just == null) A.reveal(document.getElementById('main'));
+    else A.reveal(document.querySelector(`.exp[data-ph="${just}"]`)
+      ?.closest('.card')?.querySelector('.ph-body'), { now: true });
   }
 
+  let just = null;
   draw();
 
   document.getElementById('main').addEventListener('click', e => {
     const b = e.target.closest('.exp');
     if (!b) return;
     const i = +b.dataset.ph;
-    if (open.has(i)) open.delete(i); else open.add(i);
-    saveOpen(); draw();
+    const opening = !open.has(i);
+    if (opening) open.add(i); else open.delete(i);
+    saveOpen();
+    just = opening ? i : -1;      // -1 = קיפול, אין מה להנפיש
+    draw();
   });
 })();
