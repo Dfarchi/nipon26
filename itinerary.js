@@ -2,7 +2,10 @@
   const A = App, T = A.T;
   A.boot('itinerary.html');
   const idx = A.dayIndex();
-  const clip = (s, n) => s.length > n ? s.slice(0, n).trim() + '…' : s;
+  // קיצוץ על גבול מילה. חיתוך באמצע מילה ("היום הכי…") נראה כמו תקלה.
+  const clip = (s, n) => { s = String(s); if (s.length <= n) return s;
+    const c = s.slice(0, n), i = c.lastIndexOf(' ');
+    return (i > n * 0.55 ? c.slice(0, i) : c).replace(/[\s·—-]+$/, '') + '…'; };
 
   const phases = (T.phases || []).map((p, i) => ({ p, i }));
   const active = phases.filter(x => !x.p.parked);
@@ -103,6 +106,7 @@
   function peekFor(di) {
     const d = T.days[di], acts = d.acts || [], stay = stayOn(d.t);
     let h = '<div class="peek-in">';
+    if (d.flag) h += `<div class="pk flag"><span>${A.esc(String(d.flag).replace(/<[^>]+>/g, '')).slice(0, 150)}…</span></div>`;
     h += acts.length
       ? acts.slice(0, 6).map(a => `<div class="pk"><b>${a.ic || '·'}</b>
           <span>${A.esc(clip(String(a.t), 52))}</span>${a.cr ? `<i>${a.cr}</i>` : ''}</div>`).join('')

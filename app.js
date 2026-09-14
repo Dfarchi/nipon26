@@ -30,6 +30,12 @@ window.App = (function () {
   const allItems = (T.decisions || []).flatMap(g => g.items || []);
   const corpus = allItems.map(i => esc(i.q)).join('\n');
 
+  // טקסט המחבר מכיל <b> ו-<br> בכוונה. בורחים מהכל ואז מחזירים רק את השניים
+  // האלה — כך שסימן קטן יותר בתוכן לא יכול להפוך לתגית.
+  function rich(s) {
+    return esc(s).replace(/&lt;(\/?)b&gt;/g, '<$1b>').replace(/&lt;br\s*\/?&gt;/g, '<br>');
+  }
+
   function factsFor(name) {
     const key = String(name).replace(/[·—–-].*$/, '').trim().split(/\s+/).filter(w => w.length > 2);
     // המילה הארוכה ביותר היא המבדילה. התאמה על מילה כלשהי שלפה כתובת וטלפון
@@ -417,5 +423,5 @@ window.App = (function () {
     });
   }
 
-  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, dl, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

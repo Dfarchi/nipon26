@@ -36,6 +36,8 @@
       <div style="display:flex;align-items:baseline;gap:7px;padding-bottom:5px">
         <div class="city">${city || latin}</div>${jp ? `<div class="jp">${jp}</div>` : ''}</div></div></div>`;
 
+  if (cur.flag) h += `<div class="flagnote">${A.rich(cur.flag)}</div>`;
+
   if (acts.length) {
     const a = acts[0], tm = time(a.d) || time(a.t);
     h += `<div class="card now"><div class="lbl">עכשיו<i></i>${tm ? `<span class="big">${tm}</span>` : ''}</div>
