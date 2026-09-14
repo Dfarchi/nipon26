@@ -479,3 +479,13 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
   color:var(--ink);font-variant-numeric:tabular-nums}
 .clk span{display:block;margin-top:4px;font-size:var(--fs-meta);color:var(--soft)}
 .clk > i{width:1px;align-self:stretch;background:var(--rule);display:block}
+
+/* חירום. שני מספרים, גדולים, לחיצה מחייגת. */
+.sos{display:flex;gap:10px}
+.sos a{flex:1;display:block;text-align:center;text-decoration:none;color:inherit;
+  background:var(--well);border:1px solid color-mix(in srgb,var(--hi) 34%,transparent);
+  border-radius:12px;padding:12px 8px;-webkit-tap-highlight-color:transparent}
+.sos a:active{background:color-mix(in srgb,var(--hi) 14%,transparent)}
+.sos b{display:block;font-size:var(--fs-title);font-weight:800;color:var(--hi);
+  line-height:var(--lh-tight);font-variant-numeric:tabular-nums}
+.sos span{display:block;margin-top:3px;font-size:var(--fs-meta);color:var(--soft)}

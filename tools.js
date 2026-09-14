@@ -36,6 +36,36 @@
       </div>`;
   }
 
+  // ---- חירום ----
+  // 110 ו-119 הם המספרים היפניים, והם עובדים גם מטלפון נעול ובלי סים מקומי.
+  // מה שמבקשים ראשון בשיחה הוא המיקום — ולכן כתובת הלילה יושבת כאן ביפנית,
+  // מוכנה להקראה או להצגה, ולא במסך אחר.
+  {
+    const idx = A.dayIndex(), d = (T.days || [])[idx] || {};
+    const m = String(d.t).match(/^(\d{1,2})\.(\d{1,2})/);
+    const dt = m ? new Date(2026, +m[2] - 1, +m[1]) : null;
+    const stay = dt && (T.budget.booked || []).find(b => {
+      const p = String(b.d).split(/[–-]/);
+      const s = (p[0] || '').match(/(\d{1,2})\.?(\d{1,2})?/), e = (p[1] || '').match(/(\d{1,2})\.(\d{1,2})/);
+      if (!s || !e) return false;
+      return dt >= new Date(2026, (s[2] ? +s[2] : +e[2]) - 1, +s[1]) && dt < new Date(2026, +e[2] - 1, +e[1]);
+    });
+    const addr = stay ? ((T.stayAddr || {})[stay.n] || '') : '';
+
+    h += `<div class="lbl" style="margin-top:20px">חירום<i></i></div>
+      <div class="card">
+        <div class="sos">
+          <a href="tel:110"><b>110</b><span>משטרה</span></a>
+          <a href="tel:119"><b>119</b><span>אמבולנס · כיבוי אש</span></a>
+        </div>
+        ${addr ? `<div class="well" style="margin-top:12px">
+          <div class="pk"><b>📍</b><span>איפה אתם הלילה — להקריא או להראות</span></div>
+          <div class="pk"><b></b><span class="jp" style="color:var(--ink);font-weight:700">${A.esc(addr)}</span></div>
+        </div>` : ''}
+        <div class="d" style="margin-top:9px">עובדים מכל טלפון ביפן, גם נעול וגם בלי סים מקומי.</div>
+      </div>`;
+  }
+
   document.getElementById('main').innerHTML = h;
   A.reveal(document.getElementById('main'));
 
