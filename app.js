@@ -369,7 +369,7 @@ window.App = (function () {
     `<path d="M${cx - half - 4},${y + drop} Q${cx - half},${y + drop - 3} ${cx - half + 3},${y + drop - 4} ` +
     `L${cx},${y} L${cx + half - 3},${y + drop - 4} Q${cx + half},${y + drop - 3} ${cx + half + 4},${y + drop} Z"/>`;
 
-  function townSVG() {
+  function villageSVG_() {
     // 町家 ו-蔵: קיר טיח לבן, גג רעפים שחור, ותורי ארגמן. אדום־שחור־לבן.
     return `${GROUND}
       <g fill="var(--torii)">
@@ -398,33 +398,70 @@ window.App = (function () {
       <g fill="var(--tree)"><path d="M214,74 L214,63 L217,63 L217,74 Z M204,63 Q215,38 226,63 Z"/></g>`;
   }
 
-  function citySVG() {
-    // מגדלים בגבהים משתנים ורשת חלונות. הפסגות נשמרות כמדרגות גג שטוחות.
+  function metroSVG() {
+    // 大都市: מגדלים שעולים מעל קו החתולות, ניאון אנכי, ומגדל תצפית.
+    // הגגות ב-86/258/356 נשארים בגובה החתולה — הגבוהים עולים ביניהם.
     const grid = (x, y, w, h, cols, rows) => {
       let g = '';
       for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++)
-        if ((c + r * 3) % 4 !== 1) g += win(x + 4 + c * 7, y + 5 + r * 7, 4, 4.5);
+        if ((c * 3 + r * 5) % 7 > 1) g += win(x + 3.5 + c * 6, y + 4 + r * 6, 3.4, 3.8);
+      return g;
+    };
+    const neon = (x, y, h, col) => `<rect x="${x}" y="${y}" width="4.5" height="${h}" rx="1.4" fill="${col}"/>`;
+    return `${GROUND}
+      <g fill="var(--roof)" class="plate">
+        <path d="M-6,74 L-6,30 L16,30 L16,74 Z"/><path d="M22,74 L22,8 L44,8 L44,74 Z"/>
+        <path d="M50,74 L50,46 L70,46 L70,74 Z"/><path d="M72,74 L72,36 L100,36 L100,74 Z"/>
+        <path d="M106,74 L106,18 L128,18 L128,74 Z"/><path d="M134,74 L134,52 L162,52 L162,74 Z"/>
+        <path d="M168,74 L168,26 L192,26 L192,74 Z"/><path d="M198,74 L198,44 L222,44 L222,74 Z"/>
+        <path d="M228,74 L228,35 L288,35 L288,74 Z"/><path d="M294,74 L294,14 L314,14 L314,74 Z"/>
+        <path d="M320,74 L320,48 L340,48 L340,74 Z"/><path d="M344,74 L344,37 L370,37 L370,74 Z"/>
+        <path d="M376,74 L376,22 L398,22 L398,74 Z"/>
+      </g>
+      <g fill="var(--roof)">
+        <path d="M250,35 L250,16 L252,16 L252,35 Z M258,35 L258,10 L260,10 L260,35 Z"/>
+        <path d="M244,16 L266,16 L262,12 L248,12 Z"/>
+      </g>
+      <g fill="var(--lit)" opacity=".82">
+        ${grid(22, 8, 22, 66, 3, 10)}${grid(72, 36, 28, 38, 4, 6)}${grid(106, 18, 22, 56, 3, 9)}
+        ${grid(168, 26, 24, 48, 3, 7)}${grid(228, 35, 60, 39, 9, 6)}${grid(294, 14, 20, 60, 3, 9)}
+        ${grid(344, 37, 26, 37, 4, 6)}${grid(376, 22, 22, 52, 3, 8)}
+      </g>
+      ${neon(52, 50, 20, 'var(--torii)')}${neon(60, 52, 15, 'var(--hot)')}
+      ${neon(202, 48, 22, 'var(--torii)')}${neon(324, 52, 17, 'var(--hot)')}
+      <circle cx="259" cy="8" r="2.2" fill="var(--torii)"/>`;
+  }
+
+  function townSVG2() {
+    // עיירה: בינוי נמוך-בינוני עם 五重塔 — קיוטו ונגויה. לא גורד ולא כפר.
+    const pagoda = (cx, base, top) => {
+      let g = `<path d="M${cx - 1.6},${base} L${cx - 1.6},${top} L${cx + 1.6},${top} L${cx + 1.6},${base} Z"/>`;
+      for (let i = 0; i < 5; i++) {
+        const y = top + 4 + i * ((base - top - 4) / 5), w = 7 + i * 2.6;
+        g += `<path d="M${cx - w},${y + 3.4} Q${cx - w + 2},${y} ${cx - w + 4},${y - .6} L${cx},${y - 3} ` +
+             `L${cx + w - 4},${y - .6} Q${cx + w - 2},${y} ${cx + w},${y + 3.4} Z"/>`;
+      }
       return g;
     };
     return `${GROUND}
-      <g fill="var(--roof)" class="plate">
-        <path d="M6,74 L6,44 L34,44 L34,74 Z"/>
-        <path d="M44,74 L44,56 L74,56 L74,74 Z"/>
-        <path d="M78,74 L78,35 L112,35 L112,74 Z"/>
-        <path d="M120,74 L120,50 L158,50 L158,74 Z"/>
-        <path d="M168,74 L168,60 L200,60 L200,74 Z"/>
-        <path d="M212,74 L212,46 L240,46 L240,74 Z"/>
-        <path d="M244,74 L244,35 L274,35 L274,74 Z"/>
-        <path d="M282,74 L282,54 L316,54 L316,74 Z"/>
-        <path d="M326,74 L326,38 L386,38 L386,74 Z"/>
+      <g fill="var(--plaster)">
+        <rect x="112" y="50" width="40" height="24" rx="1"/><rect x="300" y="54" width="34" height="20" rx="1"/>
       </g>
-      <g fill="var(--torii)">
-        <path d="M252,35 L252,22 L254,22 L254,35 Z"/><circle cx="253" cy="20" r="2.4"/>
+      <g fill="var(--tile)" class="plate">
+        <path d="M16,74 L16,54 L46,54 L46,74 Z"/>${tileRoof(31, 44, 21, 10)}
+        <path d="M66,74 L66,50 L106,50 L106,74 Z"/>${tileRoof(86, 36, 28, 14)}
+        <path d="M172,74 L172,58 L204,58 L204,74 Z"/>${tileRoof(188, 48, 22, 10)}
+        <path d="M232,74 L232,52 L284,52 L284,74 Z"/>${tileRoof(258, 35, 33, 17)}
+        ${tileRoof(317, 46, 22, 8)}
+        <path d="M352,74 L352,56 L386,56 L386,74 Z"/>${tileRoof(369, 44, 24, 12)}
       </g>
-      <g fill="var(--lit)" opacity=".8">
-        ${grid(6, 44, 28, 30, 3, 4)}${grid(78, 35, 34, 39, 4, 5)}${grid(120, 50, 38, 24, 4, 3)}
-        ${grid(212, 46, 28, 28, 3, 4)}${grid(244, 35, 30, 39, 3, 5)}${grid(326, 38, 60, 36, 7, 5)}
-      </g>`;
+      <g fill="var(--torii)">${pagoda(150, 74, 20)}</g>
+      <g fill="var(--tile)" opacity=".9"><path d="M120,60 h24 v1.4 h-24 Z M120,65 h24 v1.4 h-24 Z"/></g>
+      <g fill="var(--lit)" opacity=".92">
+        ${win(22, 61, 7, 8)}${win(34, 61, 7, 8)}${win(74, 58, 8, 9)}${win(90, 58, 8, 9)}${win(178, 63, 7, 7)}${win(192, 63, 7, 7)}
+        ${win(240, 58, 9, 11)}${win(262, 58, 9, 11)}${win(358, 62, 7, 8)}${win(374, 62, 7, 8)}
+      </g>
+      <g fill="var(--tree)"><path d="M214,74 L214,64 L217,64 L217,74 Z M205,64 Q215,42 225,64 Z"/></g>`;
   }
 
   function mountainSVG() {
@@ -439,6 +476,16 @@ window.App = (function () {
       <g fill="var(--lit)" opacity=".9">
         ${win(80, 62, 8, 9)}${win(252, 60, 9, 10)}${win(351, 64, 7, 7)}${win(145, 65, 7, 6)}
       </g>
+      <g fill="var(--torii)">
+        <path d="M112,74 L112,52 L115,52 L115,74 Z M134,74 L134,52 L137,52 L137,74 Z"/>
+        <path d="M106,48 L143,48 L140,44 L109,44 Z"/><path d="M108,54 L141,54 L141,56 L108,56 Z"/>
+      </g>
+      <g fill="var(--tile)">
+        <path d="M316,74 L316,54 L348,54 L348,74 Z"/>
+        <path d="M304,55 Q312,47 318,45 L332,41 L346,45 Q352,47 360,55 Z"/>
+        <path d="M330,41 L330,33 L334,33 L334,41 Z"/><path d="M322,33 Q332,27 342,33 Z"/>
+      </g>
+      <g fill="var(--lit)" opacity=".9">${win(326, 60, 9, 10)}</g>
       <g fill="var(--tree)">
         <path d="M22,74 L22,58 L25,58 L25,74 Z M10,58 Q23,26 36,58 Z"/>
         <path d="M46,74 L46,62 L48,62 L48,74 Z M37,62 Q47,38 57,62 Z"/>
@@ -452,9 +499,12 @@ window.App = (function () {
   // איזה נוף. נגזר מבלוק הלינה של היום — הוא השדה הנקי היחיד שאומר איפה אתם.
   function villageSVG() {
     const st = (T.days && T.days[dayIndex()] || {}).st || '';
-    const kind = /טוקיו|אוסקה|נגויה/.test(st) ? 'city'
-               : /אלפים|קויאסאן/.test(st) ? 'mountain' : 'town';
-    const body = kind === 'city' ? citySVG() : kind === 'mountain' ? mountainSVG() : townSVG();
+    const kind = /טוקיו|אוסקה/.test(st) ? 'metro'
+               : /נגויה|קיוטו/.test(st) ? 'town'
+               : /אלפים|קויאסאן/.test(st) ? 'mountain' : 'village';
+    const body = kind === 'metro' ? metroSVG()
+               : kind === 'town' ? townSVG2()
+               : kind === 'mountain' ? mountainSVG() : villageSVG_();
     return `<svg class="l-village" data-kind="${kind}" viewBox="0 0 390 104"
       preserveAspectRatio="none" style="height:104px">${body}</svg>`;
   }
