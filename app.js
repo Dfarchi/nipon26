@@ -129,14 +129,14 @@ window.App = (function () {
   // נקרא גם אחרי decorate(), שמחליף את .l-chars ומשאיר הפניה מתה
   function cacheLayers() {
     const sc = document.querySelector('.scene');
-    LAYERS = sc ? { sc, head: document.querySelector('.head'),
+    LAYERS = sc ? { sc,
                     els: DEPTH.map(([s, a]) => [sc.querySelector(s), a]) } : null;
   }
 
   function frame() {
     ticking = false;
     if (!LAYERS) return;
-    const { sc, head, els } = LAYERS, y = MOTION.y;
+    const { sc, els } = LAYERS, y = MOTION.y;
     els.forEach(([el, s]) => {
       if (el) el.style.transform = `translate3d(0,${(y * s).toFixed(2)}px,0)`;
     });
@@ -152,8 +152,7 @@ window.App = (function () {
       // מחדש של ה-blend ושל feTurbulence שב-.l-far, בכל פריים.
       const z = (1 + Math.min(y, 400) / 2600).toFixed(4);
       els.forEach(([el], n) => { if (el && n >= 2) el.style.scale = z; });
-      // הכותרת נגררת אחרי הדף, אחרת הכל נע כגוש אחד ואין עומק בטקסט
-      if (head) head.style.transform = `translateY(${(y * 0.1).toFixed(2)}px)`;
+
     }
   }
 
@@ -177,29 +176,10 @@ window.App = (function () {
   // וזה סדר גודל של באג רינדור ולא של תנופה.
   const RV_MAP = [
     ['.card,.tcard,.countdown,.empty,.acts', 'rv-rise',  45, 4],
-    ['.lbl',                                 'rv-wipe',  45, 4],
+    ['.lbl',                                 'rv-lbl',   45, 4],
     ['.step',                                'rv-slide', 38, 7]
   ];
   const RV_ALL = RV_MAP.map(r => r[0]).join(',');
-
-  // תווית נחשפת ממסכה, אז הטקסט שלה חייב לשבת בתוך אלמנט שאפשר להזיז.
-  // העטיפה נעשית כאן ולא בתבניות, כדי ש-.lbl יישאר זהה בכל חמשת המסכים.
-  function maskLabel(el) {
-    if (el.querySelector(':scope > .wi')) return;
-    let run = [];
-    const flush = () => {
-      if (!run.length) return;
-      const s = document.createElement('span');
-      s.className = 'wi';
-      el.insertBefore(s, run[0]);
-      run.forEach(n => s.appendChild(n));
-      run = [];
-    };
-    [].slice.call(el.childNodes).forEach(n => {
-      if (n.nodeType === 1 && n.tagName === 'I') flush(); else run.push(n);
-    });
-    flush();
-  }
 
   function reveal(root, opt) {
     if (!root || REDUCE || !window.IntersectionObserver) return;
@@ -214,22 +194,24 @@ window.App = (function () {
         const p = el.parentElement && el.parentElement.closest(RV_ALL);
         if (p && !el.matches('.step')) return;
         seen.add(el);
-        if (cls === 'rv-wipe') maskLabel(el);
         el.classList.add(cls);
         targets.push([el, cls, step, cap]);
       });
     });
     if (!targets.length) return;
 
+    // המשך התנועה הארוכה ביותר בכל התנהגות. הניקוי על שעון ולא על transitionend:
+    // האירוע הזה מבעבע, וילד שסיים תנועה משלו היה מוריד את המחלקות מההורה
+    // באמצע — מה שקורא בדיוק כ"קופץ במקום להחליק".
+    const DUR = { 'rv-rise': 380, 'rv-slide': 340, 'rv-lbl': 400 };
     const fire = ([el, cls, step, cap], k) => {
-      el.style.transitionDelay = Math.min(k, cap) * step + 'ms';
+      const d = Math.min(k, cap) * step;
+      el.style.transitionDelay = d + 'ms';
       requestAnimationFrame(() => el.classList.add('in'));
-      const clean = () => { el.classList.remove(cls, 'in'); el.style.transitionDelay = ''; };
-      el.addEventListener('transitionend', function h(ev) {
-        if (ev.propertyName !== 'transform') return;
-        el.removeEventListener('transitionend', h); clean();
-      });
-      setTimeout(clean, 1600);
+      setTimeout(() => {
+        el.classList.remove(cls, 'in');
+        el.style.transitionDelay = '';
+      }, d + DUR[cls] + 260);   // 260 מכסה גם את הקו הנמשך שמאחר אחרי הטקסט
     };
     if (now) { targets.forEach(fire); return; }
 

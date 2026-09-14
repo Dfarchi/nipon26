@@ -142,20 +142,21 @@ a.step.opt.is-picked{border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
   transition:opacity 200ms var(--e-out),transform 340ms var(--e-out)}
 .rv-slide.in{opacity:1;transform:none}
 
-/* wipe — תווית. בלי אטימות: הטקסט חתוך פיזית, ודהייה על טקסט מחליפה מצב
-   אנטי-אליאסינג באמצע התנועה. הקו נמשך מימין, כי זה מקור השורה ב-RTL. */
-.lbl{overflow:hidden}
-.lbl .wi{display:inline-flex;align-items:center;gap:8px}
-.rv-wipe .wi{transform:translate3d(0,110%,0);will-change:transform;
-  transition:transform 520ms cubic-bezier(.19,1,.22,1)}
-.rv-wipe.in .wi{transform:none}
-.rv-wipe i{transform:scaleX(0);transform-origin:100% 50%;
-  transition:transform 620ms var(--e-out) 120ms}
-.rv-wipe.in i{transform:scaleX(1)}
+/* תווית סעיף — זזה כיחידה אחת עם הטקסט שבתוכה.
+   הגרסה הקודמת הזיזה את הטקסט בתוך מיכל שעמד במקום, וזה נקרא כרעידה
+   ולא ככניסה: מה שזז צריך להיות הדבר עצמו, לא התוכן שלו.
+   הקו הוא היוצא מן הכלל — קו שנמשך נקרא כשרטוט, לא כטקסט שקופץ. */
+.rv-lbl{opacity:0;transform:translate3d(20px,0,0);will-change:transform,opacity;
+  transition:opacity 240ms var(--e-out),transform 400ms var(--e-out)}
+.rv-lbl.in{opacity:1;transform:none}
+.rv-lbl i{transform:scaleX(0);transform-origin:100% 50%;
+  transition:transform 560ms var(--e-out) 160ms}
+.rv-lbl.in i{transform:scaleX(1)}
 
 @media (prefers-reduced-motion:reduce){
   .rv-rise,.rv-rise.in,.rv-slide,.rv-slide.in{opacity:1;transform:none;transition:none}
-  .rv-wipe .wi,.rv-wipe i{transform:none;transition:none}
+  .rv-lbl,.rv-lbl.in{opacity:1;transform:none;transition:none}
+  .rv-lbl i,.rv-lbl.in i{transform:none;transition:none}
 }
 
 /* ===== אפשרות פעולה: צורה אחת = התנהגות אחת =====
