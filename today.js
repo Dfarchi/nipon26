@@ -23,8 +23,9 @@
   });
 
   let h = '';
+  const toGo = Math.round((A.firstDay - A.today0) / 864e5);
   if (A.beforeTrip) {
-    const n = Math.round((A.firstDay - A.today0) / 864e5);
+    const n = toGo;
     h += `<div class="countdown"><div class="kicker">עד ההמראה</div>
       <div class="n">${n}</div>
       <div class="d">ימים · אל על LY91 · 13 אוק׳ 19:45</div></div>`;
@@ -35,6 +36,15 @@
       <div class="d" style="padding-bottom:6px">${A.DOW[dd.getDay()]}</div><div style="flex:1"></div>
       <div style="display:flex;align-items:baseline;gap:7px;padding-bottom:5px">
         <div class="city">${city || latin}</div>${jp ? `<div class="jp">${jp}</div>` : ''}</div></div></div>`;
+
+  // הברכה נכתבת לפני ה-head, כדי שהיא תהיה השורה הראשונה שקוראים
+  {
+    const tail = A.beforeTrip
+      ? `${toGo} ימים לטיסה`
+      : `יום ${idx + 1} · ${city || latin || ''}`.trim().replace(/ ·\s*$/, '');
+    const slot = document.getElementById('hello');
+    if (slot) { slot.outerHTML = A.hello(tail); A.wireWho(document.querySelector('.ping.ask'), tail); }
+  }
 
   if (cur.flag) h += `<div class="flagnote">${A.rich(cur.flag)}</div>`;
 

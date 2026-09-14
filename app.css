@@ -83,9 +83,19 @@ body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Ta
   border:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
 .countdown .n{font-size:var(--fs-hero);font-weight:800;color:var(--hot);line-height:var(--lh-tight);
   text-shadow:0 3px 16px color-mix(in srgb,var(--skyEnd) 70%,transparent)}
-/* צ׳יפ בדיקה זמני — מוודא שעדכונים מגיעים למכשיר. להסיר כשמאשרים. */
-.ping{display:inline-block;margin:2px 0 0;padding:4px 12px;border-radius:99px;font-size:.72rem;
-  font-weight:700;color:#fff6e8;background:color-mix(in srgb,var(--hi) 88%,transparent)}
+/* הברכה. הייתה כאן בדיקת חיים זמנית; עכשיו זו שורה אמיתית — מי, מתי,
+   ומה הדבר היחיד שחשוב כרגע. */
+.ping{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 0;
+  padding:5px 13px;border-radius:99px;font-size:var(--fs-meta);font-weight:700;
+  color:var(--ink);background:color-mix(in srgb,var(--card) 92%,transparent);
+  border:1px solid var(--line)}
+.ping.ask{color:var(--dim);font-weight:400}
+.ping .chip{border:1px solid color-mix(in srgb,var(--hot) 34%,transparent);
+  background:color-mix(in srgb,var(--hot) 10%,transparent);color:var(--ink);
+  padding:3px 10px;border-radius:99px;font:inherit;font-size:var(--fs-micro);
+  font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ping .chip:active{background:color-mix(in srgb,var(--hot) 22%,transparent)}
+.ping .chip.skip{border-color:var(--line);background:none;color:var(--soft);font-weight:400}
 .kicker{font-size:var(--fs-meta);color:var(--soft);letter-spacing:.04em;line-height:var(--lh-meta)}
 .h1{font-size:var(--fs-title);font-weight:800;letter-spacing:-.01em;line-height:var(--lh-tight)}
 .dnum{font-size:var(--fs-hero);font-weight:800;letter-spacing:-.02em;line-height:var(--lh-tight);text-shadow:0 3px 18px rgba(0,0,0,.35)}

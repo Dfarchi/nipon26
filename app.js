@@ -54,6 +54,46 @@ window.App = (function () {
     };
   }
 
+  // ===== מי מחזיק את הטלפון =====
+  // שניכם פותחים את אותה כתובת ואין התחברות, אז אין דרך לדעת מי זה —
+  // חוץ מלשאול פעם אחת ולזכור במכשיר. מדלגים? פשוט לא פונים בשם.
+  const WHO_KEY = 'nipon26_who';
+  const PEOPLE = { yuval: 'יובל', shir: 'שיר' };
+  const who = () => { try { return localStorage.getItem(WHO_KEY) || ''; } catch (e) { return ''; } };
+  const setWho = v => { try { localStorage.setItem(WHO_KEY, v); } catch (e) {} };
+
+  // השעה מגיעה משעון המכשיר, כך שביפן זה יתקן את עצמו בלי קוד —
+  // הטלפון יעבור ל-JST והברכה תזוז איתו.
+  function greeting() {
+    const hh = new Date().getHours();
+    return hh < 5 ? 'לילה טוב' : hh < 11 ? 'בוקר טוב'
+         : hh < 16 ? 'צהריים טובים' : hh < 22 ? 'ערב טוב' : 'לילה טוב';
+  }
+
+  // ברכה שהיא לא רק קישוט: שם, ואז הדבר היחיד שחשוב עכשיו.
+  function hello(tail) {
+    const w = who(), nm = PEOPLE[w];
+    if (!w) {
+      return `<div class="ping ask">מי פותח?
+        <button class="chip pick-who" data-who="yuval">יובל</button>
+        <button class="chip pick-who" data-who="shir">שיר</button>
+        <button class="chip skip pick-who" data-who="-">דלג</button></div>`;
+    }
+    const name = nm ? `, ${nm}` : '';
+    return `<div class="ping">${greeting()}${name}${tail ? ' · ' + tail : ''}</div>`;
+  }
+
+  // הלחיצה מחליפה את הברכה במקום, בלי לטעון מחדש
+  function wireWho(host, tail) {
+    if (!host) return;
+    host.addEventListener('click', e => {
+      const b = e.target.closest('.pick-who');
+      if (!b) return;
+      setWho(b.dataset.who === '-' ? 'skip' : b.dataset.who);
+      host.outerHTML = hello(tail);
+    });
+  }
+
   // ---- דדליין: כמה ימים מהיום ----
   function dl(txt) {
     const m = String(txt).match(/^(\d{1,2})\.(\d{1,2})$/); if (!m) return null;
@@ -423,5 +463,5 @@ window.App = (function () {
     });
   }
 
-  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();
