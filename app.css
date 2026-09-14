@@ -2,13 +2,23 @@
 :root{
   /* עקומות. חוק אחד: חריגה מעבר ליעד מותרת רק בסוף מחווה שהאצבע יזמה —
      בכניסה אוטומטית העין קוראת אותה כתיקון יישור, לא כתנופה. */
+  /* סולם טיפוגרפי. שני משטרים ופער מכוון ביניהם — הפער הוא ההיררכיה.
+     טקסט: חיבורי +2px, כי בטווח 11–17 העין קוראת הפרש מוחלט ולא יחס.
+     תצוגה: כפלי. כל הערכים נופלים על פיקסל שלם ב-root של 16. */
+  --fs-micro:.6875rem; --fs-meta:.8125rem; --fs-body:.9375rem; --fs-lead:1.0625rem;
+  --fs-sub:1.3125rem;  --fs-title:1.75rem; --fs-hero:2.875rem;
+  --lh-tight:1.08; --lh-snug:1.28; --lh-base:1.45; --lh-meta:1.35;
   --e-out:cubic-bezier(.16,.84,.34,1);
   --e-soft:cubic-bezier(.22,.61,.36,1);
   --e-spring:cubic-bezier(.34,1.26,.48,1);
   --sky1:#16203c; --sky2:#1d3348; --sky3:#234049; --skyEnd:#0d1220;
-  --ink:#f2ece0; --dim:#b8a894; --soft:#c5a888;
-  --card:rgba(30,42,52,.93); --line:rgba(197,168,136,.16);
-  --hot:#e8b64c; --warn:#f08a5d; --ok:#7fd0a0; --hi:#c1303f;
+  /* שלוש שכבות טקסט שנבדלות בבהירות ולא בגוון: הבחנת גוון ב-13px, על
+     טקסטורת נייר, בשמש — לא קיימת. הפרש L* של כ-15 בכל מדרגה. */
+  --ink:#f4eee2; --dim:#c3b6a4; --soft:#9a9083;
+  --card:rgba(30,42,52,.93); --well:#141d27;
+  --line:rgba(197,168,136,.16); --rule:rgba(197,168,136,.34);
+  --hot:#eab94f; --warn:#f2906a; --ok:#7fd0a0; --hi:#c1303f;
+  --onHi:#fff6e8; --onHot:#1d2833; --key:var(--hot);
   --ridge:#4a6478; --ridge2:#26394a; --roof:#18232e; --lit:#f0a94e; --tree:#1d2b28;
   /* איור: לילה */
   --cat1:#33414f; --cat2:#8d7a63; --catInner:#c98089; --catEye:#f0c05a;
@@ -23,10 +33,14 @@
   --noriFace:#f4efe4; --blush:#e08a72; --salmon:#e8845c; --salmonStripe:#f6c4ab;
 }
 body.is-day{
-  --sky1:#8fc4dd; --sky2:#bcd9e4; --sky3:#e4d8c0; --skyEnd:#f3ece0;
-  --ink:#2a2119; --dim:#6f6152; --soft:#8a7458;
-  --card:rgba(255,252,246,.95); --line:rgba(120,95,62,.18);
-  --hot:#c8621f; --warn:#c04a2a; --ok:#3f8a5c; --hi:#b3372c;
+  --sky1:#8fc4dd; --sky2:#bcd9e4; --sky3:#e4d8c0; --skyEnd:#ece1cb;
+  /* הנייר ירד מ-#f3ece0 לחם ועמוק יותר. זה גם מה שפותר את הקונטרסט:
+     רקע כהה יותר נותן לפיגמנטים מרווח להישאר רוויים במקום להיכבות. */
+  --ink:#241d15; --dim:#4a3e30; --soft:#6f614c;
+  --card:rgba(253,246,232,.95); --well:#f4ebd8;
+  --line:rgba(120,95,62,.20); --rule:rgba(120,95,62,.38);
+  --hot:#9a4a10; --warn:#a83a22; --ok:#2c6a45; --hi:#a8322a;
+  --onHi:#fff6e8; --onHot:#fdf6e8; --key:var(--hot);
   --ridge:#7f9bb0; --ridge2:#5d7f95; --roof:#6b5a48; --lit:#a8906e; --tree:#5c7a4a;
   /* איור: יום */
   --cat1:#3f3730; --cat2:#c9a274; --catInner:#e59aa0; --catEye:#4a7f4f;
@@ -41,7 +55,7 @@ body.is-day{
 }
 html,body{margin:0;padding:0;direction:rtl;text-align:right}
 body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Tahoma,sans-serif;
-  line-height:1.65;min-height:100vh;transition:background .6s}
+  line-height:var(--lh-base);font-size:var(--fs-body);min-height:100vh;transition:background .6s}
 .scene{position:fixed;top:0;right:0;left:0;height:44vh;max-height:340px;z-index:0;pointer-events:none;
   transform-origin:50% 0;will-change:transform,opacity;
   background:linear-gradient(175deg,var(--sky1) 0%,var(--sky2) 40%,var(--sky3) 66%,var(--skyEnd) 100%);transition:background .6s}
@@ -53,8 +67,8 @@ body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Ta
 /* width:auto כאן היה מחזיר את הרוחב האינטרינזי של ה-viewBox (390px) ומזיז
    את השכבה במקום להרחיב אותה — לכן רוחב מפורש ולא left+right. */
 .page{position:relative;z-index:1;padding:14px 16px 92px;max-width:560px;margin:0 auto}
-.topline{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--soft)}
-.brand{font-weight:800;letter-spacing:2.5px;font-size:.82rem;color:var(--hot)}
+.topline{display:flex;align-items:center;gap:8px;font-size:var(--fs-micro);color:var(--soft);line-height:1}
+.brand{font-weight:800;letter-spacing:.18em;font-size:var(--fs-meta);color:var(--hot);line-height:1}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 7px currentColor}
 .head{padding-top:clamp(90px,22vh,170px)}
 /* יורד אל מתחת לפס האיור, כדי שהסצנה תישאר שלמה מעליו ולא ייווצר טשטוש על הכפר */
@@ -62,30 +76,30 @@ body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Ta
   margin-top:calc(min(44vh,340px) - 46px);
   background:color-mix(in srgb,var(--skyEnd) 72%,transparent);
   border:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
-.countdown .n{font-size:2.6rem;font-weight:800;color:var(--hot);line-height:1;
+.countdown .n{font-size:var(--fs-hero);font-weight:800;color:var(--hot);line-height:var(--lh-tight);
   text-shadow:0 3px 16px color-mix(in srgb,var(--skyEnd) 70%,transparent)}
 /* צ׳יפ בדיקה זמני — מוודא שעדכונים מגיעים למכשיר. להסיר כשמאשרים. */
 .ping{display:inline-block;margin:2px 0 0;padding:4px 12px;border-radius:99px;font-size:.72rem;
   font-weight:700;color:#fff6e8;background:color-mix(in srgb,var(--hi) 88%,transparent)}
-.kicker{font-size:.73rem;color:var(--soft);letter-spacing:1px}
-.h1{font-size:2.1rem;font-weight:800;letter-spacing:-.5px;line-height:1.1}
-.dnum{font-size:3rem;font-weight:800;letter-spacing:-1px;line-height:1;text-shadow:0 3px 18px rgba(0,0,0,.35)}
+.kicker{font-size:var(--fs-meta);color:var(--soft);letter-spacing:.04em;line-height:var(--lh-meta)}
+.h1{font-size:var(--fs-title);font-weight:800;letter-spacing:-.01em;line-height:var(--lh-tight)}
+.dnum{font-size:var(--fs-hero);font-weight:800;letter-spacing:-.02em;line-height:var(--lh-tight);text-shadow:0 3px 18px rgba(0,0,0,.35)}
 body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .row{display:flex;align-items:flex-end;gap:11px;margin-top:2px;flex-wrap:wrap}
-.city{font-size:1.05rem;font-weight:700}
-.jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:.85rem}
+.city{font-size:var(--fs-sub);font-weight:700;line-height:var(--lh-tight)}
+.jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:var(--fs-body);line-height:var(--lh-base)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;
   box-shadow:0 6px 20px rgba(0,0,0,.16);margin-top:12px;
   transition:transform .18s ease,border-color .18s ease}
 .card.now{backdrop-filter:blur(10px);border-color:color-mix(in srgb,var(--hot) 45%,transparent)}
 .card.alert{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
-.lbl{font-size:.7rem;letter-spacing:2px;font-weight:700;color:var(--hot);display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.lbl{font-size:var(--fs-meta);letter-spacing:.06em;font-weight:700;line-height:1.2;color:var(--hot);display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .lbl.q{color:var(--soft)}
-.lbl i{flex:1;height:1px;background:var(--line);display:block}
-.big{font-size:1.3rem;font-weight:800;color:var(--ink)}
-.t{font-size:1rem;font-weight:700}
-.d{font-size:.85rem;color:var(--dim);margin-top:3px}
-.note{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:.82rem;display:flex;gap:8px;align-items:flex-start}
+.lbl i{flex:1;height:1px;background:var(--rule);display:block}
+.big{font-size:var(--fs-sub);font-weight:800;color:var(--ink);line-height:var(--lh-tight)}
+.t{font-size:var(--fs-lead);font-weight:700;line-height:var(--lh-snug)}
+.d{font-size:var(--fs-body);color:var(--dim);margin-top:3px;line-height:var(--lh-base)}
+.note{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:var(--fs-body);display:flex;gap:8px;align-items:flex-start}
 .note.w{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
 .note.g{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
 .steps{display:flex;flex-direction:column;gap:7px}
@@ -168,8 +182,11 @@ a.step.opt.is-picked{border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
 /* שורת מידע — שטוחה. בלי מסגרת, בלי רקע, בלי צל. */
 .step{display:flex;align-items:center;gap:11px;padding:7px 2px;
   background:none;border:0;border-radius:0}
-.step b{font-size:.85rem;color:var(--soft);min-width:44px}
-.step span{flex:1;font-size:.92rem}
+.step b{font-size:var(--fs-meta);color:var(--soft);min-width:44px;line-height:1.2}
+.step b.ic{font-size:var(--fs-sub);min-width:0}
+/* :not(.chip) — אחרת .step span (ספציפיות 0,1,1) גובר על .chip (0,1,0),
+   והצ׳יפ מקבל גם 17px וגם flex:1 במקום להישאר תווית קטנה וצמודה. */
+.step > span:not(.chip){flex:1;font-size:var(--fs-lead);line-height:var(--lh-snug)}
 
 /* שורה לחיצה — מיכל מורם. */
 a.step,button.step{padding:10px 13px;border-radius:13px;background:var(--card);
@@ -193,7 +210,7 @@ a.step,a[data-dec],.card[data-todo]{-webkit-tap-highlight-color:transparent}
 
 /* תווית — לא גלולה. צורת גלולה היא הסימן הכי חזק ל"תלחץ עליי" במובייל,
    והיא שמורה מעכשיו ללינקים בלבד. תווית היא צבע וטיפוגרפיה. */
-.chip{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.4px;
+.chip{display:inline-block;font-size:var(--fs-micro);font-weight:700;letter-spacing:.03em;line-height:1.2;
   padding:0;border:0;background:none;border-radius:0;color:var(--dim)}
 .chip.hot{color:var(--hot)}
 .chip.warn{color:var(--warn)}
@@ -221,28 +238,28 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
 .empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 0 14px;opacity:.9}
 .empty svg{display:block}
 .acts{display:flex;gap:10px;margin-top:14px}
-.cloud{position:relative;flex:1;height:58px;border:0;background:none;padding:0;cursor:pointer;font-family:inherit}
+.cloud{position:relative;flex:1;height:58px;border:0;background:none;padding:0;cursor:pointer;font:inherit}
 .cloud svg{position:absolute;inset:0;width:100%;height:58px}
 .cloud span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:7px;
-  font-size:.88rem;font-weight:700;color:#fff6e8;padding-bottom:2px}
+  font-size:var(--fs-lead);font-weight:700;color:#fff6e8;padding-bottom:2px}
 .cloud.g span{color:var(--ink)}
 /* כרטיס להראות לנהג — הפוך בכוונה, קריא לזר בשמש */
 .tcard{background:#faf7f2;color:#14100c;border-radius:16px;padding:17px;margin-top:12px;
   direction:ltr;text-align:left;box-shadow:0 10px 34px rgba(0,0,0,.4);position:relative;overflow:hidden}
-.tcard .ask{font-size:.72rem;color:#8a7f72;letter-spacing:.5px}
-.tcard .nm{font-size:1.45rem;font-weight:700;line-height:1.35;margin-top:5px}
-.tcard .ad{font-size:1.1rem;color:#2c261e;line-height:1.5;margin-top:3px}
-.tcard .ph{font-size:1.05rem;font-weight:600;margin-top:11px;padding-top:11px;border-top:1px solid #ddd4c6}
+.tcard .ask{font-size:var(--fs-meta);color:#8a7f72;letter-spacing:.03em}
+.tcard .nm{font-size:var(--fs-title);font-weight:700;line-height:1.25;margin-top:5px}
+.tcard .ad{font-size:var(--fs-sub);color:#2c261e;line-height:1.45;margin-top:3px}
+.tcard .ph{font-size:var(--fs-sub);font-weight:600;margin-top:11px;padding-top:11px;border-top:1px solid #ddd4c6}
 .nav{position:fixed;bottom:0;right:0;left:0;z-index:5;display:flex;padding:8px 4px calc(8px + env(safe-area-inset-bottom));
   background:color-mix(in srgb,var(--skyEnd) 94%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(12px)}
-.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:.61rem;text-decoration:none}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:var(--fs-micro);line-height:1;text-decoration:none}
 .nav a{position:relative;padding:5px 0 3px;transition:color .18s ease}
 .nav a.on{color:var(--hot);font-weight:700}
 .nav a.on::before{content:'';position:absolute;inset:0 12% auto;height:100%;border-radius:12px;
   background:color-mix(in srgb,var(--hot) 11%,transparent);z-index:-1}
-.pick{position:fixed;bottom:calc(62px + env(safe-area-inset-bottom));left:8px;z-index:6;max-width:44vw;
+.pick{font-size:var(--fs-micro);position:fixed;bottom:calc(62px + env(safe-area-inset-bottom));left:8px;z-index:6;max-width:44vw;
   background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:9px;
-  padding:4px 7px;font-size:.66rem;font-family:inherit;opacity:.75}
+  padding:4px 7px;font-family:inherit;opacity:.75}
 .scene .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{will-change:transform}
 
@@ -337,3 +354,6 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
   .art-sun,.art-moon,.star,.drift,.birds,.art-cat .tail,.art-cat .blink,.breathe,
   .art-fig .ribbon,.art-lantern,.l-chars .walk{animation:none !important}
 }
+
+/* ספרות ברוחב אחיד: מייצב את עמודת השעות ומונע ריצוד במספר הגדול */
+.step b,.dnum,.countdown .n,.chip{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}

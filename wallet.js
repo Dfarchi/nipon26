@@ -51,7 +51,7 @@
   booked.forEach(b => {
     h += `<div class="card" style="margin-top:8px;padding:12px 14px${b.cur ? ';border-color:color-mix(in srgb,var(--hot) 45%,transparent)' : ''}">
       <div style="display:flex;align-items:baseline;gap:9px">
-        <div class="t" style="flex:1;font-size:.95rem">${A.esc(b.n)}</div>
+        <div class="t" style="flex:1">${A.esc(b.n)}</div>
         <div class="d" style="margin:0">${money(b)}</div></div>
       <div class="d">${b.d} · ${b.nights} לילות${b.meals ? ' · ' + b.meals : ''}${b.est ? ' · הערכה' : ''}</div>
       ${b.f.addr ? `<div class="jp" style="margin-top:4px">${b.f.addr}</div>` : ''}
@@ -65,8 +65,8 @@
     h += `<div class="lbl q" style="margin-top:22px">מסמכים<i></i></div>`;
     T.docs.forEach(d => {
       h += `<a href="${d.url}" target="_blank" rel="noopener" class="step" style="margin-top:7px;text-decoration:none;color:inherit">
-        <b style="font-size:1.1rem">${d.ic || '📄'}</b>
-        <span><div class="t" style="font-size:.92rem">${A.esc(d.t)}</div><div class="d" style="margin:0">${A.esc(d.d)}</div></span></a>`;
+        <b class="ic">${d.ic || '📄'}</b>
+        <span><div class="t">${A.esc(d.t)}</div><div class="d" style="margin:0">${A.esc(d.d)}</div></span></a>`;
     });
   }
   document.getElementById('main').innerHTML = h;

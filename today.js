@@ -51,7 +51,7 @@
     const f = A.factsFor(stay.n);
     h += `<div class="card"><div class="lbl q">הלילה<i></i></div><div class="t">${A.esc(stay.n)}</div>
       <div class="d">${stay.d} · ${stay.nights} לילות${stay.meals ? ' · ' + stay.meals : ''}</div>
-      ${f.addr ? `<div class="jp" style="margin-top:5px;font-size:.92rem">${f.addr}</div>` : ''}</div>`;
+      ${f.addr ? `<div class="jp" style="margin-top:5px">${f.addr}</div>` : ''}</div>`;
   }
 
   // יעד הניווט, מהמדויק לכללי. אין יעד מדויק — אין כפתור: עדיף בלי, מאשר

@@ -44,7 +44,7 @@
             <span class="chip ${cls}">${days(i.dl.days)}</span>
             <div class="d" style="margin:0;flex:1">${i.n}</div>
             <span class="chip ok flag">בוצע</span></div>
-          <div class="t" style="margin-top:6px;font-size:.95rem">${clip(A.esc(i.q), 150)}</div>
+          <div class="t" style="margin-top:6px">${clip(A.esc(i.q), 150)}</div>
           <div class="steps" style="margin-top:8px">` +
           i.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.esc(x.t)}</span></div>`).join('') +
           `</div></div>`;
@@ -73,8 +73,8 @@
     h += `<div class="lbl q" style="margin-top:22px">משימות<i></i><span class="d">${rest.length}</span></div>`;
     rest.forEach(i => {
       h += `<a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="margin-top:7px;align-items:flex-start;cursor:pointer;text-decoration:none;color:inherit">
-        <b style="min-width:34px;font-size:.72rem">${i.n}</b>
-        <span style="font-size:.88rem">${clip(A.esc(i.q), 150)}</span>
+        <b style="min-width:34px">${i.n}</b>
+        <span>${clip(A.esc(i.q), 150)}</span>
         ${i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : ''}
         <span class="chip ok flag">בוצע</span></a>`;
     });
