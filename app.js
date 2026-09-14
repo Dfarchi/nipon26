@@ -346,8 +346,22 @@ window.App = (function () {
     host.classList.toggle('overcast', mode === 'rain' || mode === 'snow' || mode === 'mist');
   }
 
-  function cloudSVG(fill) {
+  // קו המפתח חייב להיצמד למילוי בדיוק, ומתאר שנכתב ביד רק מקרב את איחוד
+  // ארבעת העיגולים. במקום זה: אותן צורות בדיוק, מעובות בקו, ומסכה שמנקבת
+  // את הפנים — כך שנשארת רק השפה החיצונית. מדויק לפי בנייה.
+  const CLOUD_SHAPES = '<circle cx="34" cy="32" r="19"/><circle cx="66" cy="24" r="23"/>' +
+    '<circle cx="100" cy="27" r="21"/><circle cx="128" cy="33" r="17"/>' +
+    '<rect x="34" y="32" width="94" height="19" rx="9.5"/>';
+  let cloudN = 0;
+
+  function cloudSVG(fill, key) {
+    const id = 'ck' + (++cloudN);
     return `<svg viewBox="0 0 160 58" preserveAspectRatio="none">
+      ${key ? `<defs><mask id="${id}">
+        <rect x="-6" y="-6" width="172" height="70" fill="#fff"/>
+        <g fill="#000">${CLOUD_SHAPES}</g></mask></defs>
+        <g fill="${key}" stroke="${key}" stroke-width="5" stroke-linejoin="round"
+           mask="url(#${id})">${CLOUD_SHAPES}</g>` : ''}
       <g fill="${fill}" opacity=".3"><circle cx="34" cy="32" r="19"/><circle cx="66" cy="24" r="23"/><circle cx="100" cy="27" r="21"/><circle cx="128" cy="33" r="17"/><rect x="34" y="32" width="94" height="19" rx="9.5"/></g>
       <g fill="${fill}"><circle cx="34" cy="32" r="16"/><circle cx="66" cy="24" r="20"/><circle cx="100" cy="27" r="18"/><circle cx="128" cy="33" r="14"/><rect x="34" y="32" width="94" height="16" rx="8"/></g></svg>`;
   }

@@ -33,13 +33,15 @@
     .sort((a, b) => a.d.days - b.d.days);
   const deadlines = allDeadlines.slice(0, 3);
   if (deadlines.length) {
-    h += `<div class="lbl" style="margin-top:20px">ביטול חינם — מה שנסגר קרוב<i></i></div>`;
+    h += `<div class="lbl" style="margin-top:20px">ביטול חינם — מה שנסגר קרוב<i></i></div>
+      <div class="well">`;
     deadlines.forEach(({ b, d }) => {
       const cls = d.days <= 2 ? 'warn' : d.days <= 7 ? 'hot' : '';
       h += `<div class="step" style="margin-top:7px"><b>${b.f.free}</b>
         <span>${A.esc(b.n)}</span>
         <span class="chip ${cls}">${d.days === 0 ? 'היום' : d.days === 1 ? 'מחר' : 'בעוד ' + d.days + ' ימים'}</span></div>`;
     });
+    h += `</div>`;
     if (allDeadlines.length) {
       h += `<div class="acts" style="margin-top:10px"><button class="cloud g" id="icsBtn">
         ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>הוסיפו ליומן (.ics)</span></button></div>`;

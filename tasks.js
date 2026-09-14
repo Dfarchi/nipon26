@@ -45,7 +45,7 @@
             <div class="d" style="margin:0;flex:1">${i.n}</div>
             <span class="chip ok flag">בוצע</span></div>
           <div class="t" style="margin-top:6px">${clip(A.esc(i.q), 150)}</div>
-          <div class="steps" style="margin-top:8px">` +
+          <div class="steps well">` +
           i.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.esc(x.t)}</span></div>`).join('') +
           `</div></div>`;
       });
@@ -58,7 +58,7 @@
         h += `<div class="card" style="margin-top:8px">
           <div style="display:flex;gap:10px;align-items:baseline">
             <span class="chip">${i.n}</span><div class="t" style="flex:1">${A.esc(i.q)}</div></div>
-          <div class="steps" style="margin-top:10px">` +
+          <div class="steps well">` +
           (i.o || []).map((o, k) => {
             const isPicked = picked.includes(k);
             return `<a class="step opt${isPicked ? ' is-picked' : ''}" data-dec="${A.esc(i.n)}" data-i="${k}" data-multi="${i.multi || 0}"

@@ -53,7 +53,7 @@
         h += `<div class="ph-body"><div>
           <div class="d" style="margin-top:8px;line-height:1.6">${A.esc(p.p)}</div>`;
         if (days.length) {
-          h += `<div class="steps" style="margin-top:10px">` + days.map(({ d, i: di }, k) => {
+          h += `<div class="steps well">` + days.map(({ d, i: di }, k) => {
             const m = String(d.t).match(/^(\d{1,2}\.\d{1,2})\s*—\s*(.*)$/);
             const isToday = di === idx;
             const style = 'text-decoration:none;color:inherit' + (isToday ? ';border-color:color-mix(in srgb,var(--hot) 45%,transparent)' : '');
@@ -71,9 +71,10 @@
     if (parked.length) {
       h += `<div class="lbl q" style="margin-top:22px">בסימן שאלה<i></i></div>`;
       parked.forEach(({ p }) => {
-        h += `<div class="card" style="margin-top:8px;opacity:.7">
-          <div class="t">${A.esc(p.h.replace(/^אופציה\s*·\s*/, ''))}</div>
-          <div class="d" style="margin-top:4px">${A.esc(clip(p.p, 160))}</div></div>`;
+        // בלי כרטיס: אלה לא בתוכנית, והם צריכים להיקרא כהערה ולא כאובייקט
+        h += `<div style="margin-top:10px;padding-inline-start:2px">
+          <div class="t" style="color:var(--soft)">${A.esc(p.h.replace(/^אופציה\s*·\s*/, ''))}</div>
+          <div class="d" style="margin-top:3px">${A.esc(clip(p.p, 160))}</div></div>`;
       });
     }
 

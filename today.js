@@ -67,7 +67,7 @@
     : '';
   h += `<div class="acts">
     ${navHref ? `<button class="cloud" onclick="location.href='${navHref}'">
-      ${A.cloudSVG('var(--hi)')}<span>ניווט</span></button>` : ''}
+      ${A.cloudSVG('var(--hi)', 'var(--key)')}<span>ניווט</span></button>` : ''}
     <button class="cloud g" id="fullDayBtn">
       ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>היום המלא</span></button></div>`;
 
