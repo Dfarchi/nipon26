@@ -224,14 +224,14 @@ window.App = (function () {
         <path filter="url(#pt)" fill="url(#g2)" d="M-30,98 C20,84 46,50 78,66 C112,82 130,40 164,58 C198,75 218,49 250,68 C284,87 308,52 342,70 C374,85 398,75 420,82 L420,150 L-30,150 Z"/>
       </svg>
       <svg class="l-village" viewBox="0 0 390 74" preserveAspectRatio="none" style="height:74px">
-        <g fill="var(--roof)">
+        <g fill="var(--roof)" class="plate">
           <path d="M18,74 L18,40 L24,40 L24,74 Z"/><path d="M4,44 L38,44 L32,38 L10,38 Z"/>
           <path d="M2,54 L40,54 L33,47 L9,47 Z"/><path d="M0,66 L42,66 L34,57 L8,57 Z"/>
           <path d="M62,74 L62,50 L86,38 L110,50 L110,74 Z"/><path d="M112,74 L112,56 L134,45 L156,56 L156,74 Z"/>
           <path d="M232,74 L232,48 L258,35 L284,48 L284,74 Z"/><path d="M286,74 L286,58 L306,48 L326,58 L326,74 Z"/>
           <path d="M328,74 L328,52 L356,38 L384,52 L384,74 Z"/>
         </g>
-        <g fill="var(--tree)">
+        <g fill="var(--tree)" class="plate">
           <path d="M178,74 L178,60 L182,60 L182,74 Z M164,60 Q180,28 196,60 Z"/>
           <path d="M206,74 L206,64 L209,64 L209,74 Z M196,64 Q207,40 218,64 Z"/>
         </g>

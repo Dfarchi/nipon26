@@ -9,6 +9,8 @@
   --cat1:#33414f; --cat2:#8d7a63; --catInner:#c98089; --catEye:#f0c05a;
   --figure:#1e2a38; --skyCloud:#2a3b52; --bird:#3b4f66; --wire:#4a5a6b;
   --vignette:rgba(0,0,0,.28);
+  /* הדפס: דיו הפלטות שנוחתות מעט מחוץ לקו המפתח */
+  --beni:rgba(198,58,54,.40); --ai:rgba(58,92,140,.26);
   --moon:#e8e2cf; --moonCrater:#b3ab95; --sun:#ffcf6b; --sunCore:#ffdf9a;
   --lantern:#e8734a; --lanternGlow:#ff9b52; --lanternRib:#8c3b1e;
   --umbrella:#c1303f; --umbrellaRib:#e8dcc4;
@@ -25,6 +27,7 @@ body.is-day{
   --cat1:#3f3730; --cat2:#c9a274; --catInner:#e59aa0; --catEye:#4a7f4f;
   --figure:#5a4a3a; --skyCloud:#ffffff; --bird:#7d8fa0; --wire:#8d7f6b;
   --vignette:rgba(96,74,48,.13);
+  --beni:rgba(178,52,40,.36); --ai:rgba(64,98,148,.24);
   --moon:#e8e2cf; --moonCrater:#b3ab95; --sun:#ffc44d; --sunCore:#fff0c2;
   --lantern:#e8734a; --lanternGlow:#ff9b52; --lanternRib:#8c3b1e;
   --umbrella:#c1303f; --umbrellaRib:#f6f1e6;
@@ -120,21 +123,41 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
 .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{will-change:transform}
 
 
-/* ===== נייר וואשי: הגרעין שמפריד בין "ציור שטוח" לבין הדפס =====
-   רעש פרקטלי שנוצר פעם אחת ומרוצף כרקע, לא פילטר חי על כל הסצנה —
-   feTurbulence על שטח מלא הוא יקר מדי בטלפון. */
-.scene::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22170%22%20height%3D%22170%22%3E%3Cfilter%20id%3D%22n%22%20x%3D%220%22%20y%3D%220%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.85%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22170%22%20height%3D%22170%22%20filter%3D%22url(%23n)%22%2F%3E%3C%2Fsvg%3E");background-size:170px 170px;
-  opacity:.10;mix-blend-mode:overlay}
-body.is-day .scene::after{opacity:.09;mix-blend-mode:multiply}
-/* וינייטה עדינה — נותנת עומק לשמיים במקום משטח אחיד */
+/* ===== ההדפס: גיד עץ, סיבי קוזו, ורישום שגוי =====
+   שלוש השכבות שמבדילות הדפס אמיתי מציור שטוח, לפי סדר ההדפסה:
+   האיור → גיד הבלוק שעולה דרך שטחי הצבע → סיבי הנייר מעל הכל.
+   הכל נוצר פעם אחת כאריח ומרוצף. feTurbulence חי על כל הסצנה יקר מדי בטלפון. */
+
+/* מוקומה — גיד העץ. רץ לרוחב, כי כך מנסרים בלוק בפורמט נוף.
+   נמצא מעל האיור ומתחת לנייר, בדיוק כמו בהדפס. */
 .scene::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
-  background:radial-gradient(125% 85% at 50% 6%,transparent 55%,var(--vignette) 100%)}
-/* הכרטיס לנהג הוא עצם נייר — מקבל את אותו גרעין, חזק יותר */
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22420%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.003%200.045%22%20numOctaves%3D%222%22%20seed%3D%2211%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncA%20type%3D%22table%22%20tableValues%3D%220%200.5%200.12%200.6%200.1%200.45%200%22%2F%3E%3C%2FfeComponentTransfer%3E%3CfeGaussianBlur%20stdDeviation%3D%220.4%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22420%22%20filter%3D%22url%28%23w%29%22%2F%3E%3C%2Fsvg%3E"),
+    radial-gradient(125% 85% at 50% 6%,transparent 55%,var(--vignette) 100%);
+  background-size:420px 420px,cover;background-repeat:repeat,no-repeat;
+  opacity:.24;mix-blend-mode:soft-light}
+body.is-day .scene::before{opacity:.22}
+
+/* קוזו — סיבי הנייר. אניזוטרופי בכוונה: סיב ארוך, לא רעש טלוויזיה. */
+.scene::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%22220%22%3E%3Cfilter%20id%3D%22k%22%20x%3D%220%22%20y%3D%220%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.14%200.9%22%20numOctaves%3D%224%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22220%22%20height%3D%22220%22%20filter%3D%22url%28%23k%29%22%2F%3E%3C%2Fsvg%3E");background-size:220px 220px;
+  opacity:.13;mix-blend-mode:overlay}
+body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
+
+/* קֶנְטוֹ — סימני ההיצמדות. בהדפס אמיתי כל פלטת צבע נוחתת שערה מחוץ
+   לקו המפתח, ומשאירה שפה אדומה בצד אחד וכחולה בשני. זה מה שהעין
+   קוראת כ"הדפס" ולא כ"וקטור", ואי אפשר לקבל אותו מטקסטורה שמונחת מעל —
+   הוא חייב לחול על האיור עצמו. */
+.scene .l-village .plate{filter:drop-shadow(.9px 1px 0 var(--beni)) drop-shadow(-.7px -.5px 0 var(--ai))}
+
+/* הכרטיס לנהג הוא עצם נייר — אותם סיבים, חזק יותר */
 .tcard::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22170%22%20height%3D%22170%22%3E%3Cfilter%20id%3D%22n%22%20x%3D%220%22%20y%3D%220%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.85%22%20numOctaves%3D%224%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22170%22%20height%3D%22170%22%20filter%3D%22url(%23n)%22%2F%3E%3C%2Fsvg%3E");background-size:150px 150px;
-  opacity:.18;mix-blend-mode:multiply}
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%22220%22%3E%3Cfilter%20id%3D%22k%22%20x%3D%220%22%20y%3D%220%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.14%200.9%22%20numOctaves%3D%224%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22220%22%20height%3D%22220%22%20filter%3D%22url%28%23k%29%22%2F%3E%3C%2Fsvg%3E");background-size:190px 190px;
+  opacity:.20;mix-blend-mode:multiply}
 .tcard > *{position:relative;z-index:1}
+
+@media (prefers-reduced-motion:no-preference){
+  .scene::before{transition:opacity .6s}
+}
 
 /* ===== שכבת שמיים ===== */
 .l-sky{position:absolute;inset:0;overflow:hidden}
