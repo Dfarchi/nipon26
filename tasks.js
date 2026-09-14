@@ -6,17 +6,28 @@
   const openDec  = items.filter(i => i.open === true && i.todo !== true);
   const openTask = items.filter(i => i.open === true && i.todo === true);
 
-  // דדליין מתוך טקסט המשימה
+  // הדדליינים מגיעים משדה due, לא מפרסור הטקסט. תאריך בפרוזה יכול להיות דדליין
+  // ביטול, תאריך שבו נפתחת הזמנה, או סתם יום נסיעה — ובאותה משימה מופיעים כמה
+  // סוגים יחד (I31: 27.9 פתיחה מול 27.10 נסיעה). שום רג׳קס לא מבדיל ביניהם,
+  // והישן תפס אחת מתוך 17 המשימות שנושאות תאריך.
+  const days = n => n === 0 ? 'היום' : n === 1 ? 'מחר' : 'בעוד ' + n + ' ימים';
   const withDl = openTask.map(i => {
-    const m = A.esc(i.q).match(/(?:עד|דדליין[^0-9]{0,12})\s*(\d{1,2}\.\d{1,2})/);
-    return Object.assign({ dl: m ? A.dl(m[1]) : null }, i);
+    const ds = (i.due || []).map(x => Object.assign({}, x, A.dl(x.d) || {}))
+      .filter(x => x.date && x.days >= 0).sort((a, b) => a.days - b.days);
+    return Object.assign({ ds, dl: ds[0] || null }, i);
   });
-  const urgent = withDl.filter(i => i.dl && i.dl.days >= 0 && i.dl.days <= 14).sort((a, b) => a.dl.days - b.dl.days);
-  const rest   = withDl.filter(i => !urgent.includes(i));
+  // תמיד שלוש הקרובות, ולא "עד 14 יום" — סף קבוע מציג מסך ריק רוב השנה
+  const urgent = withDl.filter(i => i.dl).sort((a, b) => a.dl.days - b.dl.days).slice(0, 3);
+  const rest   = withDl.filter(i => !urgent.includes(i))
+    .sort((a, b) => (a.dl ? a.dl.days : 9e9) - (b.dl ? b.dl.days : 9e9));
 
   const KEY = 'nipon26_choices_v1';
   let store = {}; try { store = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
   const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+  // קיצוץ על גבול מילה — חיתוך באמצע סוגריים נראה כמו תקלה
+  const clip = (s, n) => { s = String(s); if (s.length <= n) return s;
+    const c = s.slice(0, n); const i = c.lastIndexOf(' ');
+    return (i > n * 0.6 ? c.slice(0, i) : c).replace(/[\s(\[·—-]+$/, '') + '…'; };
   const done = n => store[n] === true;
   const chosen = n => Array.isArray(store[n]) ? store[n] : (store[n] !== undefined ? [store[n]] : []);
 
@@ -27,13 +38,16 @@
     if (urgent.length) {
       h += `<div class="lbl" style="margin-top:16px">דדליין קרוב<i></i></div>`;
       urgent.forEach(i => {
-        const cls = i.dl.days <= 2 ? 'warn' : 'hot';
+        const cls = i.dl.days <= 2 ? 'warn' : i.dl.days <= 7 ? 'hot' : '';
         h += `<div class="card alert" style="margin-top:8px;padding:13px 15px" data-todo="${A.esc(i.n)}">
           <div style="display:flex;gap:9px;align-items:baseline">
-            <span class="chip ${cls}">${i.dl.days === 0 ? 'היום' : i.dl.days === 1 ? 'מחר' : 'בעוד ' + i.dl.days + ' ימים'}</span>
+            <span class="chip ${cls}">${days(i.dl.days)}</span>
             <div class="d" style="margin:0;flex:1">${i.n}</div>
             ${done(i.n) ? '<span class="chip ok">בוצע</span>' : ''}</div>
-          <div class="t" style="margin-top:6px;font-size:.95rem">${A.esc(i.q).slice(0, 190)}</div></div>`;
+          <div class="t" style="margin-top:6px;font-size:.95rem">${clip(A.esc(i.q), 150)}</div>
+          <div class="steps" style="margin-top:8px">` +
+          i.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.esc(x.t)}</span></div>`).join('') +
+          `</div></div>`;
       });
     }
 
@@ -60,7 +74,8 @@
     rest.forEach(i => {
       h += `<a class="step" data-todo="${A.esc(i.n)}" style="margin-top:7px;align-items:flex-start;cursor:pointer;text-decoration:none;color:inherit${done(i.n) ? ';opacity:.5' : ''}">
         <b style="min-width:34px;font-size:.72rem">${i.n}</b>
-        <span style="font-size:.88rem">${A.esc(i.q).slice(0, 160)}</span>
+        <span style="font-size:.88rem">${clip(A.esc(i.q), 150)}</span>
+        ${i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : ''}
         ${done(i.n) ? '<span class="chip ok">בוצע</span>' : ''}</a>`;
     });
 
