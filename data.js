@@ -12,8 +12,8 @@ function dir(a,b){ return "https://www.google.com/maps/dir/?api=1&origin=" + enc
 // כתובות המלונות בפועל — נקודות הקצה של כל חישוב מסלול, כדי שהניווט
 // יהיה מהדלת לדלת ולא מ/אל תחנת הרכבת הכללית.
 const HOTEL = {
-  tokyo:    "Tosei Hotel Cocone Asakusa Kuramae, 2-3-3 Komagata, Taito City, Tokyo",
-  sendai:   "Sendai Washington Hotel, 4-10-8 Chuo, Aoba-ku, Sendai, Miyagi",
+  tokyo:    "トーセイホテルココネ浅草蔵前, 東京都台東区駒形2-3-3",   // מאומת מול אישור בוקינג
+  sendai:   "Sendai Washington Hotel, 宮城県仙台市青葉区中央4-10-8",
   akiu:     "曽良一, 宮城県仙台市太白区秋保町湯元字薬師108",
   yudanaka: "ホテル椿野, 長野県下高井郡山ノ内町平穏3294",
   kanazawa: "東横INN金沢兼六園香林坊, 石川県金沢市香林坊2-4-28",

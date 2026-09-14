@@ -32,7 +32,14 @@ window.App = (function () {
 
   function factsFor(name) {
     const key = String(name).replace(/[·—–-].*$/, '').trim().split(/\s+/).filter(w => w.length > 2);
-    const line = corpus.split('\n').find(l => key.some(w => l.includes(w))) || '';
+    // המילה הארוכה ביותר היא המבדילה. התאמה על מילה כלשהי שלפה כתובת וטלפון
+    // של מלון אחר ברגע ששתי הזמנות חלקו מילה גנרית כמו "הוטל" — כלומר כרטיס
+    // הנהג הראה כתובת שגויה, וזו התקלה הגרועה ביותר שהמסך הזה יכול לייצר.
+    const lines = corpus.split('\n');
+    const main = key.slice().sort((a, b) => b.length - a.length)[0] || '';
+    const line = (main && lines.find(l => l.includes(main)))
+      || lines.find(l => key.length > 1 && key.every(w => l.includes(w)))
+      || '';
     return {
       addr:  (line.match(/[一-龯ぁ-んァ-ヶ][一-龯ぁ-んァ-ヶ0-9０-９\-ー－]{3,}(?:[市町村区][^\s,)·]*)?[0-9０-９][0-9０-９\-ー－]*/) || [])[0]
           || (line.match(/[一-龯]{2,}[市町村区][^\s,)·]{0,20}/) || [])[0] || '',

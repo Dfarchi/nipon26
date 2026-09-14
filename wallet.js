@@ -22,7 +22,7 @@
       <div class="tcard">
         <div class="ask jp">ここまでお願いします</div>
         <div class="nm jp">${A.esc(cur.n).replace(/^[^—·]*[—·]\s*/, '')}</div>
-        ${cur.f.addr || (T.stayAddr || {})[cur.n] ? `<div class="ad jp">${A.esc(cur.f.addr || T.stayAddr[cur.n])}</div>` : ''}
+        ${(T.stayAddr || {})[cur.n] || cur.f.addr ? `<div class="ad jp">${A.esc((T.stayAddr || {})[cur.n] || cur.f.addr)}</div>` : ''}
         ${cur.f.phone ? `<div class="ph">${cur.f.phone}</div>` : ''}
       </div>
       <div class="d" style="margin-top:6px;text-align:center">בהיר בכוונה — זה המסך היחיד שזר קורא</div>`;
