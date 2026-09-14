@@ -126,15 +126,36 @@ a.step.opt.is-picked{border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
 }
 
 /* ===== כניסות =====
-   מצב ההתחלה: בחוץ ושקוף. ה-easing עובר מעט את היעד וחוזר, כדי שהבלוק
-   ייראה כאילו נחת במקום ולא כאילו הוחלק לשם. */
-.rv{opacity:0;transform:translate3d(var(--rvx,26px),10px,0);
-  transition:opacity .42s cubic-bezier(.22,1,.36,1),transform .52s cubic-bezier(.34,1.4,.64,1)}
-.rv.in{opacity:1;transform:none}
-/* שורות ותוויות מגיעות מהצד בלבד — הן צרות, ותנועה אנכית עליהן קופצת */
-.step.rv,.lbl.rv{--rvx:32px;transform:translate3d(var(--rvx),0,0)}
+   שלוש התנהגויות. אף אחת מהן לא חורגת מעבר ליעד: חריגה מותרת רק בסוף
+   מחווה שהאצבע יזמה, ובכניסה אוטומטית העין קוראת אותה כתיקון יישור. */
+
+/* rise — בלוק. אפס תזוזה אופקית; קנה המידה הוא רמז העומק שמחליף את החריגה,
+   והעין לא יכולה לפרש עומק כשגיאת יישור. */
+.rv-rise{opacity:0;transform:translate3d(0,18px,0) scale(.985);transform-origin:50% 100%;
+  will-change:transform,opacity;
+  transition:opacity 260ms var(--e-out),transform 380ms var(--e-out)}
+.rv-rise.in{opacity:1;transform:none}
+
+/* slide — שורת רשימה. המסכה על .steps היא מה שהופך 20px מ"נגיעה" ל"כניסה". */
+.steps:not(:has(> .card)){overflow:hidden;padding-inline:3px;margin-inline:-3px}
+.rv-slide{opacity:0;transform:translate3d(22px,0,0);will-change:transform,opacity;
+  transition:opacity 200ms var(--e-out),transform 340ms var(--e-out)}
+.rv-slide.in{opacity:1;transform:none}
+
+/* wipe — תווית. בלי אטימות: הטקסט חתוך פיזית, ודהייה על טקסט מחליפה מצב
+   אנטי-אליאסינג באמצע התנועה. הקו נמשך מימין, כי זה מקור השורה ב-RTL. */
+.lbl{overflow:hidden}
+.lbl .wi{display:inline-flex;align-items:center;gap:8px}
+.rv-wipe .wi{transform:translate3d(0,110%,0);will-change:transform;
+  transition:transform 520ms cubic-bezier(.19,1,.22,1)}
+.rv-wipe.in .wi{transform:none}
+.rv-wipe i{transform:scaleX(0);transform-origin:100% 50%;
+  transition:transform 620ms var(--e-out) 120ms}
+.rv-wipe.in i{transform:scaleX(1)}
+
 @media (prefers-reduced-motion:reduce){
-  .rv,.rv.in{opacity:1;transform:none;transition:none}
+  .rv-rise,.rv-rise.in,.rv-slide,.rv-slide.in{opacity:1;transform:none;transition:none}
+  .rv-wipe .wi,.rv-wipe i{transform:none;transition:none}
 }
 
 /* ===== אפשרות פעולה: צורה אחת = התנהגות אחת =====

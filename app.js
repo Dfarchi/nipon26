@@ -120,31 +120,25 @@ window.App = (function () {
   // שתי מערכות שכותבות transform לאותה שכבה דורסות זו את זו, אז הגלילה
   // והנטייה נאספות למצב אחד ונכתבות יחד, בפריים אחד.
   const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const MOTION = { y: 0, tx: 0, ty: 0 };
+  const MOTION = { y: 0 };
   let LAYERS = null, ticking = false, lastOp = 1;
 
-  // עומק לכל שכבה: [בורר, מקדם גלילה, טווח נטייה בפיקסלים]
-  const DEPTH = [
-    ['.l-sky',     0.06,  4],
-    ['.l-far',     0.12,  9],
-    ['.l-village', 0.42, 16],
-    ['.l-chars',   0.42, 20]
-  ];
+  // עומק לכל שכבה: [בורר, מקדם גלילה]
+  const DEPTH = [['.l-sky', 0.06], ['.l-far', 0.12], ['.l-village', 0.42], ['.l-chars', 0.42]];
 
   // נקרא גם אחרי decorate(), שמחליף את .l-chars ומשאיר הפניה מתה
   function cacheLayers() {
     const sc = document.querySelector('.scene');
     LAYERS = sc ? { sc, head: document.querySelector('.head'),
-                    els: DEPTH.map(([s, a, b]) => [sc.querySelector(s), a, b]) } : null;
+                    els: DEPTH.map(([s, a]) => [sc.querySelector(s), a]) } : null;
   }
 
   function frame() {
     ticking = false;
     if (!LAYERS) return;
     const { sc, head, els } = LAYERS, y = MOTION.y;
-    els.forEach(([el, s, t]) => {
-      if (el) el.style.transform =
-        `translate3d(${(MOTION.tx * t).toFixed(2)}px,${(y * s + MOTION.ty * t).toFixed(2)}px,0)`;
+    els.forEach(([el, s]) => {
+      if (el) el.style.transform = `translate3d(0,${(y * s).toFixed(2)}px,0)`;
     });
     // אטימות מקוונטטת: ל-.scene יש שני pseudo-elements עם mix-blend-mode פרושים
     // על כל השטח, ושינוי אטימות על ההורה מקבץ את כל הערימה לשכבה אחת. בקפיצות
@@ -165,84 +159,92 @@ window.App = (function () {
 
   const schedule = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
 
-  // ---- נטייה: הפארלקס של הטלפון. אין כאן עכבר, יש ג׳ירוסקופ. ----
-  function tiltLayer() {
-    const DOE = window.DeviceOrientationEvent;
-    if (!DOE || REDUCE) return;
-    let live = false;
-    const handle = e => {
-      const g = e.gamma, b = e.beta;      // gamma: שמאל/ימין · beta: קדימה/אחורה
-      if (g == null || b == null) return;
-      const cl = (v, n) => Math.max(-1, Math.min(1, v / n));
-      MOTION.tx = cl(g, 28);
-      MOTION.ty = cl(b - 45, 40) * 0.5;   // 45° = איך שמחזיקים טלפון בפועל
-      schedule();
-    };
-    const begin = () => { if (!live) { live = true; addEventListener('deviceorientation', handle, { passive: true }); } };
-    if (typeof DOE.requestPermission === 'function') {
-      // iOS 13+ נותן חיישנים רק מתוך מגע של המשתמש. בלי מגע הבקשה נדחית בשקט,
-      // ולכן היא תלויה במגע הראשון ולא ברגע הטעינה.
-      const ask = () => DOE.requestPermission().then(r => { if (r === 'granted') begin(); }).catch(() => {});
-      addEventListener('touchend', ask, { once: true });
-      addEventListener('click', ask, { once: true });
-    } else {
-      begin();
-    }
-  }
-
   function parallax() {
     cacheLayers();
     if (!LAYERS) return;
     addEventListener('scroll', () => { MOTION.y = window.scrollY || 0; schedule(); }, { passive: true });
-    tiltLayer();
     frame();
   }
 
-  // ===== כניסות: הבלוקים מגיעים למקומם, לא נמצאים בו =====
-  // מה שנכנס לתצוגה נכנס גם לתמונה — מהצד ומעט מלמטה, בהשהיה מדורגת.
-  // .rv מוחל מ-JS בלבד: אם הסקריפט נופל, התוכן פשוט מוצג ולא נעלם.
-  // בסוף המעבר שתי המחלקות מוסרות, כדי שלא יישאר transform תלוי על
-  // כרטיס שיש לו transform משלו בלחיצה.
-  const RV = '.card,.tcard,.step,.lbl,.acts,.countdown,.empty';
+  // ===== כניסות =====
+  // שלוש התנהגויות, לא אחת, ולכל אחת תפקיד:
+  //   rise  — בלוק עולה מעט וגדל לתוך גודלו. בלי תזוזה אופקית: ציר הגלילה
+  //           הוא האנכי, ותזוזה אופקית זעירה נקראת כ"לא מיושר" ולא כ"הגיע".
+  //   slide — שורת רשימה נכנסת מהצד מאחורי קצה המיכל. ה-overflow על .steps
+  //           הוא מה שהופך את זה מ"זזה קצת" ל"נכנסה מבחוץ".
+  //   wipe  — תווית נחשפת ממסכה והקו נמשך. בלי אטימות כלל.
+  // אין חריגה מעבר ליעד באף אחת מהן: על מרחק קצר היא יוצאת פיקסל וחצי,
+  // וזה סדר גודל של באג רינדור ולא של תנופה.
+  const RV_MAP = [
+    ['.card,.tcard,.countdown,.empty,.acts', 'rv-rise',  45, 4],
+    ['.lbl',                                 'rv-wipe',  45, 4],
+    ['.step',                                'rv-slide', 38, 7]
+  ];
+  const RV_ALL = RV_MAP.map(r => r[0]).join(',');
+
+  // תווית נחשפת ממסכה, אז הטקסט שלה חייב לשבת בתוך אלמנט שאפשר להזיז.
+  // העטיפה נעשית כאן ולא בתבניות, כדי ש-.lbl יישאר זהה בכל חמשת המסכים.
+  function maskLabel(el) {
+    if (el.querySelector(':scope > .wi')) return;
+    let run = [];
+    const flush = () => {
+      if (!run.length) return;
+      const s = document.createElement('span');
+      s.className = 'wi';
+      el.insertBefore(s, run[0]);
+      run.forEach(n => s.appendChild(n));
+      run = [];
+    };
+    [].slice.call(el.childNodes).forEach(n => {
+      if (n.nodeType === 1 && n.tagName === 'I') flush(); else run.push(n);
+    });
+    flush();
+  }
 
   function reveal(root, opt) {
-    if (!root) return;
-    const o = opt || {};
-    const els = [].slice.call(root.querySelectorAll(RV))
-      // כותרת המסך מקבלת transform מצינור התנועה — שתי כתיבות לאותה תכונה נאבקות
-      .filter(el => !el.closest('.head'))
-      // שורות בתוך גוף שלב מנוהלות על ידי .just-open. הן בגובה אפס כשהשלב
-      // מקופל, IntersectionObserver לא יורה עליהן, והן היו נתקעות שקופות.
-      .filter(el => !el.closest('.ph-body'))
-      // שורה בתוך כרטיס שנכנס תיכנס יחד איתו; אין צורך להנפיש פעמיים
-      .filter(el => !el.parentElement || !el.parentElement.closest(RV) || el.matches('.step'));
-    if (!els.length) return;
-    if (REDUCE || !window.IntersectionObserver) return;
+    if (!root || REDUCE || !window.IntersectionObserver) return;
+    const now = (opt || {}).now, seen = new Set(), targets = [];
 
-    els.forEach(el => el.classList.add('rv'));
-    const fire = (el, i) => {
-      el.style.transitionDelay = Math.min(i, 9) * 55 + 'ms';
+    RV_MAP.forEach(([sel, cls, step, cap]) => {
+      [].slice.call(root.querySelectorAll(sel)).forEach(el => {
+        if (seen.has(el)) return;
+        // הכותרת מקבלת transform מצינור התנועה; שורות בתוך שלב מנוהלות ב-.just-open
+        if (el.closest('.head') || el.closest('.ph-body')) return;
+        // מה שיושב בתוך בלוק שנכנס — נכנס יחד איתו. חוץ משורות ברשימה.
+        const p = el.parentElement && el.parentElement.closest(RV_ALL);
+        if (p && !el.matches('.step')) return;
+        seen.add(el);
+        if (cls === 'rv-wipe') maskLabel(el);
+        el.classList.add(cls);
+        targets.push([el, cls, step, cap]);
+      });
+    });
+    if (!targets.length) return;
+
+    const fire = ([el, cls, step, cap], k) => {
+      el.style.transitionDelay = Math.min(k, cap) * step + 'ms';
       requestAnimationFrame(() => el.classList.add('in'));
-      const clean = () => { el.classList.remove('rv', 'in'); el.style.transitionDelay = ''; };
-      // דווקא על transform: הוא הארוך מבין השניים, והאטימות שמסיימת לפניו
-      // הייתה קוטעת את התנועה באמצע אילו ניקינו על האירוע הראשון שמגיע
-      el.addEventListener('transitionend', function h(e) {
-        if (e.propertyName !== 'transform') return;
+      const clean = () => { el.classList.remove(cls, 'in'); el.style.transitionDelay = ''; };
+      el.addEventListener('transitionend', function h(ev) {
+        if (ev.propertyName !== 'transform') return;
         el.removeEventListener('transitionend', h); clean();
       });
-      setTimeout(clean, 1600);   // רשת ביטחון: transitionend לא נורה על אלמנט מוסתר
+      setTimeout(clean, 1600);
     };
-    if (o.now) { els.forEach(fire); return; }
+    if (now) { targets.forEach(fire); return; }
 
-    let seen = 0;
+    const map = new Map(targets.map(t => [t[0], t]));
     const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        io.unobserve(e.target);
-        fire(e.target, seen++);
+      // האינדקס נספר בתוך האצווה הזו בלבד. מונה שרץ לאורך חיי הדף היה נותן
+      // לכל אלמנט מעבר לעשירי את ההשהיה המקסימלית — כלומר חצי שנייה של כלום.
+      let k = 0;
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        io.unobserve(en.target);
+        fire(map.get(en.target), k++);
       });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
-    els.forEach(el => io.observe(el));
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
+    targets.forEach(t => io.observe(t[0]));
   }
 
   // ---- כוכבים: מיקומים קבועים, לא אקראיים — אחרת הם קופצים בכל רינדור ----
