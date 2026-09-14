@@ -462,6 +462,14 @@ window.App = (function () {
       document.body.insertBefore(bl, document.body.firstChild);
     }
     nav(document.getElementById('nav'), page);
+    // today0 מחושב פעם אחת בטעינת הסקריפט. PWA שנשאר פתוח בטלפון וחוצה חצות
+    // ימשיך להציג את הספירה של אתמול — אז כשחוזרים אליו, אם התאריך זז, טוענים.
+    const bootDay = today0.getTime();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      const n = new Date(), d = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
+      if (d !== bootDay) location.reload();
+    });
     net();
     parallax();
     const phase = (T.dayPhase && T.days) ? (T.dayPhase[T.days[dayIndex()].st] ?? 0) : 0;

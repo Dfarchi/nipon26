@@ -1,4 +1,5 @@
 (function () {
+  const MON = ['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצמ'];
   const A = App, T = A.T;
   A.boot('today.html');
   const idx = A.dayIndex(), cur = T.days[idx], dd = A.dated[idx].date;
@@ -23,12 +24,17 @@
   });
 
   let h = '';
-  const toGo = Math.round((A.firstDay - A.today0) / 864e5);
+  // סופרים עד ההמראה עצמה, לא עד היום הראשון בטיול — הם לא אותו תאריך.
+  const fl = T.flight || {};
+  const dep = fl.dep ? new Date(fl.dep) : null;
+  const dep0 = dep ? new Date(dep.getFullYear(), dep.getMonth(), dep.getDate()) : A.firstDay;
+  const toGo = Math.round((dep0 - A.today0) / 864e5);
   if (A.beforeTrip) {
-    const n = toGo;
-    h += `<div class="countdown"><div class="kicker">עד ההמראה</div>
-      <div class="n">${n}</div>
-      <div class="d">ימים · אל על LY91 · 13 אוק׳ 19:45</div></div>`;
+    const hhmm = dep ? String(dep.getHours()).padStart(2, '0') + ':' + String(dep.getMinutes()).padStart(2, '0') : '';
+    const when = dep ? `${dep.getDate()} ${MON[dep.getMonth()]}׳ ${hhmm}` : '';
+    h += `<div class="countdown"><div class="kicker">${toGo === 0 ? 'היום' : 'עד ההמראה'}</div>
+      <div class="n">${toGo}</div>
+      <div class="d">ימים${fl.airline ? ' · ' + fl.airline : ''}${fl.code ? ' ' + fl.code : ''}${when ? ' · ' + when : ''}</div></div>`;
   }
   h += `<div class="head"${A.beforeTrip ? ' style="padding-top:clamp(30px,8vh,70px)"' : ''}>
     <div class="kicker">יום ${idx + 1} · מתוך ${T.days.length}${cur.st ? ' · ' + cur.st : ''}</div>
