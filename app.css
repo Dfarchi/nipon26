@@ -468,3 +468,11 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
   padding:5px 11px;border-radius:99px;font:inherit;font-size:var(--fs-micro);
   font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .fxq .chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent)}
+
+/* שני שעונים זה מול זה. ההפרש הוא מה שמפיל הזמנה שנפתחת ב-09:00 ביפן. */
+.clk{display:flex;align-items:center;gap:14px}
+.clk > div{flex:1;text-align:center}
+.clk b{display:block;font-size:var(--fs-hero);font-weight:800;line-height:var(--lh-tight);
+  color:var(--ink);font-variant-numeric:tabular-nums}
+.clk span{display:block;margin-top:4px;font-size:var(--fs-meta);color:var(--soft)}
+.clk > i{width:1px;align-self:stretch;background:var(--rule);display:block}

@@ -2,17 +2,17 @@
    קליפה: cache-first (מהיר, עובד אופליין).
    trip.json: network-first (תוכן הטיול זז כל יום — רוצים את הטרי, עם נפילה לעותק).
    מארחים חיצוניים (leaflet, אריחי מפה): לא נוגעים — הם לא זמינים אופליין ממילא. */
-const V = '2026091436';
+const V = '2026091437';
 const SHELL = 'nipon26-shell-' + V;
 const DATA  = 'nipon26-data-' + V;
 
 const SHELL_FILES = [
   './', './index.html', './site.html', './itinerary.html', './stage.html', './decisions.html',
   './budget.html', './transit.html', './documents.html',
-  './today.html', './wallet.html', './tasks.html',
+  './today.html', './wallet.html', './tasks.html', './tools.html',
   './styles.css', './data.js', './basemap.js', './delight.js', './mapexport.js',
   './pwa.js', './app.css', './app.js', './art.js', './today.js', './wallet.js', './tasks.js',
-  './itinerary.js', './documents.js', './manifest.webmanifest',
+  './itinerary.js', './documents.js', './tools.js', './manifest.webmanifest',
   './icon-192.png', './icon-512.png'
 ];
 

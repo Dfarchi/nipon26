@@ -89,25 +89,6 @@
     <button class="cloud g" id="fullDayBtn">
       ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>היום המלא</span></button></div>`;
 
-  // מחשבון ין→שקל. הרעיון של שירשה, והוא נכון: זה החישוב שעושים עשרים
-  // פעם ביום מול תפריט, והוא לא דורש רשת — השער כבר בנתונים.
-  {
-    const fx = (T.budget && T.budget.fx) || {};
-    if (fx.jpy) {
-      h += `<div class="lbl q" style="margin-top:20px">כמה זה בשקלים<i></i>
-        <span class="d">¥100 = ₪${(fx.jpy * 100).toFixed(2)}</span></div>
-        <div class="card fxc">
-          <div class="fxrow">
-            <label><span>¥</span><input id="fxJpy" type="text" inputmode="numeric" placeholder="1,000"></label>
-            <b>=</b>
-            <label><span>₪</span><input id="fxIls" type="text" inputmode="decimal" placeholder="19.20"></label>
-          </div>
-          <div class="fxq">` +
-            [500, 1000, 3000, 10000].map(v => `<button class="chip fxp" data-v="${v}">¥${v.toLocaleString()}</button>`).join('') +
-          `</div></div>`;
-    }
-  }
-
   h += `<div id="fullDayWrap" hidden style="margin-top:16px">
     <div class="lbl q">כל הפעילויות היום<i></i></div>
     <div class="steps" style="margin-top:8px">` +
@@ -128,20 +109,6 @@
   document.getElementById('main').innerHTML = h;
   A.reveal(document.getElementById('main'));
 
-  // שני שדות שמזינים זה את זה. עיצוב מכוון: אין כפתור "חשב" — מקלידים ורואים.
-  {
-    const fx = (T.budget && T.budget.fx) || {}, j = document.getElementById('fxJpy'), s = document.getElementById('fxIls');
-    if (j && s && fx.jpy) {
-      const num = v => { const n = parseFloat(String(v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : null; };
-      const fmt = n => n.toLocaleString('he-IL', { maximumFractionDigits: 2 });
-      j.addEventListener('input', () => { const n = num(j.value); s.value = n === null ? '' : fmt(n * fx.jpy); });
-      s.addEventListener('input', () => { const n = num(s.value); j.value = n === null ? '' : fmt(Math.round(n / fx.jpy)); });
-      document.querySelectorAll('.fxp').forEach(b => b.addEventListener('click', () => {
-        j.value = (+b.dataset.v).toLocaleString('he-IL');
-        s.value = fmt(+b.dataset.v * fx.jpy);
-      }));
-    }
-  }
 
   document.getElementById('fullDayBtn').onclick = () => {
     const w = document.getElementById('fullDayWrap');

@@ -432,7 +432,8 @@ window.App = (function () {
     ['today.html','היום','<rect x="3.5" y="4.5" width="17" height="16" rx="3.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/>'],
     ['itinerary.html','מסלול','<circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v4.1a4 4 0 0 0 4 4h4"/>'],
     ['wallet.html','ארנק','<rect x="3.5" y="6.5" width="17" height="12" rx="3"/><path d="M3.5 10.5h17"/>'],
-    ['tasks.html','משימות','<path d="M4 7.5l2 2 3.5-3.5M4 16.5l2 2 3.5-3.5M13 7.5h7M13 16.5h7"/>']
+    ['tasks.html','משימות','<path d="M4 7.5l2 2 3.5-3.5M4 16.5l2 2 3.5-3.5M13 7.5h7M13 16.5h7"/>'],
+    ['tools.html','כלים','<path d="M14.5 3.5a4.5 4.5 0 0 0-5.6 5.6L3.5 14.5v6h6l5.4-5.4a4.5 4.5 0 0 0 5.6-5.6l-3 3-2.6-2.6z"/>']
   ];
   function nav(host, on) {
     host.innerHTML = NAV.map(([href, label, path]) =>
@@ -451,7 +452,7 @@ window.App = (function () {
   // 落款 — החותם. תו אחד בריבוע ורמיליון, במקום שם המותג: הניווט התחתון
   // כבר אומר באיזה מסך אתה, והחותם אומר את זה בסימן ולא במילה.
   const SEAL = { 'today.html': '今', 'itinerary.html': '道',
-                 'wallet.html': '財', 'tasks.html': '事', 'documents.html': '書' };
+                 'wallet.html': '財', 'tasks.html': '事', 'tools.html': '具', 'documents.html': '書' };
 
   function boot(page) {
     const brand = document.querySelector('.brand'), ch = SEAL[page];
