@@ -415,6 +415,25 @@ window.App = (function () {
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   }
 
+  // רכס הרים מנקודות דגימה, עם משיקים אופקיים בכל נקודה — גבעות מתגלגלות,
+  // לא זיגזג. השמיים הם רוב המסך; אם רק הבניינים משתנים, היום עדיין נראה זהה.
+  const ridgePath = (R, base, amp, n) => {
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const high = i % 2 === 1;            // פסגה, עמק, פסגה — לא הילוך אקראי
+      pts.push({ x: -30 + i * (450 / n), y: base - amp * (high ? .58 + R() * .42 : .04 + R() * .26) });
+    }
+    let d = `M${pts[0].x.toFixed(0)},${pts[0].y.toFixed(1)}`;
+    for (let i = 1; i <= n; i++) {
+      const a = pts[i - 1], b = pts[i], span = b.x - a.x, dy = b.y - a.y;
+      const k = .16 + R() * .2;          // בקרה קרובה לקו הישר → מדרון ישר
+      d += ` C${(a.x + span * k).toFixed(0)},${(a.y + dy * k * 1.7).toFixed(1)} ` +
+           `${(b.x - span * k).toFixed(0)},${(b.y - dy * k * 1.7).toFixed(1)} ` +
+           `${b.x.toFixed(0)},${b.y.toFixed(1)}`;
+    }
+    return d + ' L420,150 L-30,150 Z';
+  };
+
   const winTint = r => r < .18 ? 'var(--tvlit)' : 'var(--lit)';
 
   // רשת חלונות עם כמה כבויים וכמה בגוון מסך
@@ -490,6 +509,55 @@ window.App = (function () {
   // הכביש: פס בהיר שמפריד בין הבתים לקדמה, אחרת הכל צף על מישור אחד
   const ROAD = '<path fill="var(--wire)" opacity=".13" d="M-30,84 C90,81 200,86 300,82 L420,84 L420,104 L-30,104 Z"/>';
 
+  // תעלה — כמו שירקאווה בקיוטו. הבתים מאחור, הגדה הקרובה מלפנים,
+  // ובאמצע פס מים שמחזיר את האור של החלונות כמריחה אנכית רועדת.
+  const canalAt = (R, lit) => {
+    let s = '<path fill="var(--ridge)" opacity=".5" d="M-30,80 C90,78.5 200,82 300,79.5 L420,81 L420,92 ' +
+            'C300,93.5 190,90 90,92.5 L-30,91 Z"/>';
+    lit.forEach(x => {
+      s += `<rect x="${(x - 3.4).toFixed(1)}" y="80" width="6.8" height="12" fill="var(--lit)" opacity=".3"/>` +
+           `<rect x="${(x - 1.3).toFixed(1)}" y="80" width="2.6" height="12" fill="var(--lit)" opacity=".5"/>`;
+    });
+    for (let i = 0; i < 11; i++)
+      s += `<rect x="${(-10 + R() * 400).toFixed(1)}" y="${(81 + R() * 9).toFixed(1)}" ` +
+           `width="${(9 + R() * 18).toFixed(1)}" height=".9" rx=".45" fill="var(--rice)" opacity=".3"/>`;
+    return s;
+  };
+
+  // שלט אנכי. בקנה מידה הזה קנג׳י אמיתי הוא כתם — אז משיכות מופשטות,
+  // שלוש או ארבע לכל סימן. זה מה שהעין קוראת כשלט יפני מרחוק.
+  const signAt = (x, y, h, R) => {
+    const col = R() < .5 ? 'var(--torii)' : 'var(--hot)';
+    let s = `<rect x="${(x - 1.6).toFixed(1)}" y="${y.toFixed(1)}" width="1.6" height="3.4" fill="var(--wire)" opacity=".7"/>` +
+            `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="7.4" height="${h.toFixed(1)}" rx="1" fill="${col}"/>`;
+    for (let i = 0; i + 8 < h; i += 8) {
+      const gy = y + 3 + i;
+      s += `<g fill="var(--rice)" opacity=".9">` +
+           `<rect x="${(x + 1.7).toFixed(1)}" y="${gy.toFixed(1)}" width="4" height=".9"/>` +
+           `<rect x="${(x + 1.7).toFixed(1)}" y="${(gy + 2.1).toFixed(1)}" width="4" height=".9"/>` +
+           `<rect x="${(x + 3.3).toFixed(1)}" y="${gy.toFixed(1)}" width=".9" height="4.8"/>` +
+           (R() < .55 ? `<rect x="${(x + 1.7).toFixed(1)}" y="${(gy + 4.2).toFixed(1)}" width="4" height=".9"/>` : '') +
+           `</g>`;
+    }
+    return s;
+  };
+
+  // אוניגאווארה — כובע הרכס עם שתי קרניים בקצוות. שתי נקודות לכל גג,
+  // וזה כבר גג יפני ולא משולש. חייב להיצמד לפסגה, אחרת הוא מרחף.
+  const ridgeEnds = (cx, y, half) => { const h = Math.min(7, half * .22);
+    return `<path d="M${(cx - h).toFixed(1)},${(y - 1.1).toFixed(1)} L${(cx + h).toFixed(1)},${(y - 1.1).toFixed(1)} ` +
+      `L${(cx + h).toFixed(1)},${(y + 1.7).toFixed(1)} L${(cx - h).toFixed(1)},${(y + 1.7).toFixed(1)} Z ` +
+      `M${(cx - h).toFixed(1)},${(y - 1.1).toFixed(1)} l0,-3 l2,3 Z ` +
+      `M${(cx + h).toFixed(1)},${(y - 1.1).toFixed(1)} l0,-3 l-2,3 Z"/>`; };
+
+  // עשן מארובה. שלוש נשיפות שעולות ונמוגות — התנועה היחידה בקומת הכפר.
+  const chimney = (x, y) => `<rect x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}" width="5" height="11" rx=".8" fill="var(--ridge2)"/>` +
+    `<rect x="${(x - 1).toFixed(1)}" y="${(y - 9.4).toFixed(1)}" width="7" height="2" rx=".6" fill="var(--ridge2)"/>` +
+    `<g class="smoke" fill="var(--smoke)">` +
+    `<circle cx="${(x + 2.5).toFixed(1)}" cy="${(y - 11).toFixed(1)}" r="3.6"/>` +
+    `<circle cx="${(x + 1.4).toFixed(1)}" cy="${(y - 11).toFixed(1)}" r="4.6"/>` +
+    `<circle cx="${(x + 3.4).toFixed(1)}" cy="${(y - 11).toFixed(1)}" r="5.6"/></g>`;
+
   const tileRoof2 = (cx, y, half, drop) =>
     `<path d="M${cx - half - 4},${y + drop} Q${cx - half},${y + drop - 3} ${cx - half + 3},${y + drop - 4} ` +
     `L${cx},${y} L${cx + half - 3},${y + drop - 4} Q${cx + half},${y + drop - 3} ${cx + half + 4},${y + drop} Z"/>`;
@@ -537,12 +605,12 @@ window.App = (function () {
 
   // ---- פרופיל לכל אזור ----
   const PROFILE = {
-    tokyo:    { lm: 'tokyo',  n: [9, 11], hi: [14, 46], flat: 1, tank: .5, pole: 2, tree: 0, neon: 2 },
-    osaka:    { lm: 'osaka',  n: [9, 12], hi: [34, 56], flat: 1, tank: .6, pole: 3, tree: 0, neon: 5 },
-    nagoya:   { lm: 'nagoya', n: [8, 10], hi: [38, 58], flat: 1, tank: .35, pole: 2, tree: 1, neon: 1 },
-    kyoto:    { lm: 'kyoto',  n: [7, 9],  hi: [44, 58], flat: 0, tank: 0, pole: 2, tree: 2, neon: 0 },
-    village:  { lm: 'torii',  n: [6, 8],  hi: [46, 60], flat: 0, tank: 0, pole: 1, tree: 2, neon: 0 },
-    mountain: { lm: 'torii',  n: [5, 7],  hi: [36, 56], flat: 0, gassho: 1, tank: 0, pole: 0, tree: 6, neon: 0 }
+    tokyo:    { lm: 'tokyo',  n: [9, 11], hi: [14, 46], flat: 1, tank: .5, pole: 2, tree: 0, sign: 3 },
+    osaka:    { lm: 'osaka',  n: [9, 12], hi: [34, 56], flat: 1, tank: .6, pole: 3, tree: 0, sign: 5 },
+    nagoya:   { lm: 'nagoya', n: [8, 10], hi: [38, 58], flat: 1, tank: .35, pole: 2, tree: 1, sign: 2 },
+    kyoto:    { lm: 'kyoto',  n: [7, 9],  hi: [44, 58], flat: 0, tank: 0, pole: 2, tree: 2, sign: 1, canal: 1 },
+    village:  { lm: 'torii',  n: [6, 8],  hi: [46, 60], flat: 0, tank: 0, pole: 1, tree: 2, sign: 0, smoke: 1 },
+    mountain: { lm: 'torii',  n: [5, 7],  hi: [36, 56], flat: 0, gassho: 1, tank: 0, pole: 0, tree: 6, sign: 0, smoke: 1 }
   };
 
   // ---- בניית הסצנה ----
@@ -574,44 +642,91 @@ window.App = (function () {
       if (score > bestGap) { bestGap = score; lmX = mid; }
     }
 
-    // שורה אחורית — עומק. קטנה, כהה, בלי חלונות.
-    let back = '<g fill="var(--land)" opacity=".55">';
+    // שלוש שורות עומק, לא שתיים: רחוקה ושטוחה, אמצעית עם כמה חלונות
+    // עמומים, וקדמית מלאה. שתי שורות נראו כמו קיר; שלוש נראות כמו רחוב.
+    let back = '<g fill="var(--land)" opacity=".5">';
     for (let i = 0; i < 7; i++) {
       const bx = -20 + i * 62 + R() * 26, bw = 30 + R() * 30, by = 48 + R() * 12;
       back += `<path d="M${bx.toFixed(1)},74 L${bx.toFixed(1)},${by.toFixed(1)} ` +
               `L${(bx + bw).toFixed(1)},${by.toFixed(1)} L${(bx + bw).toFixed(1)},74 Z"/>`;
     }
-    back += '</g>';
+    back += '</g><g fill="var(--land)" opacity=".8">';
+    let midLit = '';
+    for (let i = 0; i < 6; i++) {
+      const bx = -34 + i * 74 + R() * 34, bw = 34 + R() * 34, by = 40 + R() * 14;
+      back += `<path d="M${bx.toFixed(1)},74 L${bx.toFixed(1)},${by.toFixed(1)} ` +
+              `L${(bx + bw).toFixed(1)},${by.toFixed(1)} L${(bx + bw).toFixed(1)},74 Z"/>`;
+      if (P.flat) midLit += grid(bx, by, bw, 74 - by, R);
+    }
+    back += `</g><g opacity=".28">${midLit}</g>`;
 
     let body = '', lights = '', extra = '';
     const perch = [];
+    let smoked = 0;
+    const litX = [];
     slots.forEach((s, i) => {
       const cx = s.x + s.w / 2;
       if (P.gassho) {
         body += `<path d="M${s.x.toFixed(1)},74 L${cx.toFixed(1)},${s.top.toFixed(1)} ` +
                 `L${(s.x + s.w).toFixed(1)},74 Z"/>`;
         lights += `<rect x="${(cx - 4).toFixed(1)}" y="${(s.top + 22).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>`;
+        // קורות הרוחב של גג הגאשו — הקווים שמסמנים שהוא קש ולא משולש
+        extra += `<g stroke="var(--wire)" stroke-width="1" opacity=".32" fill="none">` +
+                 `<path d="M${(cx - s.w * .22).toFixed(1)},${(s.top + (74 - s.top) * .45).toFixed(1)} ` +
+                 `L${(cx + s.w * .22).toFixed(1)},${(s.top + (74 - s.top) * .45).toFixed(1)}"/>` +
+                 `<path d="M${(cx - s.w * .34).toFixed(1)},${(s.top + (74 - s.top) * .68).toFixed(1)} ` +
+                 `L${(cx + s.w * .34).toFixed(1)},${(s.top + (74 - s.top) * .68).toFixed(1)}"/></g>`;
       } else if (P.flat) {
         body += `<path d="M${s.x.toFixed(1)},74 L${s.x.toFixed(1)},${s.top.toFixed(1)} ` +
                 `L${(s.x + s.w).toFixed(1)},${s.top.toFixed(1)} L${(s.x + s.w).toFixed(1)},74 Z"/>`;
         lights += grid(s.x, s.top, s.w, 74 - s.top, R);
         if (R() < P.tank) extra += tank(cx - 4.5, s.top);
+        // מעקה גג ואנטנה — הצללית של גג עירוני, לא קו ישר
+        else if (R() < .45) extra += `<rect x="${(s.x + 1).toFixed(1)}" y="${(s.top - 2).toFixed(1)}" ` +
+          `width="${(s.w - 2).toFixed(1)}" height="2" fill="var(--roof)"/>`;
+        if (R() < .3) extra += `<g stroke="var(--wire)" stroke-width=".8" opacity=".6" fill="none">` +
+          `<path d="M${(cx + 6).toFixed(1)},${s.top.toFixed(1)} L${(cx + 6).toFixed(1)},${(s.top - 9).toFixed(1)}"/>` +
+          `<path d="M${(cx + 3).toFixed(1)},${(s.top - 6).toFixed(1)} L${(cx + 9).toFixed(1)},${(s.top - 6).toFixed(1)}"/></g>`;
       } else {
-        const wallTop = s.top + 12;
+        const wallTop = s.top + 12, half = s.w / 2 - 2;
         body += `<path d="M${(s.x + 3).toFixed(1)},74 L${(s.x + 3).toFixed(1)},${wallTop.toFixed(1)} ` +
                 `L${(s.x + s.w - 3).toFixed(1)},${wallTop.toFixed(1)} L${(s.x + s.w - 3).toFixed(1)},74 Z"/>` +
-                tileRoof2(cx, s.top, s.w / 2 - 2, 12);
+                tileRoof2(cx, s.top, half, 12) + ridgeEnds(cx, s.top, half);
         lights += `<rect x="${(cx - 9).toFixed(1)}" y="${(wallTop + 5).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>` +
                   `<rect x="${(cx + 1).toFixed(1)}" y="${(wallTop + 5).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>`;
+        // מרזב: קו דק לאורך שולי הגג, ואז מוריד בפינה
+        extra += `<g stroke="var(--land)" stroke-width=".7" opacity=".45" fill="none">` +
+                 `<path d="M${(cx - half - 3).toFixed(1)},${(s.top + 12.8).toFixed(1)} ` +
+                 `L${(cx + half + 3).toFixed(1)},${(s.top + 12.8).toFixed(1)}"/>` +
+                 `<path d="M${(cx + half + 1).toFixed(1)},${(s.top + 12.8).toFixed(1)} ` +
+                 `L${(cx + half + 1).toFixed(1)},74"/></g>`;
+      }
+      // ארובה מעשנת — על בית אחד בלבד, לא על כולם
+      if (P.smoke && !smoked && cx > 60 && cx < 320 && R() < .5) {
+        // לא על הרכס: שם יושבת החתולה. מעט הצידה, על המדרון.
+        const dx = s.w * .17, ry = s.top + (P.gassho ? (74 - s.top) * .34 : 4);
+        extra += chimney(cx + dx, ry); smoked = 1;
       }
       // מועמד למושב: גג שלא נחתך בקצה ולא מתחת לציון הדרך
-      if (cx > 44 && cx < 348 && Math.abs(cx - lmX) > 34) perch.push({ x: cx, y: s.top });
+      if (cx > 56 && cx < 322 && Math.abs(cx - lmX) > 34) perch.push({ x: cx, y: s.top });
+      litX.push(cx);
     });
+    if (P.smoke && !smoked && slots.length) {
+      const s = slots[Math.floor(slots.length / 2)];
+      extra += chimney(s.x + s.w * .67, s.top + (74 - s.top) * .34);
+    }
 
     for (let i = 0; i < P.pole; i++) extra += pole(30 + R() * 330, 34 + R() * 16);
-    for (let i = 0; i < P.neon; i++)
-      extra += `<rect x="${(20 + R() * 350).toFixed(1)}" y="${(46 + R() * 10).toFixed(1)}" width="4.5" ` +
-               `height="${(12 + R() * 12).toFixed(1)}" rx="1.4" fill="${R() < .5 ? 'var(--torii)' : 'var(--hot)'}"/>`;
+    // שלטים נתלים על חזיתות. קודם הם ריחפו באמצע האוויר.
+    let signs = P.sign || 0;
+    for (const s of slots.slice().sort(() => R() - .5)) {
+      if (!signs) break;
+      const cx = s.x + s.w / 2, tall = 74 - s.top;
+      if (s.w < 22 || tall < 26 || cx < 20 || cx > 370 || Math.abs(cx - lmX) < 26) continue;
+      const sx = R() < .5 ? s.x + 2.4 : s.x + s.w - 9.8;
+      extra += signAt(sx, s.top + 4 + R() * 5, Math.min(30, tall * .52), R);
+      signs--;
+    }
     // עצים נכנסים לפערים שבין הבניינים, ונצבעים לפני הבניינים כדי שגג
     // יסתיר עץ ולא להפך. קודם הם נחתו על הגגות ונראו כמו מדבקות.
     const gaps = [];
@@ -642,7 +757,7 @@ window.App = (function () {
     return {
       svg: `${GROUND}${back}<g fill="var(--tree)">${trees}</g>` +
            `<g fill="${fill}" class="plate">${body}</g>${LM[P.lm](lmX)}` +
-           `<g opacity=".9">${lights}</g>${ROAD}${extra}${street}`,
+           `<g opacity=".9">${lights}</g>${P.canal ? canalAt(R, litX) : ROAD}${extra}${street}`,
       seats
     };
   }
@@ -659,6 +774,29 @@ window.App = (function () {
       preserveAspectRatio="none" style="height:104px">${SCENE.svg}</svg>`;
   }
 
+  // ---- הרכס הרחוק ----
+  // היה קבוע לנצח (seed="7" ושני נתיבים כתובים ביד). עכשיו הוא נגזר מאותו
+  // זרע יומי כמו הכפר, כולל זרע הרעש — כך שגם קו הרקיע משתנה מיום ליום.
+  function farSVG() {
+    const d = dayIndex() + 1, R1 = rng(d * 31 + 5), R2 = rng(d * 97 + 11);
+    return `<svg class="l-far" viewBox="0 0 390 150" preserveAspectRatio="none" style="height:150px">
+      <defs>
+        <filter id="pt" x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.013 0.03" numOctaves="4"
+            seed="${(d * 13) % 89}" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="13"/><feGaussianBlur stdDeviation="1.6"/></filter>
+        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--ridge)" stop-opacity=".45"/>
+          <stop offset="100%" stop-color="var(--ridge)" stop-opacity="0"/></linearGradient>
+        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--ridge2)" stop-opacity=".8"/>
+          <stop offset="100%" stop-color="var(--ridge2)" stop-opacity="0"/></linearGradient>
+      </defs>
+      <path filter="url(#pt)" fill="url(#g1)" d="${ridgePath(R1, 64, 52, 7 + 2 * Math.floor(R1() * 2))}"/>
+      <path filter="url(#pt)" fill="url(#g2)" d="${ridgePath(R2, 100, 58, 5 + 2 * Math.floor(R2() * 2))}"/>
+    </svg>`;
+  }
+
   // ---- ציור הסצנה ----
   function scene(host) {
     const r = document.documentElement.style;
@@ -666,19 +804,7 @@ window.App = (function () {
     const mt = document.querySelector('meta[name=theme-color]');
     if (mt) mt.content = theme === 'day' ? '#f3ece0' : '#0b0e14';
     host.innerHTML = `<div class="art"></div>${skyLayer()}<div class="fx" id="fx"></div>
-      <svg class="l-far" viewBox="0 0 390 150" preserveAspectRatio="none" style="height:150px">
-        <defs>
-          <filter id="pt" x="-15%" y="-15%" width="130%" height="130%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.013 0.03" numOctaves="4" seed="7" result="n"/>
-            <feDisplacementMap in="SourceGraphic" in2="n" scale="13"/><feGaussianBlur stdDeviation="1.6"/></filter>
-          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--ridge)" stop-opacity=".45"/><stop offset="100%" stop-color="var(--ridge)" stop-opacity="0"/></linearGradient>
-          <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--ridge2)" stop-opacity=".8"/><stop offset="100%" stop-color="var(--ridge2)" stop-opacity="0"/></linearGradient>
-        </defs>
-        <path filter="url(#pt)" fill="url(#g1)" d="M-30,62 C12,48 32,14 60,28 C88,42 106,8 140,24 C170,38 192,18 216,34 C246,52 264,12 298,27 C328,40 352,22 420,45 L420,150 L-30,150 Z"/>
-        <path filter="url(#pt)" fill="url(#g2)" d="M-30,98 C20,84 46,50 78,66 C112,82 130,40 164,58 C198,75 218,49 250,68 C284,87 308,52 342,70 C374,85 398,75 420,82 L420,150 L-30,150 Z"/>
-      </svg>
+      ${farSVG()}
       ${villageSVG()}
       ${charLayer('')}<div class="haze" id="haze"></div>`;
   }
