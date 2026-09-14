@@ -57,9 +57,11 @@
             const m = String(d.t).match(/^(\d{1,2}\.\d{1,2})\s*—\s*(.*)$/);
             const isToday = di === idx;
             const style = 'text-decoration:none;color:inherit' + (isToday ? ';border-color:color-mix(in srgb,var(--hot) 45%,transparent)' : '');
-            return `<a class="step" href="today.html?d=${di}" style="--i:${k};${style}">
+            // הלחיצה כבר לא מנווטת אלא פותחת הצצה. השברון יורד ולא לצד,
+            // כי זה מה שמבדיל "ייפתח כאן" מ"ייקח אותך למקום אחר".
+            return `<button class="step day" data-d="${di}" aria-expanded="false" style="--i:${k};${style}">
               <b>${m ? m[1] : ''}</b><span>${A.esc(clip(m ? m[2] : String(d.t), 46))}</span>
-              ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</a>`;
+              ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</button>`;
           }).join('') + `</div>`;
         }
         h += `</div></div>`;
@@ -83,6 +85,55 @@
   }
 
   draw();   // פעם אחת. 45 שורות הן זולות; בנייה מחדש בכל לחיצה היא לא.
+
+
+  // ---- הצצה ליום: מה יש בו, ואז כפתור שלוקח אליו ----
+  const stayOn = dayTitle => {
+    const m = String(dayTitle).match(/^(\d{1,2})\.(\d{1,2})/);
+    if (!m) return null;
+    const dt = new Date(2026, +m[2] - 1, +m[1]);
+    return (T.budget.booked || []).find(b => {
+      const p = String(b.d).split(/[–-]/);
+      const s = (p[0] || '').match(/(\d{1,2})\.?(\d{1,2})?/), e = (p[1] || '').match(/(\d{1,2})\.(\d{1,2})/);
+      if (!s || !e) return false;
+      return dt >= new Date(2026, (s[2] ? +s[2] : +e[2]) - 1, +s[1]) && dt < new Date(2026, +e[2] - 1, +e[1]);
+    });
+  };
+
+  function peekFor(di) {
+    const d = T.days[di], acts = d.acts || [], stay = stayOn(d.t);
+    let h = '<div class="peek-in">';
+    h += acts.length
+      ? acts.slice(0, 6).map(a => `<div class="pk"><b>${a.ic || '·'}</b>
+          <span>${A.esc(clip(String(a.t), 52))}</span>${a.cr ? `<i>${a.cr}</i>` : ''}</div>`).join('')
+        + (acts.length > 6 ? `<div class="pk more">ועוד ${acts.length - 6}</div>` : '')
+      : '<div class="pk more">יום פנוי</div>';
+    if (stay) h += `<div class="pk stay"><b>🛏</b><span>${A.esc(stay.n)}</span></div>`;
+    h += `<a class="go" href="today.html?d=${di}">לפתוח את היום</a></div>`;
+    return h;
+  }
+
+  document.getElementById('main').addEventListener('click', e => {
+    const btn = e.target.closest('.day');
+    if (!btn) return;
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    // הצצה אחת בכל רגע — שתיים פתוחות הופכות את הרשימה לבלתי קריאה
+    document.querySelectorAll('.day[aria-expanded="true"]').forEach(b => {
+      b.setAttribute('aria-expanded', 'false');
+      const pk = b.nextElementSibling;
+      if (pk && pk.classList.contains('peek')) pk.classList.remove('on');
+    });
+    if (open) return;
+    btn.setAttribute('aria-expanded', 'true');
+    let pk = btn.nextElementSibling;
+    if (!pk || !pk.classList.contains('peek')) {
+      pk = document.createElement('div');
+      pk.className = 'peek';
+      pk.innerHTML = peekFor(+btn.dataset.d);
+      btn.after(pk);
+    }
+    requestAnimationFrame(() => pk.classList.add('on'));
+  });
 
   document.getElementById('main').addEventListener('click', e => {
     const b = e.target.closest('.exp');

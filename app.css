@@ -69,6 +69,11 @@ body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Ta
 .page{position:relative;z-index:1;padding:14px 16px 92px;max-width:560px;margin:0 auto}
 .topline{display:flex;align-items:center;gap:8px;font-size:var(--fs-micro);color:var(--soft);line-height:1}
 .brand{font-weight:800;letter-spacing:.18em;font-size:var(--fs-meta);color:var(--hot);line-height:1}
+/* 落款 — חותם. ריבוע קטן, פינות כמעט חדות, תו יחיד. */
+.seal{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+  border-radius:3px;background:var(--hi);color:var(--onHi);line-height:1;
+  font-family:'Noto Sans JP','Heebo',serif;font-size:13px;font-weight:700;
+  letter-spacing:0;user-select:none}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 7px currentColor}
 .head{padding-top:clamp(90px,22vh,170px)}
 /* יורד אל מתחת לפס האיור, כדי שהסצנה תישאר שלמה מעליו ולא ייווצר טשטוש על הכפר */
@@ -104,6 +109,37 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .note{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:var(--fs-body);display:flex;gap:8px;align-items:flex-start}
 .note.w{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
 .note.g{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
+/* ===== הצצה ליום =====
+   שורת יום פותחת במקום ולא מנווטת. שברון למטה, כמו כותרת שלב —
+   וכפתור מפורש הוא מה שלוקח אותך משם. */
+.step.day{position:relative;padding-inline-end:28px;width:100%;text-align:right;
+  font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.step.day::after{content:'';position:absolute;inset-inline-end:10px;top:50%;width:6px;height:6px;
+  border-left:2px solid var(--soft);border-bottom:2px solid var(--soft);
+  transform:translateY(-70%) rotate(-45deg);transition:transform .22s var(--e-out);opacity:.7}
+.step.day[aria-expanded="true"]::after{transform:translateY(-30%) rotate(135deg)}
+
+.peek{display:grid;grid-template-rows:0fr;transition:grid-template-rows 280ms var(--e-soft)}
+.peek.on{grid-template-rows:1fr}
+.peek > .peek-in{overflow:hidden;min-height:0;
+  background:var(--well);border-radius:10px;box-shadow:inset 0 1px 0 var(--line)}
+.peek.on > .peek-in{padding:10px 12px 12px}
+.pk{display:flex;align-items:baseline;gap:9px;padding:5px 0;font-size:var(--fs-body);color:var(--dim)}
+.pk b{font-size:var(--fs-lead);line-height:1;min-width:0}
+.pk span{flex:1}
+.pk i{font-style:normal;font-size:var(--fs-micro);opacity:.85}
+.pk.more{color:var(--soft);font-size:var(--fs-meta)}
+.pk.stay{border-top:1px solid var(--line);margin-top:4px;padding-top:8px;color:var(--soft)}
+.go{display:block;margin-top:10px;padding:9px 12px;border-radius:9px;text-align:center;
+  font-size:var(--fs-meta);font-weight:700;text-decoration:none;
+  color:var(--onHot);background:var(--hot);transition:opacity .16s ease}
+.go:active{opacity:.75}
+
+@media (prefers-reduced-motion:reduce){
+  .peek{transition:none}
+  .step.day::after{transition:none}
+}
+
 /* ===== שלושה ניבי משטח =====
    刷り物 מוגבה (.card) · 凹み שקוע (.well) · והדף החשוף.
    קודם היה ניב אחד, ולכן לא היה figure/ground בתוך התוכן: כל בלוק צעק

@@ -393,7 +393,14 @@ window.App = (function () {
     addEventListener('online', s); addEventListener('offline', s); s();
   }
 
+  // 落款 — החותם. תו אחד בריבוע ורמיליון, במקום שם המותג: הניווט התחתון
+  // כבר אומר באיזה מסך אתה, והחותם אומר את זה בסימן ולא במילה.
+  const SEAL = { 'today.html': '今', 'itinerary.html': '道',
+                 'wallet.html': '財', 'tasks.html': '事', 'documents.html': '書' };
+
   function boot(page) {
+    const brand = document.querySelector('.brand'), ch = SEAL[page];
+    if (brand && ch) { brand.className = 'seal'; brand.textContent = ch; brand.title = 'NIPON26'; }
     scene(document.getElementById('scene'));
     nav(document.getElementById('nav'), page);
     net();
