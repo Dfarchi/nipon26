@@ -140,6 +140,16 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
   .step.day::after{transition:none}
 }
 
+/* ===== כרטיסיית הזמנה ===== */
+.card.bk{overflow:hidden}
+.bkh{padding:12px 14px}
+.bkh::after{top:17px}
+.card.bk .bkd{padding:0 14px 14px}
+/* כרטיס הנהג בתוך כרטיסייה: אותו עצם נייר, בלי המרווח העליון שלו */
+.card.bk .tcard{margin-top:10px}
+.tel{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)}
+.pk .jp{font-family:'Noto Sans JP','Heebo',sans-serif}
+
 /* ===== שלושה ניבי משטח =====
    刷り物 מוגבה (.card) · 凹み שקוע (.well) · והדף החשוף.
    קודם היה ניב אחד, ולכן לא היה figure/ground בתוך התוכן: כל בלוק צעק
