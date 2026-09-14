@@ -20,6 +20,7 @@
   --hot:#eab94f; --warn:#f2906a; --ok:#7fd0a0; --hi:#c1303f;
   --onHi:#fff6e8; --onHot:#1d2833; --key:var(--hot);
   --ridge:#4a6478; --ridge2:#26394a; --roof:#18232e; --lit:#f0a94e; --tree:#1d2b28;
+  --land:#141f27;
   /* איור: לילה */
   --cat1:#33414f; --cat2:#8d7a63; --catInner:#c98089; --catEye:#f0c05a;
   --figure:#1e2a38; --skyCloud:#2a3b52; --bird:#3b4f66; --wire:#4a5a6b;
@@ -42,6 +43,7 @@ body.is-day{
   --hot:#9a4a10; --warn:#a83a22; --ok:#2c6a45; --hi:#a8322a;
   --onHi:#fff6e8; --onHot:#fdf6e8; --key:var(--hot);
   --ridge:#7f9bb0; --ridge2:#5d7f95; --roof:#6b5a48; --lit:#a8906e; --tree:#5c7a4a;
+  --land:#8a9a6a;
   /* איור: יום */
   --cat1:#3f3730; --cat2:#c9a274; --catInner:#e59aa0; --catEye:#4a7f4f;
   --figure:#5a4a3a; --skyCloud:#ffffff; --bird:#7d8fa0; --wire:#8d7f6b;
@@ -79,7 +81,8 @@ body.is-day .bloom{mix-blend-mode:multiply;opacity:.24;
     color-mix(in srgb,var(--hot) 26%,transparent) 0%,
     transparent 70%)}
 
-.page{position:relative;z-index:1;padding:14px 16px 92px;max-width:560px;margin:0 auto}
+.page{position:relative;z-index:1;max-width:560px;margin:0 auto;
+  padding:calc(14px + env(safe-area-inset-top)) 16px 92px}
 .topline{display:flex;align-items:center;gap:8px;font-size:var(--fs-micro);color:var(--soft);line-height:1}
 .brand{font-weight:800;letter-spacing:.18em;font-size:var(--fs-meta);color:var(--hot);line-height:1}
 /* 落款 — חותם. ריבוע קטן, פינות כמעט חדות, תו יחיד. */
@@ -414,7 +417,7 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 @keyframes soar{0%{transform:translate(14vw,6px)}100%{transform:translate(-90vw,-14px)}}
 
 /* ===== דמויות על הגגות ===== */
-.l-chars{position:absolute;right:-28px;left:-28px;bottom:0;height:74px}
+.l-chars{position:absolute;right:-28px;left:-28px;bottom:30px;height:74px}
 .l-chars .ch{position:absolute;transform:translateX(-50%);line-height:0}
 .l-chars .wire{position:absolute;right:0;left:0;bottom:56px;width:100%;height:12px;opacity:.9}
 .art-cat,.art-fig,.art-lantern{overflow:visible}

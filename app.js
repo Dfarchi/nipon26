@@ -374,7 +374,10 @@ window.App = (function () {
         <path filter="url(#pt)" fill="url(#g1)" d="M-30,62 C12,48 32,14 60,28 C88,42 106,8 140,24 C170,38 192,18 216,34 C246,52 264,12 298,27 C328,40 352,22 420,45 L420,150 L-30,150 Z"/>
         <path filter="url(#pt)" fill="url(#g2)" d="M-30,98 C20,84 46,50 78,66 C112,82 130,40 164,58 C198,75 218,49 250,68 C284,87 308,52 342,70 C374,85 398,75 420,82 L420,150 L-30,150 Z"/>
       </svg>
-      <svg class="l-village" viewBox="0 0 390 74" preserveAspectRatio="none" style="height:74px">
+      <svg class="l-village" viewBox="0 0 390 104" preserveAspectRatio="none" style="height:104px">
+        <!-- הקרקע: הכפר עומד על רכס ולא מרחף בתחתית המסגרת, כך שמה שנחתך
+             מתחת לכרטיסים הוא ההר ולא חצי בית. -->
+        <path fill="var(--land)" d="M-30,70 C60,63 120,73 190,67 C250,62 300,72 360,65 C390,62 410,67 420,65 L420,104 L-30,104 Z"/>
         <g fill="var(--roof)" class="plate">
           <path d="M18,74 L18,40 L24,40 L24,74 Z"/><path d="M4,44 L38,44 L32,38 L10,38 Z"/>
           <path d="M2,54 L40,54 L33,47 L9,47 Z"/><path d="M0,66 L42,66 L34,57 L8,57 Z"/>
@@ -476,12 +479,13 @@ window.App = (function () {
     const phase = (T.dayPhase && T.days) ? (T.dayPhase[T.days[dayIndex()].st] ?? 0) : 0;
     const fx = document.getElementById('fx');
     const forced = q.get('wx');
-    if (forced) { particles(fx, forced); decorate(forced); return; }
-    const first = 'leaves';
-    particles(fx, first); decorate(first);              // ברירת מחדל מיידית
-    weather(phase, m => {
-      particles(fx, m); decorate(m);
-    });
+    const pmF = m => m === 'clear' ? 'leaves' : m;
+    if (forced) { particles(fx, pmF(forced)); decorate(forced); return; }
+    // decorate מקבל את המצב האמיתי (הוא מכוון שמש/ערפל), אבל החלקיקים
+    // מתרגמים "בהיר" לשלכת: clear היה n:0, כלומר שום דבר לא נפל ביום בהיר
+    // באוקטובר — בדיוק העונה שבשבילה נוסעים.
+    particles(fx, 'leaves'); decorate('clear');         // ברירת מחדל מיידית
+    weather(phase, m => { particles(fx, pmF(m)); decorate(m); });
   }
 
   return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
