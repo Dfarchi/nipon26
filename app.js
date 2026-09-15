@@ -1015,7 +1015,6 @@ window.App = (function () {
   }
 
   const NAV = [
-    ['now.html','עכשיו','<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'],
     ['today.html','היום','<rect x="3.5" y="4.5" width="17" height="16" rx="3.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/>'],
     ['itinerary.html','מסלול','<circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v4.1a4 4 0 0 0 4 4h4"/>'],
     ['wallet.html','ארנק','<rect x="3.5" y="6.5" width="17" height="12" rx="3"/><path d="M3.5 10.5h17"/>'],
@@ -1026,47 +1025,6 @@ window.App = (function () {
     host.innerHTML = NAV.map(([href, label, path]) =>
       `<a href="${href}${q.has('theme') ? '?theme=' + theme : ''}"${href === on ? ' class="on"' : ''}>
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>${label}</a>`).join('');
-  }
-
-  // ===== מה עכשיו =====
-  // מקור אחד לשאלה "איפה אנחנו בתוך היום". גם מסך היום וגם מסך עכשיו
-  // נשענים עליו, אחרת שני המסכים יתפצלו ויגידו דברים שונים באותו רגע.
-  //
-  // רק 25% מהפעילויות נושאות שעה, אבל 57% מהימים מכילים לפחות אחת.
-  // כשיש שעות — מקדמים את האחרונה שעברה. כשאין — אין "עכשיו", יש "היום".
-  const hhmm = s => (String(s).match(/\b([0-2]?\d:[0-5]\d)\b/) || [])[1] || '';
-  const toMin = s => { const t = hhmm(s); if (!t) return null;
-    const [H, M] = t.split(':').map(Number); return H * 60 + M; };
-
-  function whatNow(idx) {
-    const day = (T.days || [])[idx] || {};
-    const acts = (day.acts || []).filter(a => a && a.t);
-    const isToday = !!(dated[idx] && dated[idx].date &&
-                       dated[idx].date.getTime() === today0.getTime());
-    const n = new Date(), nowMin = n.getHours() * 60 + n.getMinutes();
-    const timed = acts.map((a, i) => ({ a, i, m: toMin(a.d) ?? toMin(a.t) })).filter(x => x.m !== null);
-
-    let cursor = 0, lead = 'היום', until = null;
-    if (timed.length) {
-      lead = 'מתחילים';
-      if (isToday) {
-        const passed = timed.filter(x => x.m <= nowMin);
-        if (passed.length) { cursor = passed[passed.length - 1].i; lead = 'עכשיו'; }
-        else { cursor = timed[0].i; until = timed[0].m - nowMin; }
-      } else cursor = timed[0].i;
-    }
-    const nxt = timed.find(x => x.i > cursor && (!isToday || x.m > nowMin));
-    // כשעוד לא התחיל כלום, "הדבר הבא" הוא הסמן עצמו ולא זה שאחריו.
-    // בלי ההבחנה הזו ב-07:15 הוצג "בעוד 7:45 שעות" — המרחק לפעילות
-    // השנייה — במקום 75 הדקות שנותרו לראשונה.
-    const started = lead === 'עכשיו';
-    return {
-      acts, isToday, lead, cursor,
-      cur: acts[cursor] || null,
-      next: nxt ? nxt.a : (acts[cursor + 1] || null),
-      mins: !started ? until : (isToday && nxt ? nxt.m - nowMin : null),
-      time: a => a ? (hhmm(a.d) || hhmm(a.t)) : ''
-    };
   }
 
   // ===== סרגל קפיצה =====
@@ -1159,5 +1117,5 @@ window.App = (function () {
     weather(phase, (m, rec) => { particles(fx, pmF(m)); decorate(m); showWx(m, rec, false); });
   }
 
-  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, whatNow, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

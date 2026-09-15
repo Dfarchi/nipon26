@@ -4,7 +4,7 @@
   "description": "מלווה הטיול של יובל ושיר ביפן, אוקטובר–נובמבר 2026",
   "lang": "he",
   "dir": "rtl",
-  "start_url": "./now.html",
+  "start_url": "./today.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
