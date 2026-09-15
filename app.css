@@ -593,3 +593,17 @@ body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyo
 @media (prefers-reduced-motion:reduce){
   .l-back img,.l-art img{transition:none}
   .l-art img.puff{animation:none;opacity:.3}}
+
+/* ===== הרכס הרחוק =====
+   היה feTurbulence על שני נתיבים שנבנו בקוד. עכשיו תמונה אחת בשני
+   עותקים: הרחוק בהיר וקטן, הקרוב כהה וגדול — פרספקטיבה אטמוספרית.
+   הזרע היומי קובע רוחב, הזזה וגובה, כך שאותו קובץ הוא רכס אחר בכל יום. */
+.l-far{position:absolute;right:0;left:0;bottom:0;height:150px;pointer-events:none;
+  overflow:hidden;will-change:transform}
+.l-far .ridge{position:absolute;height:auto;opacity:0 !important;
+  transition:opacity 1.2s var(--e-out);
+  /* התמונה חתוכה בקו ישר בראשה, וזה נקרא כתפר בין שמיים להרים.
+     המסכה ממיסה את השליש העליון אל השמיים. */
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.18) 26%,rgba(0,0,0,.6) 52%,#000 78%);
+  mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.18) 26%,rgba(0,0,0,.6) 52%,#000 78%)}
+.l-far .ridge.on{opacity:var(--o) !important}

@@ -207,13 +207,13 @@
  "special": {
   "ridges-day": {
    "w": 1280,
-   "h": 287,
-   "kb": 52.3
+   "h": 286,
+   "kb": 98.6
   },
   "ridges-night": {
    "w": 1280,
    "h": 355,
-   "kb": 39.5
+   "kb": 113.5
   },
   "washi-texture": {
    "w": 512,

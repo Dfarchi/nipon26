@@ -860,29 +860,6 @@ window.App = (function () {
       preserveAspectRatio="none" style="height:104px">${SCENE.svg}</svg>`;
   }
 
-  // ---- הרכס הרחוק ----
-  // היה קבוע לנצח (seed="7" ושני נתיבים כתובים ביד). עכשיו הוא נגזר מאותו
-  // זרע יומי כמו הכפר, כולל זרע הרעש — כך שגם קו הרקיע משתנה מיום ליום.
-  function farSVG() {
-    const d = dayIndex() + 1, R1 = rng(d * 31 + 5), R2 = rng(d * 97 + 11);
-    return `<svg class="l-far" viewBox="0 0 390 150" preserveAspectRatio="none" style="height:150px">
-      <defs>
-        <filter id="pt" x="-15%" y="-15%" width="130%" height="130%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.013 0.03" numOctaves="4"
-            seed="${(d * 13) % 89}" result="n"/>
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="13"/><feGaussianBlur stdDeviation="1.6"/></filter>
-        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="var(--ridge)" stop-opacity=".45"/>
-          <stop offset="100%" stop-color="var(--ridge)" stop-opacity="0"/></linearGradient>
-        <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="var(--ridge2)" stop-opacity=".8"/>
-          <stop offset="100%" stop-color="var(--ridge2)" stop-opacity="0"/></linearGradient>
-      </defs>
-      <path filter="url(#pt)" fill="url(#g1)" d="${ridgePath(R1, 64, 52, 7 + 2 * Math.floor(R1() * 2))}"/>
-      <path filter="url(#pt)" fill="url(#g2)" d="${ridgePath(R2, 100, 58, 5 + 2 * Math.floor(R2() * 2))}"/>
-    </svg>`;
-  }
-
   // ---- שכבות הנכסים ----
   // תמונה לא נכנסת ל-.l-village: שם preserveAspectRatio="none" מותח הכל
   // ×1.144 לרוחב, ונתיב SVG לא אכפת לו אבל תמונה מתעוותת. לכן שתי שכבות
@@ -913,6 +890,26 @@ window.App = (function () {
         style="${atXY(lm.x, 74 - c.base)};height:${c.h}px" onload="this.classList.add('on')">`;
     }
     return `<div class="l-art">${s}${((SCENE && SCENE.front) || []).map(propTag).join('')}</div>`;
+  }
+
+  // ---- הרכס הרחוק ----
+  // שני עותקים של אותו קובץ, בגדלים ובהזזות שנגזרים מהזרע היומי: אותה
+  // תמונה נראית כמו רכס אחר בכל יום, בלי לייצר 42 קבצים. הקרוב כהה
+  // וגדול, הרחוק בהיר וקטן — פרספקטיבה אטמוספרית.
+  function farSVG() {
+    const d = dayIndex() + 1, R = rng(d * 31 + 5);
+    const v = theme === 'day' ? 'day' : 'night';
+    // קנה מידה לפי רוחב, וחייב לעבור את רוחב המסך: בקנה מידה לפי גובה
+    // הרכס יצא צר מ-390px ונפער פס ריק בצד. רובו מוסתר מאחורי הכפר —
+    // רק הפסגות מציצות מעליו, וזה בדיוק מה שרוצים מרכס רחוק.
+    const lay = (cls, w, x, y, op) =>
+      `<img class="ridge ${cls}" src="assets/special/ridges-${v}.webp" alt="" decoding="async"
+        style="width:${w.toFixed(0)}%;left:${x.toFixed(0)}%;bottom:${y.toFixed(0)}px;--o:${op}"
+        onload="this.classList.add('on')">`;
+    return `<div class="l-far">
+      ${lay('r-back', 190 + R() * 60, -62 + R() * 30, 34 + R() * 10, .28)}
+      ${lay('r-front', 145 + R() * 40, -34 + R() * 24, 8 + R() * 8, .5)}
+    </div>`;
   }
 
   // עצים מאחורי הבניינים: גג מסתיר עץ ולא להפך
