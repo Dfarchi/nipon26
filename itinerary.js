@@ -8,8 +8,9 @@
     return (i > n * 0.55 ? c.slice(0, i) : c).replace(/[\s·—-]+$/, '') + '…'; };
 
   const phases = (T.phases || []).map((p, i) => ({ p, i }));
+  // parked נשאר כמסנן: אם יחזור שלב מוחנה הוא לא ייכנס למסלול
+  // בטעות. הבלוק שהציג אותם ירד — פוג'י ירד מהנתונים לגמרי.
   const active = phases.filter(x => !x.p.parked);
-  const parked = phases.filter(x => x.p.parked);
 
   const byPhase = {};
   (T.days || []).forEach((d, i) => {
@@ -82,15 +83,8 @@
     });
     h += `</div>`;
 
-    if (parked.length) {
-      h += `<div class="lbl q" style="margin-top:22px">בסימן שאלה<i></i></div>`;
-      parked.forEach(({ p }) => {
-        // בלי כרטיס: אלה לא בתוכנית, והם צריכים להיקרא כהערה ולא כאובייקט
-        h += `<div style="margin-top:10px;padding-inline-start:2px">
-          <div class="t" style="color:var(--soft)">${A.esc(p.h.replace(/^אופציה\s*·\s*/, ''))}</div>
-          <div class="d" style="margin-top:3px">${A.esc(clip(p.p, 160))}</div></div>`;
-      });
-    }
+    // בלוק "בסימן שאלה" ירד: פוג'י הוא מה שהיה בו, והוא כבר לא בנתונים.
+    // אם יחזור שלב מוחנה — צריך להחזיר גם את התצוגה, בכוונה.
 
     document.getElementById('main').innerHTML = h;
     A.reveal(document.getElementById('main'));
