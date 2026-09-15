@@ -217,7 +217,7 @@ window.App = (function () {
 
   // עומק לכל שכבה: [בורר, מקדם גלילה]
   const DEPTH = [['.l-sky', 0.06], ['.l-far', 0.12], ['.l-back', 0.42],
-                 ['.l-village', 0.42], ['.l-art', 0.42], ['.l-chars', 0.42]];
+                 ['.l-village', 0.42], ['.l-house', 0.42], ['.l-art', 0.42], ['.l-chars', 0.42]];
 
   // נקרא גם אחרי decorate(), שמחליף את .l-chars ומשאיר הפניה מתה
   function cacheLayers() {
@@ -377,10 +377,12 @@ window.App = (function () {
     const catImg = (file, h) =>
       `<img class="cat-img" src="assets/cats/${file}.webp" alt="" decoding="async"
         style="height:${ak(h)}px" onload="this.classList.add('on')">`;
-    const morgana = catImg(curl ? 'cat-sleep' : 'morgana-sit', curl ? 21 : 31) +
+    const morgana = catImg(wet ? 'cat-umbrella-morgana' : curl ? 'cat-sleep' : 'morgana-sit',
+                           wet ? 40 : curl ? 21 : 31) +
       `<span class="cat-fallback">${A.cat({ coat: 'var(--cat1)', eye: 'var(--catEye)',
         pose: curl ? 'curl' : 'sit', w: curl ? 34 : 27, delay: 0 })}</span>`;
-    const baltrkis = catImg(curl ? 'cat-sleep' : 'bellatrix-sit', curl ? 19 : 29) +
+    const baltrkis = catImg(wet ? 'cat-umbrella-bellatrix' : curl ? 'cat-sleep' : 'bellatrix-sit',
+                            wet ? 37 : curl ? 19 : 29) +
       `<span class="cat-fallback">${A.cat({ coat: 'var(--cat2)', eye: 'var(--catEye2)',
         pose: curl ? 'curl' : 'sit', w: curl ? 31 : 25, delay: 2.3 })}</span>`;
 
@@ -405,9 +407,9 @@ window.App = (function () {
     const st = (SCENE && SCENE.seats) || [{ x: 258, y: 36 }, { x: 86, y: 39 }, { x: 356, y: 39 }];
     // 3px פנימה אל תוך הגג. חתולה שבסיסה מונח בדיוק על קודקוד הרכס
     // נראית מרחפת מעליו; מעט שקיעה קוראת כישיבה.
-    const at = s => `left:${(s.x / 3.9).toFixed(1)}%;bottom:${ak(74 - s.y - 3)}px`;
+    const at = s => `left:${(s.x / 3.9).toFixed(1)}%;bottom:${ak(74 - s.y)}px`;
     h += `<div class="ch" style="${at(st[0])}">
-      ${wet ? `<div class="brolly">${A.umbrella(30)}</div>` : ''}${morgana}
+      ${morgana}
       ${cold ? '<i class="snowcap"></i>' : ''}</div>`;
     h += `<div class="ch" style="${at(st[1])}">${baltrkis}</div>`;
     h += night
@@ -561,9 +563,9 @@ window.App = (function () {
     <rect x="${x + 1}" y="76.8" width="24" height="1.4" fill="var(--tile)"/>`;
 
   // מכונת משקאות, פנס אבן ונורן — שלושה דברים שרואים ביפן כל יום
-  const STREET = { tokyo: ['vending', 'vending', 'noren'], osaka: ['vending', 'noren', 'vending'],
-                   nagoya: ['vending', 'noren', 'toro'], kyoto: ['toro', 'noren', 'toro'],
-                   village: ['toro', 'noren', 'toro'], mountain: ['toro', 'toro', 'noren'] };
+  const STREET = { tokyo: ['vending', 'vending', 'vending'], osaka: ['vending', 'vending', 'vending'],
+                   nagoya: ['vending', 'vending', 'toro'], kyoto: ['toro', 'toro', 'toro'],
+                   village: ['toro', 'toro', 'toro'], mountain: ['toro', 'toro', 'toro'] };
 
   // הכביש: פס בהיר שמפריד בין הבתים לקדמה, אחרת הכל צף על מישור אחד
   const ROAD = '<path fill="var(--wire)" opacity=".13" d="M-30,84 C90,81 200,86 300,82 L420,84 L420,104 L-30,104 Z"/>';
@@ -627,6 +629,29 @@ window.App = (function () {
   const AK = 1.42;
   const ak = v => +(v * AK).toFixed(1);
 
+  // ---- הבתים ----
+  // r = יחס רוחב/גובה מהקובץ. h = טווח הגובה ביחידות הסצנה. הרוחב תמיד
+  // נגזר מהיחס, אחרת הבית מתעוות.
+  const HOUSE = {
+    'house-gassho-1':  { r: 1.08, h: [30, 40], sink: .30 },
+    'house-gassho-2':  { r: 1.37, h: [28, 37], sink: .30 },
+    'house-gassho-3':  { r: 1.38, h: [28, 37], sink: .30 },
+    'house-machiya-1': { r: 0.97, h: [36, 48], sink: .14 },
+    'house-machiya-2': { r: 1.35, h: [30, 40], sink: .16 },
+    'house-machiya-3': { r: 1.06, h: [36, 48], sink: .14 },
+    'tower-1':         { r: 0.53, h: [44, 66], sink: .03 },
+    'tower-2':         { r: 0.39, h: [48, 72], sink: .03 },
+    'tower-3':         { r: 1.11, h: [30, 42], sink: .04 }
+  };
+  const ROW = {
+    tokyo:    ['tower-1', 'tower-2', 'tower-3'],
+    osaka:    ['tower-2', 'tower-1', 'tower-3'],
+    nagoya:   ['tower-3', 'tower-1', 'tower-2'],
+    kyoto:    ['house-machiya-1', 'house-machiya-2', 'house-machiya-3'],
+    village:  ['house-machiya-2', 'house-machiya-3', 'house-machiya-1'],
+    mountain: ['house-gassho-1', 'house-gassho-2', 'house-gassho-3']
+  };
+
   // ---- נכסי הרחוב ----
   // h הוא גובה ביחידות הסצנה (74 = קו הקרקע). y הוא היכן הבסיס יושב:
   // 96 = על המדרכה לפני הבתים, 74 = על קו הקרקע, 62 = על גג.
@@ -638,7 +663,7 @@ window.App = (function () {
     pole:    { f: 'street/utility-pole',    h: 27, y: 75 },
     tank:    { f: 'street/water-tank',      h: 10, y: 0  },   // y מגיע מהגג
     brolly:  { f: 'street/red-umbrella',    h: 22, y: 97 },
-    smoke:   { f: 'street/chimney-smoke',   h: 30, y: 0  },
+    smoke:   { f: 'street/chimney-smoke',   h: 40, y: 0  },
     pine:    { f: 'street/black-pine',      h: 30, y: 76 },
     maple:   { f: 'street/maple-tree',      h: 32, y: 76 }
   };
@@ -650,11 +675,11 @@ window.App = (function () {
   const LM_IMG = {
     // ‎tokyo-tower-night הגיע כציור שלם עם גלים, שמש ועצי אדר במקום צללית.
     // עד שיוחלף — הקובץ הצבעוני בשתי הערכות. הוא נקרא סביר גם על שמי יום.
-    tokyo:  { f: 'tokyo-tower',   h: 86, base: 0, solo: 'day' },
-    osaka:  { f: 'tsutenkaku',    h: 74, base: 0 },
-    nagoya: { f: 'nagoya-castle', h: 46, base: 0 },
-    kyoto:  { f: 'pagoda',        h: 62, base: 0 },
-    torii:  { f: 'torii',         h: 34, base: 0 }
+    tokyo:  { f: 'tokyo-tower',   h: 94, base: 0, solo: 'day' },
+    osaka:  { f: 'tsutenkaku',    h: 84, base: 0 },
+    nagoya: { f: 'nagoya-castle', h: 62, base: 0 },
+    kyoto:  { f: 'pagoda',        h: 76, base: 0 },
+    torii:  { f: 'torii',         h: 46, base: 0 }
   };
   // הקבצים נקראים ‎-day (צבעוני) ו-‎-night (צללית כהה), וזה הפוך ממה
   // שצריך: צללית כהה נעלמת על שמי לילה, וצבעוני בולט עליהם. בפועל —
@@ -715,130 +740,73 @@ window.App = (function () {
   };
 
   // ---- בניית הסצנה ----
+  // שורת הבתים כבר לא נבנית מצורות SVG אלא מתמונות. לכן אין יותר הגרלת
+  // רוחב וגובה בנפרד: מגרילים גובה, והרוחב נגזר מהיחס של הקובץ. הבתים
+  // נפרסים משמאל לימין עד שהשורה מלאה, עם חפיפה קלה שמשתנה — כך אף שתי
+  // סצנות לא נראות זהות, וגם אין פערים ריקים.
   function buildScene(kind, seed) {
     const P = PROFILE[kind], R = rng(seed);
     const pick = ([a, b]) => a + R() * (b - a);
-    const n = Math.round(pick(P.n));
+    const names = ROW[kind] || ROW.village;
 
-    // פריסה: רוחבים ומרווחים משתנים, ואז נרמול לרוחב המלא
-    const slots = [];
-    let w = [], gap = [];
-    for (let i = 0; i < n; i++) { w.push(26 + R() * 34); gap.push(4 + R() * 14); }
-    const total = w.reduce((a, b) => a + b, 0) + gap.reduce((a, b) => a + b, 0);
-    const k = 450 / total;
-    let x = -30;
-    for (let i = 0; i < n; i++) {
-      const bw = w[i] * k, top = pick(P.hi);
-      slots.push({ x, w: bw, top });
-      x += bw + gap[i] * k;
+    const houses = [], litX = [];
+    let x = -14 - R() * 16;
+    let guard = 0;
+    while (x < 404 && guard++ < 40) {
+      const nm = names[Math.floor(R() * names.length)], c = HOUSE[nm];
+      const h = pick(c.h), w = h * c.r;
+      houses.push({ f: nm, x: x + w / 2, y: 74, h, w, sink: c.sink, flip: R() < .35 });
+      litX.push(x + w / 2);
+      // חפיפה של 4%–16%: בלי חפיפה נפערים חורים, ובחפיפה קבועה זה נראה מסודר מדי
+      x += w * (.84 + R() * .12);
     }
 
-    // ציון הדרך נכנס לפער הרחב ביותר שנמצא בתוך המסגרת הנראית — לא בקצה,
-    // שם הוא נחתך, ולא מתחת לבניין, שם הוא נבלע.
+    // ציון הדרך נכנס לפער הרחב ביותר שנמצא בתוך המסגרת הנראית
     let lmX = 195, bestGap = -1;
-    for (let i = 1; i < slots.length; i++) {
-      const g0 = slots[i - 1].x + slots[i - 1].w, g1 = slots[i].x, mid = (g0 + g1) / 2;
+    for (let i = 1; i < houses.length; i++) {
+      const g0 = houses[i - 1].x + houses[i - 1].w / 2, g1 = houses[i].x - houses[i].w / 2;
+      const mid = (g0 + g1) / 2;
       if (mid < 92 || mid > 298) continue;
       const score = (g1 - g0) * (1 - Math.abs(mid - 195) / 260);
       if (score > bestGap) { bestGap = score; lmX = mid; }
     }
+    if (bestGap < 0) lmX = 120 + R() * 150;
 
-    // שלוש שורות עומק, לא שתיים: רחוקה ושטוחה, אמצעית עם כמה חלונות
-    // עמומים, וקדמית מלאה. שתי שורות נראו כמו קיר; שלוש נראות כמו רחוב.
-    let back = '<g fill="var(--land)" opacity=".5">';
+    // שלוש שורות עומק: שתיים מאחור כצלליות שטוחות, והשורה הקדמית היא
+    // התמונות. שתי שורות נראו כמו קיר; שלוש נראות כמו רחוב שנמשך פנימה.
+    let back = '<g fill="var(--land)" opacity=".2">';
     for (let i = 0; i < 7; i++) {
-      const bx = -20 + i * 62 + R() * 26, bw = 30 + R() * 30, by = 48 + R() * 12;
+      const bx = -20 + i * 62 + R() * 26, bw = 30 + R() * 30, by = 46 + R() * 12;
       back += `<path d="M${bx.toFixed(1)},74 L${bx.toFixed(1)},${by.toFixed(1)} ` +
               `L${(bx + bw).toFixed(1)},${by.toFixed(1)} L${(bx + bw).toFixed(1)},74 Z"/>`;
     }
-    back += '</g><g fill="var(--land)" opacity=".8">';
-    let midLit = '';
+    back += '</g><g fill="var(--land)" opacity=".3">';
     for (let i = 0; i < 6; i++) {
-      const bx = -34 + i * 74 + R() * 34, bw = 34 + R() * 34, by = 40 + R() * 14;
+      const bx = -34 + i * 74 + R() * 34, bw = 34 + R() * 34, by = 38 + R() * 14;
       back += `<path d="M${bx.toFixed(1)},74 L${bx.toFixed(1)},${by.toFixed(1)} ` +
               `L${(bx + bw).toFixed(1)},${by.toFixed(1)} L${(bx + bw).toFixed(1)},74 Z"/>`;
-      if (P.flat) midLit += grid(bx, by, bw, 74 - by, R);
     }
-    back += `</g><g opacity=".28">${midLit}</g>`;
+    back += '</g>';
 
-    let body = '', lights = '', extra = '';
-    const perch = [];
-    let smoked = 0;
-    const litX = [], front = [], back2 = [];
-    slots.forEach((s, i) => {
-      const cx = s.x + s.w / 2;
-      if (P.gassho) {
-        body += `<path d="M${s.x.toFixed(1)},74 L${cx.toFixed(1)},${s.top.toFixed(1)} ` +
-                `L${(s.x + s.w).toFixed(1)},74 Z"/>`;
-        lights += `<rect x="${(cx - 4).toFixed(1)}" y="${(s.top + 22).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>`;
-        // קורות הרוחב של גג הגאשו — הקווים שמסמנים שהוא קש ולא משולש
-        extra += `<g stroke="var(--wire)" stroke-width="1" opacity=".32" fill="none">` +
-                 `<path d="M${(cx - s.w * .22).toFixed(1)},${(s.top + (74 - s.top) * .45).toFixed(1)} ` +
-                 `L${(cx + s.w * .22).toFixed(1)},${(s.top + (74 - s.top) * .45).toFixed(1)}"/>` +
-                 `<path d="M${(cx - s.w * .34).toFixed(1)},${(s.top + (74 - s.top) * .68).toFixed(1)} ` +
-                 `L${(cx + s.w * .34).toFixed(1)},${(s.top + (74 - s.top) * .68).toFixed(1)}"/></g>`;
-      } else if (P.flat) {
-        body += `<path d="M${s.x.toFixed(1)},74 L${s.x.toFixed(1)},${s.top.toFixed(1)} ` +
-                `L${(s.x + s.w).toFixed(1)},${s.top.toFixed(1)} L${(s.x + s.w).toFixed(1)},74 Z"/>`;
-        lights += grid(s.x, s.top, s.w, 74 - s.top, R);
-        if (R() < P.tank) front.push({ p: 'tank', x: cx, y: s.top + 2 });
-        // מעקה גג ואנטנה — הצללית של גג עירוני, לא קו ישר
-        else if (R() < .45) extra += `<rect x="${(s.x + 1).toFixed(1)}" y="${(s.top - 2).toFixed(1)}" ` +
-          `width="${(s.w - 2).toFixed(1)}" height="2" fill="var(--roof)"/>`;
-        if (R() < .3) extra += `<g stroke="var(--wire)" stroke-width=".8" opacity=".6" fill="none">` +
-          `<path d="M${(cx + 6).toFixed(1)},${s.top.toFixed(1)} L${(cx + 6).toFixed(1)},${(s.top - 9).toFixed(1)}"/>` +
-          `<path d="M${(cx + 3).toFixed(1)},${(s.top - 6).toFixed(1)} L${(cx + 9).toFixed(1)},${(s.top - 6).toFixed(1)}"/></g>`;
-      } else {
-        const wallTop = s.top + 12, half = s.w / 2 - 2;
-        body += `<path d="M${(s.x + 3).toFixed(1)},74 L${(s.x + 3).toFixed(1)},${wallTop.toFixed(1)} ` +
-                `L${(s.x + s.w - 3).toFixed(1)},${wallTop.toFixed(1)} L${(s.x + s.w - 3).toFixed(1)},74 Z"/>` +
-                tileRoof2(cx, s.top, half, 12) + ridgeEnds(cx, s.top, half);
-        lights += `<rect x="${(cx - 9).toFixed(1)}" y="${(wallTop + 5).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>` +
-                  `<rect x="${(cx + 1).toFixed(1)}" y="${(wallTop + 5).toFixed(1)}" width="8" height="9" rx="1.2" fill="var(--lit)"/>`;
-        // מרזב: קו דק לאורך שולי הגג, ואז מוריד בפינה
-        extra += `<g stroke="var(--land)" stroke-width=".7" opacity=".45" fill="none">` +
-                 `<path d="M${(cx - half - 3).toFixed(1)},${(s.top + 12.8).toFixed(1)} ` +
-                 `L${(cx + half + 3).toFixed(1)},${(s.top + 12.8).toFixed(1)}"/>` +
-                 `<path d="M${(cx + half + 1).toFixed(1)},${(s.top + 12.8).toFixed(1)} ` +
-                 `L${(cx + half + 1).toFixed(1)},74"/></g>`;
-      }
-      // ארובה מעשנת — על בית אחד בלבד, לא על כולם
-      if (P.smoke && !smoked && cx > 60 && cx < 320 && R() < .5) {
-        // לא על הרכס: שם יושבת החתולה. מעט הצידה, על המדרון.
-        const dx = s.w * .17, ry = s.top + (P.gassho ? (74 - s.top) * .34 : 4);
-        extra += chimneyStack(cx + dx, ry);
-        front.push({ p: 'smoke', x: cx + dx + 2.5, y: ry - 9 });
-        smoked = 1;
-      }
-      // מועמד למושב: גג שלא נחתך בקצה ולא מתחת לציון הדרך
-      if (cx > 56 && cx < 322 && Math.abs(cx - lmX) > 34) perch.push({ x: cx, y: s.top });
-      litX.push(cx);
-    });
-    if (P.smoke && !smoked && slots.length) {
-      const s = slots[Math.floor(slots.length / 2)];
-      const cy = s.top + (74 - s.top) * .34, cxx = s.x + s.w * .67;
-      extra += chimneyStack(cxx, cy);
-      front.push({ p: 'smoke', x: cxx + 2.5, y: cy - 9 });
-    }
+    const front = [], back2 = [];
 
+    // עמוד חשמל בקצה, מכל מים על גג
     for (let i = 0; i < P.pole; i++)
       front.push({ p: 'pole', x: R() < .5 ? 24 + R() * 40 : 326 + R() * 40,
                    h: PROP.pole.h * (.85 + R() * .3), flip: R() < .5 });
-    // שלטים נתלים על חזיתות. קודם הם ריחפו באמצע האוויר.
-    let signs = P.sign || 0;
-    for (const s of slots.slice().sort(() => R() - .5)) {
-      if (!signs) break;
-      const cx = s.x + s.w / 2, tall = 74 - s.top;
-      if (s.w < 22 || tall < 26 || cx < 20 || cx > 370 || Math.abs(cx - lmX) < 26) continue;
-      const sx = R() < .5 ? s.x + 2.4 : s.x + s.w - 9.8;
-      extra += signAt(sx, s.top + 4 + R() * 5, Math.min(30, tall * .52), R);
-      signs--;
+
+
+    // עשן מגג אחד. בגאשו העשן יוצא מהקש עצמו — אין ארובה, וזה נכון.
+    if (P.smoke) {
+      const mid = houses.filter(hs => hs.x > 60 && hs.x < 320);
+      const hs = mid[Math.floor(R() * mid.length)] || houses[0];
+      if (hs) front.push({ p: 'smoke', x: hs.x + hs.w * .2, y: 74 - hs.h + 4 });
     }
-    // עצים נכנסים לפערים שבין הבניינים, ונצבעים לפני הבניינים כדי שגג
-    // יסתיר עץ ולא להפך. קודם הם נחתו על הגגות ונראו כמו מדבקות.
+
+    // עצים בפערים, מאחורי הבתים
     const gaps = [];
-    for (let i = 1; i < slots.length; i++) {
-      const g0 = slots[i - 1].x + slots[i - 1].w, g1 = slots[i].x;
+    for (let i = 1; i < houses.length; i++) {
+      const g0 = houses[i - 1].x + houses[i - 1].w / 2, g1 = houses[i].x - houses[i].w / 2;
       if (g1 - g0 > 6) gaps.push({ x: (g0 + g1) / 2, w: g1 - g0 });
     }
     gaps.sort((a, b) => b.w - a.w);
@@ -849,28 +817,29 @@ window.App = (function () {
       back2.push({ p: k, x: tx, h: PROP[k].h * (.72 + R() * .5), flip: R() < .5 });
     }
 
-    // קומת הרחוב — שלושה עצמים, פרוסים על שליש־שליש־שליש
+    // קומת הרחוב
     let shop = '';
     (STREET[kind] || STREET.village).forEach((k, i) => {
-      const x = 34 + i * 112 + R() * 54;
-      if (k === 'noren') shop += `<path fill="var(--roof)" d="M${x - 13},96 L${x - 13},74 ` +
-        `L${x + 13},74 L${x + 13},96 Z"/><path fill="var(--tile)" d="M${x - 15},75 L${x + 15},75 ` +
-        `L${x + 15},71.5 L${x - 15},71.5 Z"/>`;
-      front.push({ p: k, x, flip: R() < .4 });
+      const sx = 34 + i * 112 + R() * 54;
+      if (k === 'noren') shop += `<path fill="var(--roof)" d="M${sx - 13},96 L${sx - 13},74 ` +
+        `L${sx + 13},74 L${sx + 13},96 Z"/><path fill="var(--tile)" d="M${sx - 15},75 L${sx + 15},75 ` +
+        `L${sx + 15},71.5 L${sx - 15},71.5 Z"/>`;
+      front.push({ p: k, x: sx, flip: R() < .4 });
     });
 
-    // שלושה מושבים, מפוזרים: שמאל, אמצע, ימין
-    perch.sort((a, b) => a.x - b.x);
+    // מושבי החתולות: גג של בית שלא נחתך בקצה ולא מתחת לציון הדרך
+    const clear = hs => !houses.some(o => o !== hs && o.h > hs.h + 1 &&
+      Math.abs(o.x - hs.x) < o.w / 2);
+    const perch = houses
+      .filter(hs => hs.x > 56 && hs.x < 322 && Math.abs(hs.x - lmX) > 34 && clear(hs))
+      .map(hs => ({ x: hs.x, y: 74 - hs.h + hs.h * hs.sink }))
+      .sort((a, b) => a.x - b.x);
     const seat = i => perch.length ? perch[Math.min(perch.length - 1, Math.round(i * (perch.length - 1)))] : { x: 195, y: 40 };
-    const seats = [seat(.68), seat(.2), seat(.95)];
 
-    const fill = P.gassho || !P.flat ? 'var(--tile)' : 'var(--roof)';
     return {
-      svg: `${GROUND}${back}` +
-           `<g fill="${fill}" class="plate">${body}</g>` +
-           `<g class="lm-fallback">${LM[P.lm](lmX)}</g>` +
-           `<g opacity=".9">${lights}</g>${P.canal ? canalAt(R, litX) : ROAD}${shop}${extra}`,
-      seats, front, back: back2,
+      svg: `${GROUND}${back}${P.canal ? canalAt(R, litX) : ROAD}${shop}`,
+      seats: [seat(.68), seat(.2), seat(.95)],
+      houses, front, back: back2,
       lm: { kind: P.lm, x: lmX }
     };
   }
@@ -906,6 +875,14 @@ window.App = (function () {
 
   function propLayer(cls, list) {
     return `<div class="${cls}">${(list || []).map(propTag).join('')}</div>`;
+  }
+
+  // שורת הבתים: שכבה משלה, מתחת לציון הדרך ולקומת הרחוב
+  function houseLayer() {
+    return `<div class="l-house">` + ((SCENE && SCENE.houses) || []).map(hs =>
+      `<img src="assets/houses/${hs.f}.webp" alt="" decoding="async"
+        style="${atXY(hs.x, hs.y)};height:${ak(hs.h)}px${hs.flip ? ';--fx:-1' : ''}"
+        onload="this.classList.add('on')">`).join('') + `</div>`;
   }
 
   function lmLayer() {
@@ -955,7 +932,7 @@ window.App = (function () {
     const village = villageSVG();
     host.innerHTML = `<div class="art"></div>${skyLayer()}<div class="fx" id="fx"></div>
       ${farSVG()}
-      ${backLayer()}${village}
+      ${backLayer()}${village}${houseLayer()}
       ${lmLayer()}
       ${charLayer('')}<div class="haze" id="haze"></div><div class="hem"></div>`;
   }

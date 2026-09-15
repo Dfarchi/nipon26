@@ -14,7 +14,10 @@ from PIL import Image
 
 # קבוצה: (גודל מרבי, רשימת שמות). גודל 0 = לא מקטינים.
 TABLE = {
-    'cats':      (448, ['morgana-sit', 'bellatrix-sit', 'cat-sleep', 'cat-tail-up']),
+    'cats':      (448, ['morgana-sit', 'bellatrix-sit', 'cat-sleep', 'cat-tail-up',
+                        'cat-umbrella-morgana', 'cat-umbrella-bellatrix']),
+    # הבניינים עצמם. 384 כי הם מוצגים עד ~100px לוגיים על מסך ×3.
+    'houses':    (384, ['house-gassho', 'house-machiya', 'tower']),
     'landmarks': (256, ['torii', 'pagoda', 'tokyo-tower', 'tsutenkaku', 'nagoya-castle']),
     'street':    (256, ['gassho-farmhouse', 'maple-tree', 'black-pine', 'vending-machine',
                         'toro', 'noren', 'chochin', 'utility-pole', 'water-tank',

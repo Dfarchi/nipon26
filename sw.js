@@ -2,7 +2,7 @@
    קליפה: cache-first (מהיר, עובד אופליין).
    trip.json: network-first (תוכן הטיול זז כל יום — רוצים את הטרי, עם נפילה לעותק).
    מארחים חיצוניים (leaflet, אריחי מפה): לא נוגעים — הם לא זמינים אופליין ממילא. */
-const V = '2026091543';
+const V = '2026091548';
 const SHELL = 'nipon26-shell-' + V;
 const DATA  = 'nipon26-data-' + V;
 
@@ -26,24 +26,29 @@ const SHELL_FILES = [
   './assets/street/maple-tree.webp', './assets/street/noren.webp',
   './assets/street/red-umbrella.webp', './assets/street/toro.webp',
   './assets/street/utility-pole.webp', './assets/street/vending-machine.webp',
-  './assets/street/water-tank.webp', './assets/cats/bellatrix-sit.webp',
-  './assets/cats/cat-sleep.webp', './assets/cats/cat-tail-up.webp',
-  './assets/cats/morgana-sit.webp', './assets/food/dango.webp',
-  './assets/food/gyutan.webp', './assets/food/matcha.webp',
-  './assets/food/nigiri-salmon.webp', './assets/food/onigiri.webp',
-  './assets/food/ramen.webp', './assets/food/takoyaki.webp',
-  './assets/food/yaki-imo.webp', './assets/shuin/shuin-circle.webp',
-  './assets/shuin/shuin-flower.webp', './assets/shuin/shuin-mountain.webp',
-  './assets/shuin/shuin-octagon.webp', './assets/shuin/shuin-square.webp',
-  './assets/shuin/shuin-wave.webp', './assets/vignettes/vig-birds.webp',
-  './assets/vignettes/vig-chimney-smoke.webp', './assets/vignettes/vig-moon.webp',
-  './assets/vignettes/vig-tokyo-tower-night.webp', './assets/sky/birds.webp',
-  './assets/sky/clouds-day.webp', './assets/sky/clouds-night.webp',
-  './assets/sky/leaf-1.webp', './assets/sky/leaf-2.webp',
-  './assets/sky/leaf-3.webp', './assets/sky/leaf-4.webp',
-  './assets/sky/leaf-5.webp', './assets/sky/moon.webp',
-  './assets/sky/sun.webp', './assets/special/ridges-day.webp',
-  './assets/special/ridges-night.webp'
+  './assets/street/water-tank.webp', './assets/houses/house-gassho-1.webp',
+  './assets/houses/house-gassho-2.webp', './assets/houses/house-gassho-3.webp',
+  './assets/houses/house-machiya-1.webp', './assets/houses/house-machiya-2.webp',
+  './assets/houses/house-machiya-3.webp', './assets/houses/tower-1.webp',
+  './assets/houses/tower-2.webp', './assets/houses/tower-3.webp',
+  './assets/cats/bellatrix-sit.webp', './assets/cats/cat-sleep.webp',
+  './assets/cats/cat-tail-up.webp', './assets/cats/cat-umbrella-bellatrix.webp',
+  './assets/cats/cat-umbrella-morgana.webp', './assets/cats/morgana-sit.webp',
+  './assets/food/dango.webp', './assets/food/gyutan.webp',
+  './assets/food/matcha.webp', './assets/food/nigiri-salmon.webp',
+  './assets/food/onigiri.webp', './assets/food/ramen.webp',
+  './assets/food/takoyaki.webp', './assets/food/yaki-imo.webp',
+  './assets/shuin/shuin-circle.webp', './assets/shuin/shuin-flower.webp',
+  './assets/shuin/shuin-mountain.webp', './assets/shuin/shuin-octagon.webp',
+  './assets/shuin/shuin-square.webp', './assets/shuin/shuin-wave.webp',
+  './assets/vignettes/vig-birds.webp', './assets/vignettes/vig-chimney-smoke.webp',
+  './assets/vignettes/vig-moon.webp', './assets/vignettes/vig-tokyo-tower-night.webp',
+  './assets/sky/birds.webp', './assets/sky/clouds-day.webp',
+  './assets/sky/clouds-night.webp', './assets/sky/leaf-1.webp',
+  './assets/sky/leaf-2.webp', './assets/sky/leaf-3.webp',
+  './assets/sky/leaf-4.webp', './assets/sky/leaf-5.webp',
+  './assets/sky/moon.webp', './assets/sky/sun.webp',
+  './assets/special/ridges-day.webp', './assets/special/ridges-night.webp'
 ];
 
 self.addEventListener('install', e => {

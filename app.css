@@ -690,3 +690,18 @@ body.is-day .card.ph > .vig.on{opacity:.26}
    מקבלת מרווח שמוריד את התוכן מתחת לסצנה. במסך "היום" הילד הראשון הוא
    כרטיס הספירה ולא ‎.head, ולכן שם שום דבר לא זז. */
 #main > .head:first-child{margin-top:calc(min(46vh,396px) - 176px)}
+
+/* ===== שורת הבתים =====
+   הבתים הם תמונות ולכן שכבת div משלהם, מתחת לציון הדרך ולקומת הרחוב.
+   בלילה הגוף מוכהה אבל החלונות המוארים נשמרים: ‎saturate מרים את הצהוב
+   בדיוק כמה ש-‎brightness מוריד אותו. */
+.l-house{position:absolute;right:-28px;left:-28px;
+  bottom:calc(30px * var(--ak,1));height:calc(74px * var(--ak,1));
+  pointer-events:none;will-change:transform}
+.l-house img{position:absolute;width:auto;
+  transform:translateX(-50%) scaleX(var(--fx,1));
+  opacity:0;transition:opacity .4s var(--e-out);
+  filter:brightness(.46) saturate(1.45) contrast(1.12)}
+.l-house img.on{opacity:1}
+body.is-day .l-house img{filter:none}
+@media (prefers-reduced-motion:reduce){.l-house img{transition:none}}
