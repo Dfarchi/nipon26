@@ -222,19 +222,37 @@ window.App = (function () {
     if (!cfg.n) return;
     const rnd = (a, b) => a + Math.random() * (b - a);
     for (let i = 0; i < cfg.n; i++) {
-      const el = document.createElement(mode === 'leaves' ? 'img' : 'i');
+      const el = document.createElement('i');
       const size = rnd(cfg.min, cfg.max), dur = rnd(cfg.dur[0], cfg.dur[1]);
+      // השהיה שלילית מתחילה את האנימציה באמצע במקום לחכות לה: אחרת
+      // השמיים ריקים עד 19 שניות אחרי הטעינה, וזו בדיוק השנייה שבה
+      // מסתכלים על המסך.
+      const off = -rnd(0, dur).toFixed(1);
       if (mode === 'leaves') {
         // חמישה עלים אמיתיים במקום נתיב אחד עם fill מתחלף. בלילה הם
         // מוכהים בפילטר ולא בפלטת צבעים שנייה — עלה מואר כמו ביום מול
         // שמי לילה קורא כמדבקה.
-        el.src = `assets/sky/leaf-${1 + (i % 5)}.webp`;
-        el.alt = '';
-        el.decoding = 'async';
-        el.style.cssText = `position:absolute;width:${size}px;height:auto;right:${rnd(-2, 100)}%;
+        //
+        // התנועה מורכבת משלושה דברים כמו בקנבס של האתר: סחיפה קבועה
+        // הצידה (הרוח), נדנוד סביבה, וסיבוב עצמי. כל אחד על שכבה משלו
+        // כי כולם כותבים ‎transform.
+        el.style.cssText = `position:absolute;right:${rnd(-2, 100)}%;--po:1;
+          --k:${rnd(.12, .42).toFixed(2)};
+          animation:fall ${dur}s linear ${off}s infinite`;
+        const sw = document.createElement('span');
+        sw.style.cssText = `display:block;--sw:${rnd(4, 11).toFixed(1)}px;
+          animation:leaf-sway ${rnd(1.8, 3.4).toFixed(2)}s ease-in-out ${-rnd(0, 3).toFixed(2)}s infinite alternate`;
+        const img = document.createElement('img');
+        img.src = `assets/sky/leaf-${1 + (i % 5)}.webp`;
+        img.alt = '';
+        img.decoding = 'async';
+        img.style.cssText = `display:block;width:${size}px;height:auto;
+          --spin:${i % 2 ? '' : '-'}360deg;
           opacity:${theme === 'night' ? .62 : .82};
           filter:${theme === 'night' ? 'brightness(.52) saturate(.8)' : 'none'};
-          animation:fall ${dur}s linear ${rnd(0, dur)}s infinite`;
+          animation:leaf-spin ${rnd(3.5, 8).toFixed(2)}s linear ${off}s infinite`;
+        sw.appendChild(img);
+        el.appendChild(sw);
       } else if (mode === 'rain') {
         // הטיפות היו ברוחב 1.5px ובגרדיאנט בהיר, ועל שמי יום חיוורים הן
         // פשוט לא נראו. עכשיו עבות יותר, ארוכות יותר, ובצבע שמתהפך עם
@@ -243,11 +261,13 @@ window.App = (function () {
           ? 'rgba(198,222,238,.78)' : 'rgba(74,104,128,.62)';
         el.style.cssText = `position:absolute;width:${size}px;height:${rnd(20, 38)}px;right:${rnd(-4, 102)}%;
           background:linear-gradient(transparent,${wet});border-radius:2px;
-          animation:drop ${dur}s linear ${rnd(0, dur)}s infinite`;
+          animation:drop ${dur}s linear ${off}s infinite`;
       } else {
+        // גם השלג נסחף, רק פחות — פתית כבד מעלה ולא מתהפך ברוח.
         el.style.cssText = `position:absolute;width:${size}px;height:${size}px;right:${rnd(-2, 100)}%;
           background:rgba(255,255,255,.8);border-radius:50%;
-          animation:fall ${dur}s linear ${rnd(0, dur)}s infinite`;
+          --k:${rnd(.05, .15).toFixed(2)};
+          animation:fall ${dur}s linear ${off}s infinite`;
       }
       host.appendChild(el);
     }

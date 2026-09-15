@@ -479,8 +479,17 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
   background:linear-gradient(transparent 32%,color-mix(in srgb,var(--skyEnd) 62%,#c9d6dd) 100%)}
 .scene .haze.on{opacity:1}
 
-@keyframes fall{0%{transform:translateY(-40px) rotate(0);opacity:0}
-  10%{opacity:.8}88%{opacity:.8}100%{transform:translateY(46vh) rotate(340deg);opacity:0}}
+/* ===== נפילה אלכסונית =====
+   העלה לא נופל ישר למטה. ‎--k הוא זווית הרוח — כמה הוא נסחף הצידה ביחס
+   למרחק הנפילה, כך שהזווית זהה בכל גובה מסך — ו-‎--sw הוא הנדנוד סביבה. שלוש שכבות ולא אחת, כי
+   שלוש האנימציות כותבות ‎transform — על אותו אלמנט האחרונה דורסת את
+   הקודמות. החיצונית נופלת באלכסון, האמצעית מתנדנדת, התמונה מסתובבת. */
+@keyframes fall{0%{transform:translate(0,-40px);opacity:0}
+  10%{opacity:var(--po,.8)}88%{opacity:var(--po,.8)}
+  100%{transform:translate(calc((var(--sceneH) + 40px) * var(--k,0) * -1),
+                          calc(var(--sceneH) + 40px));opacity:0}}
+@keyframes leaf-sway{from{transform:translateX(calc(var(--sw) * -1))}to{transform:translateX(var(--sw))}}
+@keyframes leaf-spin{from{transform:rotate(0)}to{transform:rotate(var(--spin,360deg))}}
 @keyframes drop{0%{transform:translate(0,-40px) rotate(9deg);opacity:0}
   8%{opacity:1}
   100%{transform:translate(-26px,50vh) rotate(9deg);opacity:0}}
