@@ -68,7 +68,7 @@ body.is-day{
 html,body{margin:0;padding:0;direction:rtl;text-align:right}
 body{background:var(--skyEnd);color:var(--ink);font-family:'Heebo','Segoe UI',Tahoma,sans-serif;
   line-height:var(--lh-base);font-size:var(--fs-body);min-height:100vh;transition:background .6s}
-.scene{position:fixed;top:0;right:0;left:0;height:44vh;max-height:340px;z-index:0;pointer-events:none;
+.scene{position:fixed;top:0;right:0;left:0;height:46vh;max-height:396px;z-index:0;pointer-events:none;
   transform-origin:50% 0;will-change:transform,opacity;
   background:linear-gradient(175deg,var(--sky1) 0%,var(--sky2) 40%,var(--sky3) 66%,var(--skyEnd) 100%);transition:background .6s}
 .scene .art{position:absolute;inset:0;background-size:cover;background-position:center}
@@ -451,9 +451,10 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 @keyframes soar{0%{transform:translate(14vw,6px)}100%{transform:translate(-90vw,-14px)}}
 
 /* ===== דמויות על הגגות ===== */
-.l-chars{position:absolute;right:-28px;left:-28px;bottom:30px;height:74px}
+.l-chars{position:absolute;right:-28px;left:-28px;
+  bottom:calc(30px * var(--ak,1));height:calc(74px * var(--ak,1))}
 .l-chars .ch{position:absolute;transform:translateX(-50%);line-height:0}
-.l-chars .wire{position:absolute;right:0;left:0;bottom:56px;width:100%;height:12px;opacity:.9}
+.l-chars .wire{position:absolute;right:0;left:0;bottom:calc(56px * var(--ak,1));width:100%;height:12px;opacity:.9}
 .art-cat,.art-fig,.art-lantern{overflow:visible}
 .art-cat .tail{transform-box:view-box;transform-origin:29px 32px;animation:sway 3.4s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(12deg)}}
@@ -466,7 +467,8 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 @keyframes hang{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}
 .l-chars .walk{animation:stroll 54s linear infinite}
 @keyframes stroll{0%{left:-8%}100%{left:104%}}
-.l-chars .brolly{position:absolute;bottom:20px;left:50%;transform:translateX(-46%);line-height:0}
+.l-chars .brolly{position:absolute;bottom:calc(16px * var(--ak,1));left:50%;
+  transform:translateX(-34%) rotate(-13deg);transform-origin:50% 100%;line-height:0}
 .l-chars .snowcap{position:absolute;top:2px;left:50%;transform:translateX(-50%);
   width:16px;height:6px;border-radius:8px 8px 3px 3px;background:#f2f6f8;opacity:.92}
 
@@ -477,7 +479,9 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 
 @keyframes fall{0%{transform:translateY(-40px) rotate(0);opacity:0}
   10%{opacity:.8}88%{opacity:.8}100%{transform:translateY(46vh) rotate(340deg);opacity:0}}
-@keyframes drop{0%{transform:translateY(-30px);opacity:0}10%{opacity:.7}100%{transform:translateY(46vh);opacity:0}}
+@keyframes drop{0%{transform:translate(0,-40px) rotate(9deg);opacity:0}
+  8%{opacity:1}
+  100%{transform:translate(-26px,50vh) rotate(9deg);opacity:0}}
 @media (prefers-reduced-motion:reduce){
   .scene .fx{display:none}
   .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{transform:none !important}
@@ -575,7 +579,8 @@ body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyo
    שתי שכבות div, אחת מכל צד של .l-village: תמונה שנכנסת ל-SVG נמתחת
    שם ×1.144 לרוחב ומתעוותת. אותה מערכת צירים כמו .l-chars ואותו עודף
    28px לכל צד, כך שהאחוזים מתיישרים בין השכבות. */
-.l-back,.l-art{position:absolute;right:-28px;left:-28px;bottom:30px;height:74px;
+.l-back,.l-art{position:absolute;right:-28px;left:-28px;
+  bottom:calc(30px * var(--ak,1));height:calc(74px * var(--ak,1));
   pointer-events:none;will-change:transform}
 .l-back img,.l-art img{position:absolute;width:auto;
   transform:translateX(-50%) scaleX(var(--fx,1));
@@ -677,3 +682,11 @@ body.is-day .stamp span{color:var(--hi)}
 body.is-day .card.ph > .vig.on{opacity:.26}
 .card.ph > .exp,.card.ph > .ph-body{position:relative;z-index:1}
 @media (prefers-reduced-motion:reduce){.card.ph > .vig{transition:none;transform:none}}
+
+/* ===== מרווח לנוף =====
+   ‎.scene הוא fixed והתוכן נגלל מעליו — זו הכוונה. אבל בגלילה 0 הכרטיס
+   הראשון נחת על הכפר וכיסה בדיוק את קומת הרחוב: פנסי האבן, הנורן,
+   מכונות המשקאות. במסכים שמתחילים בכותרת (מסלול, משימות, כלים) הכותרת
+   מקבלת מרווח שמוריד את התוכן מתחת לסצנה. במסך "היום" הילד הראשון הוא
+   כרטיס הספירה ולא ‎.head, ולכן שם שום דבר לא זז. */
+#main > .head:first-child{margin-top:calc(min(46vh,396px) - 176px)}

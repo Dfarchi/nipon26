@@ -165,7 +165,7 @@ window.App = (function () {
   // ===== חלקיקים: עלים / גשם / שלג =====
   const PARTICLE = {
     leaves: { n: 9,  cls: 'leaf',  min: 9,  max: 15, dur: [11, 19] },
-    rain:   { n: 34, cls: 'drop',  min: 1,  max: 2,  dur: [0.7, 1.3] },
+    rain:   { n: 54, cls: 'drop',  min: 1.6, max: 2.9, dur: [0.6, 1.1] },
     snow:   { n: 26, cls: 'snow',  min: 3,  max: 6,  dur: [7, 14] },
     mist:   { n: 0 }, clear: { n: 0 }
   };
@@ -191,8 +191,13 @@ window.App = (function () {
           filter:${theme === 'night' ? 'brightness(.52) saturate(.8)' : 'none'};
           animation:fall ${dur}s linear ${rnd(0, dur)}s infinite`;
       } else if (mode === 'rain') {
-        el.style.cssText = `position:absolute;width:${size}px;height:${rnd(12, 22)}px;right:${rnd(-2, 100)}%;
-          background:linear-gradient(transparent,rgba(180,210,230,.55));border-radius:2px;
+        // הטיפות היו ברוחב 1.5px ובגרדיאנט בהיר, ועל שמי יום חיוורים הן
+        // פשוט לא נראו. עכשיו עבות יותר, ארוכות יותר, ובצבע שמתהפך עם
+        // הערכה: כהה על שמיים בהירים, בהיר על שמי לילה.
+        const wet = theme === 'night'
+          ? 'rgba(198,222,238,.78)' : 'rgba(74,104,128,.62)';
+        el.style.cssText = `position:absolute;width:${size}px;height:${rnd(20, 38)}px;right:${rnd(-4, 102)}%;
+          background:linear-gradient(transparent,${wet});border-radius:2px;
           animation:drop ${dur}s linear ${rnd(0, dur)}s infinite`;
       } else {
         el.style.cssText = `position:absolute;width:${size}px;height:${size}px;right:${rnd(-2, 100)}%;
@@ -371,7 +376,7 @@ window.App = (function () {
     // וברוחב 30 הן יצאו 48 גבוהות — כפול מהווקטור, ותמרו מעל הבתים.
     const catImg = (file, h) =>
       `<img class="cat-img" src="assets/cats/${file}.webp" alt="" decoding="async"
-        style="height:${h}px" onload="this.classList.add('on')">`;
+        style="height:${ak(h)}px" onload="this.classList.add('on')">`;
     const morgana = catImg(curl ? 'cat-sleep' : 'morgana-sit', curl ? 21 : 31) +
       `<span class="cat-fallback">${A.cat({ coat: 'var(--cat1)', eye: 'var(--catEye)',
         pose: curl ? 'curl' : 'sit', w: curl ? 34 : 27, delay: 0 })}</span>`;
@@ -400,7 +405,7 @@ window.App = (function () {
     const st = (SCENE && SCENE.seats) || [{ x: 258, y: 36 }, { x: 86, y: 39 }, { x: 356, y: 39 }];
     // 3px פנימה אל תוך הגג. חתולה שבסיסה מונח בדיוק על קודקוד הרכס
     // נראית מרחפת מעליו; מעט שקיעה קוראת כישיבה.
-    const at = s => `left:${(s.x / 3.9).toFixed(1)}%;bottom:${(74 - s.y - 3).toFixed(1)}px`;
+    const at = s => `left:${(s.x / 3.9).toFixed(1)}%;bottom:${ak(74 - s.y - 3)}px`;
     h += `<div class="ch" style="${at(st[0])}">
       ${wet ? `<div class="brolly">${A.umbrella(30)}</div>` : ''}${morgana}
       ${cold ? '<i class="snowcap"></i>' : ''}</div>`;
@@ -612,6 +617,15 @@ window.App = (function () {
   const tileRoof2 = (cx, y, half, drop) =>
     `<path d="M${cx - half - 4},${y + drop} Q${cx - half},${y + drop - 3} ${cx - half + 3},${y + drop - 4} ` +
     `L${cx},${y} L${cx + half - 3},${y + drop - 4} Q${cx + half},${y + drop - 3} ${cx + half + 4},${y + drop} Z"/>`;
+
+  // ===== קנה המידה של הבלוק המצויר =====
+  // כל הקואורדינטות הפנימיות של הסצנה נשארות כפי שהן (74 = קו הקרקע,
+  // 104 = גובה ה-viewBox). מה שמשתנה הוא הגובה שבו הן מרונדרות. ה-SVG
+  // הוא preserveAspectRatio="none", ולכן הוא נמתח לגובה בלי להתרחב —
+  // בדיוק מה שצריך: הבתים היו רחבים 65px וגבוהים 30, שטוחים מדי.
+  // הערך מוזרק כ---ak, כך שה-CSS וה-JS קוראים מאותו מקום.
+  const AK = 1.42;
+  const ak = v => +(v * AK).toFixed(1);
 
   // ---- נכסי הרחוב ----
   // h הוא גובה ביחידות הסצנה (74 = קו הקרקע). y הוא היכן הבסיס יושב:
@@ -870,7 +884,7 @@ window.App = (function () {
                : /אלפים|קויאסאן/.test(st) ? 'mountain' : 'village';
     SCENE = buildScene(kind, dayIndex() + 1);
     return `<svg class="l-village" data-kind="${kind}" viewBox="0 0 390 104"
-      preserveAspectRatio="none" style="height:104px">${SCENE.svg}</svg>`;
+      preserveAspectRatio="none" style="height:${ak(104)}px">${SCENE.svg}</svg>`;
   }
 
   // ---- שכבות הנכסים ----
@@ -879,14 +893,14 @@ window.App = (function () {
   // div משלהן — אחת מאחורי הבניינים (עצים) ואחת לפניהם (רחוב, ציון דרך) —
   // באותו עומק פארלקס ובאותה המרת קואורדינטות של .l-chars:
   //     left = x / 3.9 %   ·   bottom = 74 − y
-  const atXY = (x, y) => `left:${(x / 3.9).toFixed(1)}%;bottom:${(74 - y).toFixed(1)}px`;
+  const atXY = (x, y) => `left:${(x / 3.9).toFixed(1)}%;bottom:${ak(74 - y)}px`;
 
   function propTag(o) {
     const c = PROP[o.p];
     if (!c) return '';
     const h = o.h || c.h, y = o.y != null ? o.y : c.y;
     return `<img src="assets/${c.f}.webp" alt="" decoding="async" class="${o.p === 'smoke' ? 'puff' : ''}"
-      style="${atXY(o.x, y)};height:${h.toFixed(1)}px${o.flip ? ';--fx:-1' : ''}"
+      style="${atXY(o.x, y)};height:${ak(h)}px${o.flip ? ';--fx:-1' : ''}"
       onload="this.classList.add('on')">`;
   }
 
@@ -900,7 +914,7 @@ window.App = (function () {
     if (lm && LM_IMG[lm.kind]) {
       const c = LM_IMG[lm.kind];
       s = `<img src="${lmFile(lm.kind)}" alt="" decoding="async"
-        style="${atXY(lm.x, 74 - c.base)};height:${c.h}px" onload="this.classList.add('on')">`;
+        style="${atXY(lm.x, 74 - c.base)};height:${ak(c.h)}px" onload="this.classList.add('on')">`;
     }
     return `<div class="l-art">${s}${((SCENE && SCENE.front) || []).map(propTag).join('')}</div>`;
   }
@@ -931,6 +945,7 @@ window.App = (function () {
   // ---- ציור הסצנה ----
   function scene(host) {
     const r = document.documentElement.style;
+    host.style.setProperty('--ak', AK);
     document.body.classList.toggle('is-day', theme === 'day');
     const mt = document.querySelector('meta[name=theme-color]');
     if (mt) mt.content = theme === 'day' ? '#f3ece0' : '#0b0e14';
