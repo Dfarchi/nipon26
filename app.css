@@ -583,6 +583,10 @@ body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyo
 .l-back img.on,.l-art img.on{opacity:1}
 /* עצים מאחור נסוגים אל האובך, כמו השורה האחורית של הבניינים */
 .l-back img.on{opacity:.82}
+/* בלילה הם נצבעים כהים. תמונה לא משנה צבע עם הערכה, ואורן בהיר
+   שמצויר לאור יום נראה על סצנת לילה כמו כתם חיוור שהודבק. */
+.l-back img{filter:brightness(.42) saturate(.7)}
+body.is-day .l-back img{filter:none}
 /* העשן עולה ונמוג — התנועה היחידה בקומת הכפר */
 .l-art img.puff{transform-origin:50% 100%;animation:rise 9s linear infinite}
 .l-art img.puff.on{opacity:1}
@@ -607,3 +611,19 @@ body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyo
   -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.18) 26%,rgba(0,0,0,.6) 52%,#000 78%);
   mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.18) 26%,rgba(0,0,0,.6) 52%,#000 78%)}
 .l-far .ridge.on{opacity:var(--o) !important}
+
+/* ===== החתולות כתמונות =====
+   כאן נשברת ההנחה שעבדה בכל שאר הנכסים: ה-SVG שאב את צבעו מ-var(--cat1)
+   והתחלף עם הערכה. תמונה לא. בלילה היא מוכהית בפילטר — חתולה מוארת
+   כמו ביום מול סצנת לילה נקראת כמדבקה. */
+.l-chars .cat-img{display:block;width:auto;opacity:0;
+  transition:opacity .4s var(--e-out)}
+.l-chars .cat-img.on{opacity:1}
+.l-chars .cat-img{filter:brightness(.58) saturate(.85) contrast(1.05)}
+body.is-day .l-chars .cat-img{filter:none}
+/* הגיבוי הווקטורי יושב מתחת ונעלם כשהתמונה נטענה */
+.l-chars .ch{position:absolute;transform:translateX(-50%);line-height:0}
+.l-chars .cat-fallback{position:absolute;right:0;bottom:0;line-height:0}
+.l-chars .ch:has(.cat-img.on) .cat-fallback{opacity:0;transition:opacity .4s var(--e-out)}
+@media (prefers-reduced-motion:reduce){
+  .l-chars .cat-img{transition:none}}

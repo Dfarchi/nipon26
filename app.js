@@ -364,9 +364,20 @@ window.App = (function () {
 
     // בגשם החתולות מסתתרות מתחת למטרייה; בקור הן מתכרבלות; בלילה הן ישנות.
     const curl = night || cold;
-    // שתיהן שחורות. ההבדל הוא גוון הפרווה וצבע העיניים, לא ג'ינג'י מול שחור.
-    const morgana = A.cat({ coat: 'var(--cat1)', eye: 'var(--catEye)', pose: curl ? 'curl' : 'sit', w: curl ? 34 : 27, delay: 0 });
-    const baltrkis = A.cat({ coat: 'var(--cat2)', eye: 'var(--catEye2)', pose: curl ? 'curl' : 'sit', w: curl ? 31 : 25, delay: 2.3 });
+    // הציור הווקטורי נשאר כגיבוי מתחת לתמונה, כמו בכל שאר הנכסים.
+    // ההבדל היחיד: תמונה לא משנה צבע בין ערכות, ולכן בלילה מוכהית
+    // בפילטר — חתולה מוארת כמו ביום מול סצנת לילה קוראת כמדבקה.
+    // גובה ולא רוחב: התמונות של החתולות היושבות הן פורטרט (יחס .62),
+    // וברוחב 30 הן יצאו 48 גבוהות — כפול מהווקטור, ותמרו מעל הבתים.
+    const catImg = (file, h) =>
+      `<img class="cat-img" src="assets/cats/${file}.webp" alt="" decoding="async"
+        style="height:${h}px" onload="this.classList.add('on')">`;
+    const morgana = catImg(curl ? 'cat-sleep' : 'morgana-sit', curl ? 21 : 31) +
+      `<span class="cat-fallback">${A.cat({ coat: 'var(--cat1)', eye: 'var(--catEye)',
+        pose: curl ? 'curl' : 'sit', w: curl ? 34 : 27, delay: 0 })}</span>`;
+    const baltrkis = catImg(curl ? 'cat-sleep' : 'bellatrix-sit', curl ? 19 : 29) +
+      `<span class="cat-fallback">${A.cat({ coat: 'var(--cat2)', eye: 'var(--catEye2)',
+        pose: curl ? 'curl' : 'sit', w: curl ? 31 : 25, delay: 2.3 })}</span>`;
 
     let h = '<div class="l-chars">';
 
@@ -387,7 +398,9 @@ window.App = (function () {
     // המושבים מגיעים מהסצנה שנבנתה, לא ממספרים בקוד: הגגות זזים בכל יום.
     // ההמרה: left = x/3.9%  ·  bottom = 74 − y  (מקור: l-chars ב-bottom:30 וגובה 74)
     const st = (SCENE && SCENE.seats) || [{ x: 258, y: 36 }, { x: 86, y: 39 }, { x: 356, y: 39 }];
-    const at = s => `left:${(s.x / 3.9).toFixed(1)}%;bottom:${(74 - s.y).toFixed(1)}px`;
+    // 3px פנימה אל תוך הגג. חתולה שבסיסה מונח בדיוק על קודקוד הרכס
+    // נראית מרחפת מעליו; מעט שקיעה קוראת כישיבה.
+    const at = s => `left:${(s.x / 3.9).toFixed(1)}%;bottom:${(74 - s.y - 3).toFixed(1)}px`;
     h += `<div class="ch" style="${at(st[0])}">
       ${wet ? `<div class="brolly">${A.umbrella(30)}</div>` : ''}${morgana}
       ${cold ? '<i class="snowcap"></i>' : ''}</div>`;
