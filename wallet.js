@@ -107,6 +107,7 @@
   }
   document.getElementById('main').innerHTML = h;
   A.reveal(document.getElementById('main'));
+  A.jumpBar();
 
   // פתיחה במקום, בלי בנייה מחדש — אותו מנגנון כמו שלב במסלול
   document.getElementById('main').addEventListener('click', e => {

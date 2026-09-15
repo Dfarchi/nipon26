@@ -91,6 +91,7 @@
       ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>הערות ופירוט מלא</span></button></div>`;
     document.getElementById('main').innerHTML = h;
     A.reveal(document.getElementById('main'));
+  A.jumpBar();
   }
 
   render();

@@ -54,15 +54,48 @@
 
   if (cur.flag) h += `<div class="flagnote">${A.rich(cur.flag)}</div>`;
 
-  if (acts.length) {
-    const a = acts[0], tm = time(a.d) || time(a.t);
-    h += `<div class="card now"><div class="lbl">עכשיו<i></i>${tm ? `<span class="big">${tm}</span>` : ''}</div>
-      <div class="t">${a.ic || ''} ${A.txt(a.t)}</div>
-      ${a.d ? `<div class="d">${A.txt(a.d).slice(0, 160)}</div>` : ''}</div>`;
+  // ===== מה עכשיו באמת =====
+  // הכרטיס הזה הציג תמיד את acts[0] — כלומר ב-20:00 בטוקיו הוא עדיין
+  // אמר "עכשיו: קופים בבוקר". רק 25% מהפעילויות נושאות שעה, אבל 57%
+  // מהימים מכילים לפחות אחת, ובאלה אפשר לדעת.
+  //
+  // הכלל: מקדמים את הפעילות המתוזמנת האחרונה שהשעה שלה כבר עברה.
+  // אם אף שעה לא עברה — הראשונה, והכותרת היא "מתחילים". אם אין שעות
+  // בכלל — "היום", כי "עכשיו" יהיה שקר.
+  // "היום" נקבע לפי התאריך ולא לפי היעדר ‎?d=, כך שגם תצוגה מפורשת של
+  // היום הנוכחי מקבלת "עכשיו" אמיתי.
+  const isToday = !!(A.dated[idx] && A.dated[idx].date &&
+                     A.dated[idx].date.getTime() === A.today0.getTime());
+  const nowMin = (() => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); })();
+  const mins = s => { const t = time(s); if (!t) return null;
+    const [H, M] = t.split(':').map(Number); return H * 60 + M; };
+
+  const timed = acts.map((a, i) => ({ a, i, m: mins(a.d) ?? mins(a.t) })).filter(x => x.m !== null);
+  let cursor = 0, lead = 'היום';
+  if (timed.length) {
+    lead = 'מתחילים';
+    if (isToday) {
+      const passed = timed.filter(x => x.m <= nowMin);
+      if (passed.length) { cursor = passed[passed.length - 1].i; lead = 'עכשיו'; }
+      else { cursor = timed[0].i; lead = 'מתחילים'; }
+    } else cursor = timed[0].i;
   }
-  if (acts.length > 1) {
+
+  if (acts.length) {
+    const a = acts[cursor], tm = time(a.d) || time(a.t);
+    h += `<div class="card now"><div class="lbl">${lead}<i></i>${tm ? `<span class="big">${tm}</span>` : ''}</div>
+      <div class="t">${a.ic || ''} ${A.txt(a.t)}</div>
+      ${a.d ? `<div class="d">${A.txt(String(a.d).slice(0, 160))}</div>` : ''}</div>`;
+  }
+  const after = acts.filter((_, i) => i > cursor).slice(0, 5);
+  // אחרי הפעילות האחרונה המסך פשוט נגמר. שורה שאומרת את זה טובה מריק.
+  if (!after.length && acts.length && lead === 'עכשיו') {
+    h += `<div class="lbl q" style="margin-top:16px">זהו להיום<i></i></div>
+      <div class="d" style="margin-top:2px">אין עוד פעילויות מתוכננות${stay ? ' — נשאר רק לחזור ללינה' : ''}</div>`;
+  }
+  if (after.length) {
     h += `<div style="margin-top:16px"><div class="lbl q">אחר כך<i></i></div><div class="steps">` +
-      acts.slice(1, 6).map(a => `<div class="step"><b>${time(a.d) || time(a.t) || (a.ic || '·')}</b>
+      after.map(a => `<div class="step"><b>${time(a.d) || time(a.t) || (a.ic || '·')}</b>
         <span>${A.txt(a.t)}</span><i class="pip" style="background:${crowd(a.cr)}"></i></div>`).join('') + `</div></div>`;
   }
   // המנה של האזור. לא "מה לאכול היום" אלא מה המקום הזה עושה טוב —

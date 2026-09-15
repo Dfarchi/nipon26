@@ -1027,6 +1027,51 @@ window.App = (function () {
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>${label}</a>`).join('');
   }
 
+  // ===== סרגל קפיצה =====
+  // "משימות" הוא 4,600 פיקסלים — שבעה מסכים בלי שום דרך לקפוץ, ורשימה
+  // אחת בתוכו תופסת 3,300 מהם. הסרגל נבנה מכותרות ה-‎.lbl שכבר קיימות
+  // במסך, כך שאין מה לתחזק: מי שמוסיף סעיף מקבל קפיצה אליו בחינם.
+  // נבנה רק אם יש לפחות שלוש כותרות ושתי גלילות מסך של תוכן.
+  function jumpBar(root) {
+    const host = root || document.getElementById('main');
+    if (!host) return;
+    const labels = [...host.querySelectorAll(':scope > .lbl, :scope > div > .lbl')];
+    if (labels.length < 3 || host.scrollHeight < innerHeight * 2) return;
+
+    labels.forEach((l, i) => { if (!l.id) l.id = 'sec' + i; });
+    const bar = document.createElement('nav');
+    bar.className = 'jump';
+    // כותרת ארוכה דוחפת את כל השאר מחוץ למסך — "ביטול חינם — מה שנסגר
+    // קרוב" לבדה תפסה חצי סרגל. נקודת החיתוך היא המקף, ואם אין — 18 תווים.
+    const cap = s => { const t = String(s).split(/\s[—–-]\s/)[0].trim();
+      return t.length > 18 ? t.slice(0, 17).trim() + '…' : t; };
+    bar.innerHTML = labels.map((l, i) =>
+      `<button data-to="${l.id}">${esc(cap(l.firstChild ? l.firstChild.textContent : ('סעיף ' + (i + 1))))}</button>`
+    ).join('');
+    host.insertAdjacentElement('beforebegin', bar);
+
+    bar.addEventListener('click', e => {
+      const b = e.target.closest('[data-to]');
+      if (!b) return;
+      const t = document.getElementById(b.dataset.to);
+      if (!t) return;
+      // הסרגל דביק ומכסה את הכותרת שאליה קופצים — מקזזים את גובהו
+      const y = t.getBoundingClientRect().top + scrollY - bar.offsetHeight - 14;
+      scrollTo({ top: Math.max(0, y), behavior: REDUCE ? 'auto' : 'smooth' });
+    });
+
+    // סימון הסעיף הנוכחי
+    const btns = [...bar.querySelectorAll('[data-to]')];
+    const mark = id => btns.forEach(b => b.classList.toggle('on', b.dataset.to === id));
+    const io = new IntersectionObserver(es => {
+      const vis = es.filter(x => x.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (vis) mark(vis.target.id);
+    }, { rootMargin: `-${bar.offsetHeight + 20}px 0px -62% 0px` });
+    labels.forEach(l => io.observe(l));
+    mark(labels[0].id);
+  }
+
   function net() {
     const t = document.getElementById('netTxt'), d = document.getElementById('netDot');
     const s = () => { if (!t) return;
@@ -1072,5 +1117,5 @@ window.App = (function () {
     weather(phase, (m, rec) => { particles(fx, pmF(m)); decorate(m); showWx(m, rec, false); });
   }
 
-  return { T, q, theme, esc, txt, foreign, namesOn, setNames, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

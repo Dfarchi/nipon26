@@ -761,3 +761,58 @@ body.names-off .d,body.names-off .t{word-spacing:normal}
 .row-tog[aria-pressed="true"] .sw::after{transform:translateX(-18px)}
 .row-tog:active{opacity:.7}
 @media (prefers-reduced-motion:reduce){.row-tog .sw,.row-tog .sw::after{transition:none}}
+
+
+/* ===== יעדי מגע =====
+   המינימום המקובל הוא 44px. מדדתי ומצאתי מספר טלפון בגובה 18px — וזה
+   בדיוק מה שלוחצים עליו כשמשהו השתבש. הגדלה נעשית ב-padding ובאזור
+   לחיצה נסתר, לא בהגדלת הטקסט: הטיפוגרפיה נשארת כפי שהיא. */
+
+/* מספר טלפון — הכי דחוף בשורה הזו */
+.tel{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;
+  position:relative}
+.tel::after{content:'';position:absolute;inset:-6px -10px}
+
+/* שבבי אנשים וכפתורי סכום במחשבון */
+.ping .chip,.chip.fxp{min-height:40px;display:inline-flex;align-items:center;
+  position:relative}
+.ping .chip::after,.chip.fxp::after{content:'';position:absolute;inset:-7px -4px}
+
+/* בורר היום — היה 24px, והוא הדבר שמנווטים בו בין 45 ימים */
+.pick{min-height:40px;padding:8px 11px}
+
+/* "לנווט לשם" ושאר כפתורי הפעולה */
+.go{min-height:44px;display:flex;align-items:center;justify-content:center}
+
+/* שורות רשימה: הרחבת אזור הלחיצה בלי להזיז את הפריסה */
+a.step,a[data-dec],.card[data-todo]{position:relative}
+/* ‎.step.day מודר בכוונה: ל-‎::after שלו כבר יש תפקיד — הוא השברון
+   שמראה שהשורה נפתחת. הרחבה שם הייתה מוחקת אותו. */
+a.step::after,a[data-dec]::after{content:'';position:absolute;
+  inset:-3px -2px;pointer-events:none}
+.step{min-height:40px}
+a.step{min-height:44px}
+.step.day{min-height:46px}
+
+/* הניווט התחתון היה 43px — גבול. עכשיו מעל. */
+.nav a{min-height:48px;justify-content:center}
+
+/* ===== סרגל הקפיצה =====
+   דביק מתחת לשורה העליונה. חייב רקע אטום — הסצנה קבועה מאחור והתוכן
+   נגלל מעליה, ובלי רקע הכפתורים נקראים על גגות. */
+.jump{position:sticky;top:calc(6px + env(safe-area-inset-top));z-index:4;
+  display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;
+  margin:14px -16px 4px;padding:7px 16px;
+  background:color-mix(in srgb,var(--skyEnd) 94%,transparent);
+  backdrop-filter:blur(14px);
+  -webkit-mask-image:linear-gradient(to left,transparent,#000 14px,#000 calc(100% - 14px),transparent);
+  mask-image:linear-gradient(to left,transparent,#000 14px,#000 calc(100% - 14px),transparent)}
+.jump::-webkit-scrollbar{display:none}
+.jump button{flex:none;min-height:44px;padding:0 14px;border-radius:99px;
+  border:1px solid var(--line);background:var(--card);color:var(--dim);
+  font:inherit;font-size:var(--fs-meta);font-weight:700;white-space:nowrap;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:color .2s var(--e-out),border-color .2s var(--e-out),background .2s var(--e-out)}
+.jump button.on{color:var(--onHot);background:var(--hot);border-color:var(--hot)}
+.jump button:active{transform:scale(.96)}
+@media (prefers-reduced-motion:reduce){.jump button{transition:none}}
