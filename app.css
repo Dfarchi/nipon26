@@ -661,3 +661,19 @@ body.is-day .l-chars .cat-img{filter:none}
 .stamp[data-f="wave"] span,.stamp[data-f="flower"] span{max-width:52%}
 body.is-day .stamp span{color:var(--hi)}
 @media (prefers-reduced-motion:reduce){.stamp{transition:none}}
+
+/* ===== הציור בראש כרטיס השלב =====
+   ציור שעומד בפני עצמו לא נכנס לשורת הבניינים, אבל כאן הוא בבית: פינה
+   של כרטיס, דהוי, נגזר בעיגול הכרטיס. הטקסט נשאר הגיבור.
+   בצד שמאל: ב-RTL הטקסט מתחיל מימין, ושם הציור התחרה בכותרת. */
+.card.ph{position:relative;overflow:hidden}
+.card.ph > .vig{position:absolute;inset-inline-end:-14px;top:-10px;
+  width:118px;height:auto;pointer-events:none;
+  opacity:0;transform:scale(.94);
+  transition:opacity .6s var(--e-out),transform .7s var(--e-out);
+  -webkit-mask-image:radial-gradient(74% 74% at 70% 28%,#000 34%,transparent 76%);
+  mask-image:radial-gradient(74% 74% at 70% 28%,#000 34%,transparent 76%)}
+.card.ph > .vig.on{opacity:.2;transform:none}
+body.is-day .card.ph > .vig.on{opacity:.26}
+.card.ph > .exp,.card.ph > .ph-body{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.card.ph > .vig{transition:none;transform:none}}

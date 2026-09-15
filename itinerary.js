@@ -28,6 +28,11 @@
   if (!open) open = new Set([curPhase]);                 // ברירת מחדל: רק הנוכחי
   const saveOpen = () => { try { localStorage.setItem(KEY, JSON.stringify([...open])); } catch (e) {} };
 
+  // הציורים המלאים שיובל אהב. הם לא מתאימים לשורת הבניינים — הם מביאים
+  // רקע משלהם — אבל ראש כרטיס שלב הוא בדיוק המקום לתמונה שעומדת בפני
+  // עצמה. דהויה ונגזרת בפינה, כך שהיא רקע ולא מתחרה בטקסט.
+  const VIG = ['vig-tokyo-tower-night', 'vig-moon', 'vig-chimney-smoke', 'vig-birds'];
+
   function draw() {
     let h = `<div class="head"><div class="kicker">${active.length} שלבים · ${T.days.length} ימים</div>
       <div class="h1">המסלול</div></div>`;
@@ -36,14 +41,18 @@
       <div style="position:absolute;right:6px;top:6px;bottom:6px;width:2px;border-radius:2px;
         background:linear-gradient(var(--soft),var(--hot),var(--ok))"></div>`;
 
-    active.forEach(({ p, i }) => {
+    // מיקום ברשימה הפעילה ולא האינדקס המקורי: שלב פוג׳י מסונן החוצה,
+    // ולכן i רץ 0,1,2,4 ושני שלבים קיבלו את אותו ציור.
+    active.forEach(({ p, i }, vi) => {
       const isCur = i === curPhase;
       const isOpen = open.has(i);
       const days = byPhase[i] || [];
       h += `<div style="position:relative;padding-bottom:14px">
         <div style="position:absolute;right:-17px;top:5px;width:${isCur ? 14 : 10}px;height:${isCur ? 14 : 10}px;
           border-radius:50%;background:var(--hot);border:2px solid var(--skyEnd)${isCur ? ';box-shadow:0 0 0 3px color-mix(in srgb,var(--hot) 30%,transparent)' : ''}"></div>
-        <div class="card${isOpen ? ' open' : ''}"${isCur ? ' style="border-color:color-mix(in srgb,var(--hot) 45%,transparent)"' : ''}>
+        <div class="card ph${isOpen ? ' open' : ''}"${isCur ? ' style="border-color:color-mix(in srgb,var(--hot) 45%,transparent)"' : ''}>
+          <img class="vig" src="assets/vignettes/${VIG[vi % VIG.length]}.webp" alt="" decoding="async"
+            loading="lazy" onload="this.classList.add('on')">
           <button class="exp" data-ph="${i}" aria-expanded="${isOpen}">
             <div style="display:flex;align-items:baseline;gap:8px">
               <div class="t" style="flex:1">${A.esc(title(p.h))}</div>
