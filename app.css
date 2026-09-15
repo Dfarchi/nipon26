@@ -418,21 +418,36 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 /* ===== שכבת שמיים ===== */
 .l-sky{position:absolute;inset:0;overflow:hidden}
 .l-sky .orb{position:absolute;line-height:0;transition:opacity 1s}
+/* גוף השמיים כתמונה. הציור הווקטורי נשאר מתחת ונעלם כשהיא נטענת —
+   אותו דפוס כמו ציון הדרך: בלי הבזק, ועם משהו על המסך אם הקובץ חסר. */
+/* גודל: ברינדור הראשון השמש והירח השתלטו על השמיים. הירח גם צולם
+   ריאליסטית בתוך סצנה שטוחה, ולכן הוא גם מוקטן וגם מעומעם מעט — אחרת
+   הוא נקרא כתצלום שהודבק. */
+.l-sky img.orb{width:52px;height:auto;opacity:0;transition:opacity 1s var(--e-out)}
+.l-sky img.orb.moon{width:40px}
+.l-sky img.orb.on{opacity:1}
+.l-sky img.orb.moon.on{opacity:.9;filter:saturate(.7) contrast(.92)}
+.l-sky:has(img.orb.on) .orb-fallback{opacity:0}
+.l-sky .flock{position:absolute;width:56px;height:auto;opacity:0;
+  transition:opacity 1s var(--e-out);animation:soar 44s linear infinite}
+.l-sky .flock.on{opacity:.75}
+.scene.overcast .l-sky .flock{opacity:0}
 .scene.overcast .l-sky .orb{opacity:.18}
 .scene.overcast .l-sky .drift{opacity:.85}
-.scene.overcast .l-sky .birds{opacity:0}
+
 .art-sun{animation:glow 9s ease-in-out infinite}
 .art-moon{animation:glow 12s ease-in-out infinite}
 @keyframes glow{0%,100%{opacity:.9}50%{opacity:1}}
 .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;
   box-shadow:0 0 4px #fff;animation:twinkle 4.5s ease-in-out infinite}
 @keyframes twinkle{0%,100%{opacity:.22;transform:scale(.8)}50%{opacity:.95;transform:scale(1.15)}}
-.l-sky .drift{position:absolute;line-height:0;opacity:.5}
-.l-sky .drift svg{width:120px;height:44px}
-.l-sky .d1{top:16%;animation:drift 68s linear infinite}
-.l-sky .d2{top:31%;transform:scale(.72);animation:drift 96s linear infinite -30s}
-@keyframes drift{0%{left:-24%}100%{left:112%}}
-.l-sky .birds{position:absolute;top:23%;left:58%;opacity:.5;animation:soar 44s linear infinite}
+.l-sky .drift{position:absolute;height:auto;opacity:0;
+  transition:opacity 1.2s var(--e-out)}
+.l-sky .drift.on{opacity:.5}
+.l-sky .c1{animation:drift 74s linear infinite}
+.l-sky .c2{animation:drift 108s linear infinite}
+@keyframes drift{0%{left:-52%}100%{left:112%}}
+
 @keyframes soar{0%{transform:translate(14vw,6px)}100%{transform:translate(-90vw,-14px)}}
 
 /* ===== דמויות על הגגות ===== */
@@ -466,7 +481,7 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 @media (prefers-reduced-motion:reduce){
   .scene .fx{display:none}
   .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{transform:none !important}
-  .art-sun,.art-moon,.star,.drift,.birds,.art-cat .tail,.art-cat .blink,.breathe,
+  .art-sun,.art-moon,.star,.drift,.flock,.art-cat .tail,.art-cat .blink,.breathe,
   .art-fig .ribbon,.art-lantern,.l-chars .walk{animation:none !important}
 }
 

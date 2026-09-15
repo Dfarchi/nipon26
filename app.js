@@ -164,36 +164,32 @@ window.App = (function () {
 
   // ===== חלקיקים: עלים / גשם / שלג =====
   const PARTICLE = {
-    leaves: { n: 9,  cls: 'leaf',  min: 11, max: 18, dur: [11, 19] },
+    leaves: { n: 9,  cls: 'leaf',  min: 9,  max: 15, dur: [11, 19] },
     rain:   { n: 34, cls: 'drop',  min: 1,  max: 2,  dur: [0.7, 1.3] },
     snow:   { n: 26, cls: 'snow',  min: 3,  max: 6,  dur: [7, 14] },
     mist:   { n: 0 }, clear: { n: 0 }
   };
   // 紅葉 momiji — חמישה אונות וגבעול. מה שהיה כאן קודם הוא כוכב בן שמונה
   // קצוות, ולכן "שלכת" נקראה כניצוצות כתומים ולא כעלים נופלים.
-  const LEAF = '<path d="M12,1 L13.7,8 L20.6,5.2 L16,11.8 L22,15 L14.6,15.2 L17.2,21.2 ' +
-    'L12.7,16.6 L12.7,23 L11.3,23 L11.3,16.6 L6.8,21.2 L9.4,15.2 L2,15 L8,11.8 ' +
-    'L3.4,5.2 L10.3,8 Z"/>';
-  // בלילה העלים כהים. אותם פיגמנטים, מעומעמים — עלה שנופל מול שמי לילה
-  // ומואר כמו ביום קורא כמדבקה.
-  const LEAF_COL_DAY   = ['#d4622f', '#e0a03a', '#c1303f', '#b8541f'];
-  const LEAF_COL_NIGHT = ['#7e3a1c', '#8a6122', '#73202a', '#6b3212'];
-
   function particles(host, mode) {
     const cfg = PARTICLE[mode] || PARTICLE.leaves;
     host.innerHTML = '';
     if (!cfg.n) return;
     const rnd = (a, b) => a + Math.random() * (b - a);
     for (let i = 0; i < cfg.n; i++) {
-      const el = document.createElement(mode === 'leaves' ? 'svg' : 'i');
+      const el = document.createElement(mode === 'leaves' ? 'img' : 'i');
       const size = rnd(cfg.min, cfg.max), dur = rnd(cfg.dur[0], cfg.dur[1]);
       if (mode === 'leaves') {
-        el.setAttribute('viewBox', '0 0 22 24');
-        const LC = theme === 'night' ? LEAF_COL_NIGHT : LEAF_COL_DAY;
-        el.innerHTML = `<g fill="${LC[i % LC.length]}">${LEAF}</g>`;
-        el.style.cssText = `position:absolute;width:${size}px;right:${rnd(-2, 100)}%;opacity:.75;
+        // חמישה עלים אמיתיים במקום נתיב אחד עם fill מתחלף. בלילה הם
+        // מוכהים בפילטר ולא בפלטת צבעים שנייה — עלה מואר כמו ביום מול
+        // שמי לילה קורא כמדבקה.
+        el.src = `assets/sky/leaf-${1 + (i % 5)}.webp`;
+        el.alt = '';
+        el.decoding = 'async';
+        el.style.cssText = `position:absolute;width:${size}px;height:auto;right:${rnd(-2, 100)}%;
+          opacity:${theme === 'night' ? .62 : .82};
+          filter:${theme === 'night' ? 'brightness(.52) saturate(.8)' : 'none'};
           animation:fall ${dur}s linear ${rnd(0, dur)}s infinite`;
-        el.style.opacity = theme === 'night' ? '.62' : '.75';
       } else if (mode === 'rain') {
         el.style.cssText = `position:absolute;width:${size}px;height:${rnd(12, 22)}px;right:${rnd(-2, 100)}%;
           background:linear-gradient(transparent,rgba(180,210,230,.55));border-radius:2px;
@@ -328,20 +324,34 @@ window.App = (function () {
   // ---- שכבת שמיים: שמש/ירח, כוכבים, עננים, ציפורים ----
   function skyLayer() {
     const A = window.ART || {};
+    // גם השמיים נגזרים מהזרע היומי: הגוף נודד קצת, העננים בגבהים אחרים,
+    // הציפורים עוברות צד. אותו יום תמיד נראה אותו דבר, יום אחר לא.
+    const R = rng(dayIndex() * 17 + 3);
+    const orbX = 8 + R() * 16, orbY = 5 + R() * 8;
+    const cloud = (cls, top, w, dly) =>
+      `<img class="drift ${cls}" src="assets/sky/clouds-${theme === 'day' ? 'day' : 'night'}.webp"
+        alt="" decoding="async" style="top:${top.toFixed(0)}%;width:${w.toFixed(0)}%;animation-delay:-${dly}s"
+        onload="this.classList.add('on')">`;
+    const clouds = cloud('c1', 8 + R() * 10, 46 + R() * 22, (R() * 40).toFixed(0)) +
+                   cloud('c2', 22 + R() * 14, 34 + R() * 20, (14 + R() * 40).toFixed(0));
+
     if (theme === 'night') {
       const stars = STARS.map(([x, y], i) =>
         `<i class="star" style="left:${x}%;top:${y}%;animation-delay:${(i % 7) * .7}s"></i>`).join('');
-      return `<div class="l-sky">${stars}
-        <div class="orb" style="left:14%;top:9%">${A.moon ? A.moon(54) : ''}</div></div>`;
+      return `<div class="l-sky">${stars}${clouds}
+        <img class="orb moon" src="assets/sky/moon.webp" alt="" decoding="async"
+          style="left:${orbX.toFixed(0)}%;top:${orbY.toFixed(0)}%" onload="this.classList.add('on')">
+        ${A.moon ? `<div class="orb orb-fallback" style="left:${orbX.toFixed(0)}%;top:${orbY.toFixed(0)}%">${A.moon(54)}</div>` : ''}
+        </div>`;
     }
-    return `<div class="l-sky">
-      <div class="orb" style="left:16%;top:7%">${A.sun ? A.sun(62) : ''}</div>
-      <div class="drift d1">${cloudSVG('var(--skyCloud)')}</div>
-      <div class="drift d2">${cloudSVG('var(--skyCloud)')}</div>
-      <svg class="birds" viewBox="0 0 60 20" width="54">
-        <g fill="none" stroke="var(--bird)" stroke-width="1.4" stroke-linecap="round">
-          <path d="M4,9 q4,-4 8,0 q4,-4 8,0"/><path d="M24,15 q3,-3 6,0 q3,-3 6,0"/>
-          <path d="M40,6 q2.6,-2.6 5.2,0 q2.6,-2.6 5.2,0"/></g></svg></div>`;
+    const bx = R() < .5 ? 58 + R() * 18 : 12 + R() * 16;
+    return `<div class="l-sky">${clouds}
+      <img class="orb sun" src="assets/sky/sun.webp" alt="" decoding="async"
+        style="left:${orbX.toFixed(0)}%;top:${orbY.toFixed(0)}%" onload="this.classList.add('on')">
+      ${A.sun ? `<div class="orb orb-fallback" style="left:${orbX.toFixed(0)}%;top:${orbY.toFixed(0)}%">${A.sun(62)}</div>` : ''}
+      <img class="flock" src="assets/sky/birds.webp" alt="" decoding="async"
+        style="left:${bx.toFixed(0)}%;top:${(16 + R() * 10).toFixed(0)}%" onload="this.classList.add('on')">
+      </div>`;
   }
 
   // ---- דמויות: החתולות של הבית, ומי שעל הגג ----

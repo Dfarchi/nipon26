@@ -2,7 +2,7 @@
    קליפה: cache-first (מהיר, עובד אופליין).
    trip.json: network-first (תוכן הטיול זז כל יום — רוצים את הטרי, עם נפילה לעותק).
    מארחים חיצוניים (leaflet, אריחי מפה): לא נוגעים — הם לא זמינים אופליין ממילא. */
-const V = '2026091513';
+const V = '2026091516';
 const SHELL = 'nipon26-shell-' + V;
 const DATA  = 'nipon26-data-' + V;
 
@@ -26,7 +26,12 @@ const SHELL_FILES = [
   './assets/street/maple-tree.webp', './assets/street/noren.webp',
   './assets/street/red-umbrella.webp', './assets/street/toro.webp',
   './assets/street/utility-pole.webp', './assets/street/vending-machine.webp',
-  './assets/street/water-tank.webp'
+  './assets/street/water-tank.webp', './assets/sky/birds.webp',
+  './assets/sky/clouds-day.webp', './assets/sky/clouds-night.webp',
+  './assets/sky/leaf-1.webp', './assets/sky/leaf-2.webp',
+  './assets/sky/leaf-3.webp', './assets/sky/leaf-4.webp',
+  './assets/sky/leaf-5.webp', './assets/sky/moon.webp',
+  './assets/sky/sun.webp'
 ];
 
 self.addEventListener('install', e => {
