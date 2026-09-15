@@ -26,7 +26,10 @@
   --ridge:#4a6478; --ridge2:#26394a; --roof:#18232e; --lit:#f0a94e; --tree:#1d2b28;
   --land:#141f27; --plaster:#cfc8b8; --tile:#0e161f; --tvlit:#8fb6d8; --smoke:#66809a;
   /* איור: לילה */
-  --cat1:#33414f; --cat2:#8d7a63; --catInner:#c98089; --catEye:#f0c05a;
+  /* שתיהן שחורות. שחור אחד קר ואחד חמים, ועיניים בצבע שונה — זה מה
+     שמבדיל ביניהן ברוחב 30px, לא הפרווה. */
+  --cat1:#2e3a45; --cat2:#3d352f; --catInner:#c98089;
+  --catEye:#f0c05a; --catEye2:#a8c46a;
   --figure:#1e2a38; --skyCloud:#2a3b52; --bird:#3b4f66; --wire:#4a5a6b;
   --vignette:rgba(0,0,0,.28);
   /* הדפס: דיו הפלטות שנוחתות מעט מחוץ לקו המפתח */
@@ -51,7 +54,8 @@ body.is-day{
   --ridge:#7f9bb0; --ridge2:#5d7f95; --roof:#6b5a48; --lit:#a8906e; --tree:#5c7a4a;
   --land:#8a9a6a; --plaster:#f6f1e4; --tile:#33393f; --tvlit:#7d97b5; --smoke:#ffffff;
   /* איור: יום */
-  --cat1:#3f3730; --cat2:#c9a274; --catInner:#e59aa0; --catEye:#4a7f4f;
+  --cat1:#2b2c2e; --cat2:#3f352c; --catInner:#e59aa0;
+  --catEye:#c98a2a; --catEye2:#4a7f4f;
   --figure:#5a4a3a; --skyCloud:#ffffff; --bird:#7d8fa0; --wire:#8d7f6b;
   --vignette:rgba(96,74,48,.13);
   --beni:rgba(178,52,40,.36); --ai:rgba(64,98,148,.24);

@@ -353,8 +353,9 @@ window.App = (function () {
 
     // בגשם החתולות מסתתרות מתחת למטרייה; בקור הן מתכרבלות; בלילה הן ישנות.
     const curl = night || cold;
-    const morgana = A.cat({ coat: 'var(--cat1)', pose: curl ? 'curl' : 'sit', w: curl ? 34 : 27, delay: 0 });
-    const baltrkis = A.cat({ coat: 'var(--cat2)', pose: curl ? 'curl' : 'sit', w: curl ? 31 : 25, delay: 2.3 });
+    // שתיהן שחורות. ההבדל הוא גוון הפרווה וצבע העיניים, לא ג'ינג'י מול שחור.
+    const morgana = A.cat({ coat: 'var(--cat1)', eye: 'var(--catEye)', pose: curl ? 'curl' : 'sit', w: curl ? 34 : 27, delay: 0 });
+    const baltrkis = A.cat({ coat: 'var(--cat2)', eye: 'var(--catEye2)', pose: curl ? 'curl' : 'sit', w: curl ? 31 : 25, delay: 2.3 });
 
     let h = '<div class="l-chars">';
 
