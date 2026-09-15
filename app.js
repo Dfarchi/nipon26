@@ -806,7 +806,7 @@ window.App = (function () {
     host.innerHTML = `<div class="art"></div>${skyLayer()}<div class="fx" id="fx"></div>
       ${farSVG()}
       ${villageSVG()}
-      ${charLayer('')}<div class="haze" id="haze"></div>`;
+      ${charLayer('')}<div class="haze" id="haze"></div><div class="hem"></div>`;
   }
 
   // ---- עדכון הדמויות והאובך כשמזג האוויר מתברר ----

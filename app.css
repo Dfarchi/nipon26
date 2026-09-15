@@ -16,6 +16,10 @@
      טקסטורת נייר, בשמש — לא קיימת. הפרש L* של כ-15 בכל מדרגה. */
   --ink:#f4eee2; --dim:#c3b6a4; --soft:#9a9083;
   --card:#1e2a34; --cardGlass:rgba(30,42,52,.82); --well:#141d27;
+  /* שני צללים ולא אחד: מגע הדוק שמצמיד את הכרטיס לנייר, ואמביינט רחב
+     שמרים אותו. צל יחיד ורך הוא מה שגורם לכל כרטיס להיראות אותו דבר. */
+  --sh:0 1px 2px rgba(0,0,0,.4),0 10px 26px -8px rgba(0,0,0,.55);
+  --shLo:0 1px 2px rgba(0,0,0,.34),0 4px 10px -4px rgba(0,0,0,.4);
   --line:rgba(197,168,136,.16); --rule:rgba(197,168,136,.34);
   --hot:#eab94f; --warn:#f2906a; --ok:#7fd0a0; --hi:#c1303f;
   --onHi:#fff6e8; --onHot:#1d2833; --key:var(--hot);
@@ -39,6 +43,8 @@ body.is-day{
      רקע כהה יותר נותן לפיגמנטים מרווח להישאר רוויים במקום להיכבות. */
   --ink:#241d15; --dim:#4a3e30; --soft:#6f614c;
   --card:#fdf6e8; --cardGlass:rgba(253,246,232,.8); --well:#f4ebd8;
+  --sh:0 1px 2px rgba(92,70,42,.16),0 10px 26px -8px rgba(92,70,42,.3);
+  --shLo:0 1px 2px rgba(92,70,42,.14),0 4px 10px -4px rgba(92,70,42,.2);
   --line:rgba(120,95,62,.20); --rule:rgba(120,95,62,.38);
   --hot:#9a4a10; --warn:#a83a22; --ok:#2c6a45; --hi:#a8322a;
   --onHi:#fff6e8; --onHot:#fdf6e8; --key:var(--hot);
@@ -120,8 +126,8 @@ body.is-day .dnum{text-shadow:0 2px 14px rgba(255,255,255,.5)}
 .city{font-size:var(--fs-sub);font-weight:700;line-height:var(--lh-tight)}
 .jp{font-family:'Noto Sans JP','Heebo',sans-serif;color:var(--soft);font-size:var(--fs-body);line-height:var(--lh-base)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;
-  box-shadow:0 6px 20px rgba(0,0,0,.16);margin-top:12px;
-  transition:transform .18s ease,border-color .18s ease}
+  box-shadow:var(--sh);margin-top:12px;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
 /* 墨板 — לוח המפתח. בהדפס עץ קו המתאר נדפס ראשון והצבעים נוחתים בתוכו.
    הכרטיס הרם ביותר מקבל קו ולא צל: הדפס לא מטיל צל, הוא המשטח. */
 .card.now{background:var(--cardGlass);backdrop-filter:blur(14px) saturate(1.1);
@@ -300,6 +306,14 @@ a.step[href]::after{content:'';position:absolute;left:13px;top:50%;width:7px;hei
    והוא לא מוביל לשום מקום אלא משנה מצב במקום. */
 .card[data-todo]{cursor:pointer}
 a.step:active,.card[data-todo]:active,a[data-dec]:active{transform:scale(.985)}
+/* לחיצה = הכרטיס יורד אל הנייר. הצל מתכווץ איתו, אחרת הוא רק מתכווץ. */
+.card[data-todo]:active,a[data-dec]:active,.card.tap:active{box-shadow:var(--shLo)}
+.step.day:active,.exp:active,button.step:active{transform:scale(.99);opacity:.82}
+.cloud:active,.chip.fxp:active,.tel:active{transform:scale(.97);opacity:.88}
+.nav a:active{opacity:.6}
+/* בלי ‎:not(.rv-slide) המעבר הזה (0,2,0) גובר על מעבר החשיפה (0,1,0)
+   ומקצר אותו מ-340ms ל-160ms — בדיוק ה"קפיצה" שתוקנה קודם. */
+.step.day:not(.rv-slide),.exp,.cloud,.chip.fxp,.tel{transition:transform .16s ease,opacity .16s ease}
 a.step,a[data-dec],.card[data-todo]{-webkit-tap-highlight-color:transparent}
 
 .pip{width:7px;height:7px;border-radius:50%;flex:none}
@@ -341,7 +355,7 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
 .cloud.g span{color:var(--ink)}
 /* כרטיס להראות לנהג — הפוך בכוונה, קריא לזר בשמש */
 .tcard{background:#faf7f2;color:#14100c;border-radius:4px;padding:17px;margin-top:12px;
-  direction:ltr;text-align:left;box-shadow:0 2px 10px rgba(0,0,0,.3);position:relative;overflow:hidden;
+  direction:ltr;text-align:left;box-shadow:var(--sh);position:relative;overflow:hidden;
   transform:rotate(-.4deg)}   /* פתק שהונח על השולחן, לא ריבוע שמרחף */
 .tcard .ask{font-size:var(--fs-meta);color:#8a7f72;letter-spacing:.03em}
 .tcard .nm{font-size:var(--fs-title);font-weight:700;line-height:1.25;margin-top:5px}
@@ -504,3 +518,20 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
   100%{opacity:0;transform:translate(-9px,-34px) scale(1.7)}}
 @media (prefers-reduced-motion:reduce){
   .scene .smoke circle{animation:none;opacity:.16}}
+
+/* ===== המכפלת — איפה שהנוף נגמר =====
+   הסצנה נקטעה בקו ישר והנייר התחיל. זה הסימן הכי חזק ש"הודבקה כאן
+   תמונה". פס ערפל מתחתית הנוף אל צבע הנייר ממיס את הקו: הקרקע נכנסת
+   לאובך במקום להיחתך. z-index 1 — מעל גיד העץ, מתחת לסיבי הנייר (2). */
+.scene .hem{position:absolute;left:0;right:0;bottom:0;height:54px;z-index:1;pointer-events:none;
+  background:linear-gradient(to bottom,transparent 0%,
+    color-mix(in srgb,var(--skyEnd) 26%,transparent) 55%,var(--skyEnd) 97%)}
+
+/* קרקע לפי אזור. ‎--land הוא ירוק דשא, וזה נכון לכפר ולהרים — אבל
+   קו רקיע של טוקיו שעומד על מדשאה נראה כמו שתי תמונות שהודבקו.
+   בעיר הקרקע היא אבן. הכלל נופל גם על שורות העומק ועל המרזבים,
+   שמשתמשים באותו משתנה, וזה בדיוק מה שצריך. */
+.l-village[data-kind="tokyo"],.l-village[data-kind="osaka"],
+.l-village[data-kind="nagoya"],.l-village[data-kind="kyoto"]{--land:#18222c}
+body.is-day .l-village[data-kind="tokyo"],body.is-day .l-village[data-kind="osaka"],
+body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyoto"]{--land:#a69c8a}
