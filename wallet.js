@@ -31,9 +31,9 @@
       <div class="tcard">
         <div class="ask jp">ここまでお願いします</div>
         ${(() => { const dv = driver((T.stayAddr || {})[cur.n] || cur.f.addr || '',
-              A.esc(cur.n).replace(/^[^—·]*[—·]\s*/, ''));
-          return `<div class="nm jp">${A.esc(dv.nm)}</div>
-            ${dv.ad ? `<div class="ad jp">${A.esc(dv.ad)}</div>` : ''}`; })()}
+              A.txt(cur.n).replace(/^[^—·]*[—·]\s*/, ''));
+          return `<div class="nm jp">${A.txt(dv.nm)}</div>
+            ${dv.ad ? `<div class="ad jp">${A.txt(dv.ad)}</div>` : ''}`; })()}
         ${cur.f.phone ? `<div class="ph">${cur.f.phone}</div>` : ''}
       </div>
       <div class="d" style="margin-top:6px;text-align:center">בהיר בכוונה — זה המסך היחיד שזר קורא</div>`;
@@ -49,7 +49,7 @@
     deadlines.forEach(({ b, d }) => {
       const cls = d.days <= 2 ? 'warn' : d.days <= 7 ? 'hot' : '';
       h += `<div class="step" style="margin-top:7px"><b>${b.f.free}</b>
-        <span>${A.esc(b.n)}</span>
+        <span>${A.txt(b.n)}</span>
         <span class="chip ${cls}">${d.days === 0 ? 'היום' : d.days === 1 ? 'מחר' : 'בעוד ' + d.days + ' ימים'}</span></div>`;
     });
     h += `</div>`;
@@ -66,28 +66,28 @@
   // לא נמצאים כאן בכוונה: הריפו ציבורי, ומספר אישור פותח את ההזמנה עצמה.
   booked.forEach((b, k) => {
     const addr = (T.stayAddr || {})[b.n] || b.f.addr || '';
-    const short = A.esc(b.n).replace(/^[^—·]*[—·]\s*/, '');
+    const short = A.txt(b.n).replace(/^[^—·]*[—·]\s*/, '');
     const nav = addr ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr) : '';
     h += `<div class="card bk${b.cur ? ' now' : ''}" style="margin-top:8px;padding:0">
       <button class="exp bkh" data-k="${k}" aria-expanded="false">
         <div style="display:flex;align-items:baseline;gap:9px">
-          <div class="t" style="flex:1">${A.esc(b.n)}</div>
+          <div class="t" style="flex:1">${A.txt(b.n)}</div>
           <div class="d" style="margin:0">${money(b)}</div></div>
         <div class="d">${b.d} · ${b.nights} לילות${b.meals ? ' · ' + b.meals : ''}${b.est ? ' · הערכה' : ''}
           ${b.cur ? '<span class="chip hot">כאן הלילה</span>' : ''}</div>
       </button>
       <div class="ph-body"><div class="bkd">
         <div class="well" style="margin-top:0">
-          ${addr ? `<div class="pk"><b>📍</b><span class="jp">${A.esc(addr)}</span></div>` : ''}
+          ${addr ? `<div class="pk"><b>📍</b><span class="jp">${A.txt(addr)}</span></div>` : ''}
           ${b.f.phone ? `<div class="pk"><b>☎</b><span><a class="tel" href="tel:${b.f.phone.replace(/-/g, '')}">${b.f.phone}</a></span></div>` : ''}
           ${b.f.free ? `<div class="pk"><b>⏳</b><span>ביטול חינם עד ${b.f.free}</span></div>` : ''}
-          ${b.meals ? `<div class="pk"><b>🍽</b><span>${A.esc(b.meals)}</span></div>` : ''}
-          ${b.note ? `<div class="pk more"><b>ℹ️</b><span>${A.esc(b.note)}</span></div>` : ''}
+          ${b.meals ? `<div class="pk"><b>🍽</b><span>${A.txt(b.meals)}</span></div>` : ''}
+          ${b.note ? `<div class="pk more"><b>ℹ️</b><span>${A.txt(b.note)}</span></div>` : ''}
         </div>
         ${addr ? `<div class="tcard" style="margin-top:10px">
           <div class="ask jp">ここまでお願いします</div>
-          <div class="nm jp">${A.esc(driver(addr, short).nm)}</div>
-          ${driver(addr, short).ad ? `<div class="ad jp">${A.esc(driver(addr, short).ad)}</div>` : ''}
+          <div class="nm jp">${A.txt(driver(addr, short).nm)}</div>
+          ${driver(addr, short).ad ? `<div class="ad jp">${A.txt(driver(addr, short).ad)}</div>` : ''}
           ${b.f.phone ? `<div class="ph">${b.f.phone}</div>` : ''}
         </div>
         <div class="d" style="text-align:center;margin-top:5px">להראות לנהג</div>` : ''}
@@ -102,7 +102,7 @@
     T.docs.forEach(d => {
       h += `<a href="${d.url}" target="_blank" rel="noopener" class="step" style="margin-top:7px;text-decoration:none;color:inherit">
         <b class="ic">${d.ic || '📄'}</b>
-        <span><div class="t">${A.esc(d.t)}</div><div class="d" style="margin:0">${A.esc(d.d)}</div></span></a>`;
+        <span><div class="t">${A.txt(d.t)}</div><div class="d" style="margin:0">${A.txt(d.d)}</div></span></a>`;
     });
   }
   document.getElementById('main').innerHTML = h;

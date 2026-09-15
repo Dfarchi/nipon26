@@ -705,3 +705,59 @@ body.is-day .card.ph > .vig.on{opacity:.26}
 .l-house img.on{opacity:1}
 body.is-day .l-house img{filter:none}
 @media (prefers-reduced-motion:reduce){.l-house img{transition:none}}
+
+/* ===== שמות בכתב זר =====
+   רק 21% מהשדות מכילים כתב לא-עברי, וכמעט כולם שמות פרטיים: ערים,
+   תחנות, מלונות, קווי רכבת. אין כאן מה לתרגם — הבעיה טיפוגרפית.
+   "טוקיו (Tokyo · 東京)" מכריח את העין לשלוש החלפות כיוון בשורה אחת.
+   השם נשאר, כי צריך אותו מול שילוט ומול נהג מונית, אבל הוא נסוג:
+   קטן יותר, עמום יותר, ובגופן שלו — כך שאפשר לדלג עליו בקריאה. */
+.f-lat,.f-jp{font-style:normal;font-size:.92em;color:var(--soft);
+  unicode-bidi:isolate}
+.f-jp{font-family:'Noto Sans JP','Heebo',sans-serif;font-size:.9em;
+  letter-spacing:.01em}
+/* בכותרות ובכרטיס הנהג הם לא נסוגים — שם הם העיקר ולא הערה */
+.dnum .f-lat,.dnum .f-jp,.city .f-lat,.city .f-jp,
+.tcard .f-lat,.tcard .f-jp,.jp .f-jp,.jp .f-lat{
+  font-size:inherit;color:inherit;letter-spacing:inherit}
+
+/* ===== זוהר חם על הטקסט =====
+   היה על "יפן 2026" באתר הישן וזה רוב ההבדל באווירה: בלי מקור אור
+   הטקסט יושב על משטח שטוח. כאן הוא על הכותרות הגדולות בלבד — על גוש
+   טקסט שלם זה הופך לטשטוש. בלילה זוהר ענבר, ביום נייר בהיר מאחור. */
+.h1,.city,.countdown .n,.big{
+  text-shadow:0 1px 0 color-mix(in srgb,var(--hot) 14%,transparent),
+              0 0 22px color-mix(in srgb,var(--hot) 26%,transparent),
+              0 2px 30px color-mix(in srgb,var(--hot) 14%,transparent)}
+body.is-day .h1,body.is-day .city,body.is-day .countdown .n,body.is-day .big{
+  text-shadow:0 1px 0 rgba(255,255,255,.7),
+              0 0 18px color-mix(in srgb,var(--hot) 18%,transparent)}
+.lbl{text-shadow:0 0 14px color-mix(in srgb,var(--hot) 18%,transparent)}
+body.is-day .lbl{text-shadow:none}
+@media (prefers-reduced-motion:reduce){}
+
+/* סוגריים שכל תוכנם שם זר — יחידה אחת, כדי שאפשר יהיה להסתיר אותה
+   בלי להשאיר סוגריים ריקים על המסך. */
+.f-par{font-style:normal}
+body.names-off .f-par{display:none}
+body.names-off .f-par + .f-par{display:none}
+/* רווח כפול שנשאר אחרי הסתרה נבלע */
+body.names-off .d,body.names-off .t{word-spacing:normal}
+
+/* ===== מתג בשורה =====
+   שורה שלמה לחיצה, לא ריבוע קטן בקצה — 56px גובה, הרבה מעל המינימום. */
+.row-tog{display:flex;align-items:center;gap:14px;width:100%;min-height:56px;
+  padding:6px 2px;background:none;border:0;font:inherit;color:inherit;
+  text-align:start;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.row-tog > span{flex:1;min-width:0;display:block}
+.row-tog .d{display:block;margin-top:2px}
+.row-tog .sw{flex:none;width:46px;height:28px;border-radius:99px;position:relative;
+  background:color-mix(in srgb,var(--soft) 30%,transparent);
+  border:1px solid var(--line);transition:background .2s var(--e-out)}
+.row-tog .sw::after{content:'';position:absolute;top:3px;inset-inline-start:3px;
+  width:20px;height:20px;border-radius:50%;background:var(--card);
+  box-shadow:var(--shLo);transition:transform .22s var(--e-spring)}
+.row-tog[aria-pressed="true"] .sw{background:var(--hot)}
+.row-tog[aria-pressed="true"] .sw::after{transform:translateX(-18px)}
+.row-tog:active{opacity:.7}
+@media (prefers-reduced-motion:reduce){.row-tog .sw,.row-tog .sw::after{transition:none}}

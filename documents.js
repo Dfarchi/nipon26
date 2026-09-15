@@ -4,7 +4,7 @@
 
   const row = d => `<a href="${d.url}" target="_blank" rel="noopener" class="step" style="margin-top:7px;text-decoration:none;color:inherit">
     <b class="ic">${d.ic || '📄'}</b>
-    <span><div class="t">${A.esc(d.t)}</div><div class="d" style="margin:0">${A.esc(d.d)}</div></span>
+    <span><div class="t">${A.txt(d.t)}</div><div class="d" style="margin:0">${A.txt(d.d)}</div></span>
     <span style="color:var(--dim)">↗</span></a>`;
 
   let h = `<div class="head"><div class="kicker">מקור האמת — מקושר לגוגל דרייב</div><div class="h1">מסמכים</div></div>`;

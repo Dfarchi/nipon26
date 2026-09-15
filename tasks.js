@@ -46,14 +46,14 @@
           <span class="chip ${cls} lead">${days(lead.dl.days)}</span>
           <div class="d" style="margin:0;flex:1">${lead.n}</div>
           <span class="chip ok flag">בוצע</span></div>
-        <div class="t" style="margin-top:6px">${clip(A.esc(lead.q), 150)}</div>
+        <div class="t" style="margin-top:6px">${clip(A.txt(lead.q), 150)}</div>
         <div class="steps well">` +
-        lead.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.esc(x.t)}</span></div>`).join('') +
+        lead.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.txt(x.t)}</span></div>`).join('') +
         `</div></div>`;
       if (near.length) {
         h += `<div class="well" style="margin-top:8px">` + near.map(i => `
           <a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="cursor:pointer;text-decoration:none;color:inherit">
-            <b>${i.dl.d}</b><span>${clip(A.esc(i.q), 80)}</span>
+            <b>${i.dl.d}</b><span>${clip(A.txt(i.q), 80)}</span>
             <span class="chip">${days(i.dl.days)}</span>
             <span class="chip ok flag">בוצע</span></a>`).join('') + `</div>`;
       }
@@ -65,14 +65,14 @@
         const picked = chosen(i.n);
         h += `<div class="card" style="margin-top:8px">
           <div style="display:flex;gap:10px;align-items:baseline">
-            <span class="chip">${i.n}</span><div class="t" style="flex:1">${A.esc(i.q)}</div></div>
+            <span class="chip">${i.n}</span><div class="t" style="flex:1">${A.txt(i.q)}</div></div>
           <div class="steps well">` +
           (i.o || []).map((o, k) => {
             const isPicked = picked.includes(k);
             return `<a class="step opt${isPicked ? ' is-picked' : ''}" data-dec="${A.esc(i.n)}" data-i="${k}" data-multi="${i.multi || 0}"
               style="cursor:pointer;text-decoration:none;color:inherit">
               <i class="pip box"></i>
-              <span>${A.esc(o.t)}</span>${i.rec === k ? '<span class="chip hot">מומלץ</span>' : ''}</a>`;
+              <span>${A.txt(o.t)}</span>${i.rec === k ? '<span class="chip hot">מומלץ</span>' : ''}</a>`;
           }).join('') +
           `</div></div>`;
       });
@@ -82,7 +82,7 @@
     rest.forEach(i => {
       h += `<a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="margin-top:7px;align-items:flex-start;cursor:pointer;text-decoration:none;color:inherit">
         <b style="min-width:34px">${i.n}</b>
-        <span>${clip(A.esc(i.q), 150)}</span>
+        <span>${clip(A.txt(i.q), 150)}</span>
         ${i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : ''}
         <span class="chip ok flag">בוצע</span></a>`;
     });

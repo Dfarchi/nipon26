@@ -33,8 +33,42 @@ window.App = (function () {
   // טקסט המחבר מכיל <b> ו-<br> בכוונה. בורחים מהכל ואז מחזירים רק את השניים
   // האלה — כך שסימן קטן יותר בתוכן לא יכול להפוך לתגית.
   function rich(s) {
-    return esc(s).replace(/&lt;(\/?)b&gt;/g, '<$1b>').replace(/&lt;br\s*\/?&gt;/g, '<br>');
+    return foreign(esc(s).replace(/&lt;(\/?)b&gt;/g, '<$1b>').replace(/&lt;br\s*\/?&gt;/g, '<br>'));
   }
+
+  // ===== שמות בכתב זר =====
+  // רק 21% מהשדות מכילים כתב לא-עברי, וכמעט כולם שמות פרטיים: ערים,
+  // תחנות, מלונות, קווי רכבת. אין כאן מה לתרגם — הבעיה היא טיפוגרפית.
+  // "טוקיו (Tokyo · 東京)" מכריח את העין לשלוש החלפות כיוון בשורה אחת.
+  // הפתרון הוא לא כפתור שפה אלא הנמכה: השם נשאר (צריך אותו מול שילוט
+  // ומול נהג), אבל קטן, עמום, ובגופן שלו — כך שאפשר לדלג עליו.
+  // מעבר אחד בלבד: שני מעברים נפרדים הביאו לכך שהסריקה הלטינית נכנסה
+  // לתוך התגית שהסריקה היפנית בדיוק הוסיפה.
+  // הסדר חשוב: קודם סוגריים שכל תוכנם זר, כדי שאפשר יהיה להסתיר את כל
+  // ה-"(Senseki Line 仙石線)" כיחידה ולא להשאיר סוגריים ריקים.
+  const HEB = /[\u0590-\u05FF]/;
+  const FOREIGN = new RegExp(
+    '(&[a-z]+;|<[^>]*>)' +                                    // 1 — לא נוגעים
+    '|\\(([^()]{2,60})\\)' +                                    // 2 — סוגריים
+    '|([\u3040-\u30ff\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]+)' +   // 3 — יפנית
+    '|([A-Za-z][A-Za-z0-9\'\u2019\\-.]*(?:[ \u00a0][A-Za-z][A-Za-z0-9\'\u2019\\-.]*)*)', // 4
+    'g');
+
+  function foreign(safe) {
+    return String(safe).replace(FOREIGN, (m, keep, par, jp, lat) => {
+      if (keep) return m;
+      if (par !== undefined) {
+        // סוגריים שיש בהם עברית הם הערה בעברית — לא נוגעים
+        return HEB.test(par) || !/[A-Za-z\u3040-\u9fff]/.test(par)
+          ? m : `<i class="f-par">(${foreign(par)})</i>`;
+      }
+      return jp ? `<i class="f-jp">${jp}</i>` : `<i class="f-lat">${lat}</i>`;
+    });
+  }
+
+  // esc לתוכן אלמנט: בורח, ואז מנמיך את השמות בכתב זר. לא לשימוש
+  // בתוך תכונת HTML — שם צריך esc נקי, אחרת התגית נשברת.
+  const txt = s => foreign(esc(s));
 
   function factsFor(name) {
     const key = String(name).replace(/[·—–-].*$/, '').trim().split(/\s+/).filter(w => w.length > 2);
@@ -57,6 +91,17 @@ window.App = (function () {
   // ===== מי מחזיק את הטלפון =====
   // שניכם פותחים את אותה כתובת ואין התחברות, אז אין דרך לדעת מי זה —
   // חוץ מלשאול פעם אחת ולזכור במכשיר. מדלגים? פשוט לא פונים בשם.
+  // מתג השמות המקומיים. ברירת המחדל דולקת — ביפן צריך את 松島海岸駅 מול
+  // השילוט. בתכנון מהבית זה רק רעש, ואז מכבים.
+  const NAMES_KEY = 'nipon26_names';
+  function namesOn() {
+    try { return localStorage.getItem(NAMES_KEY) !== '0'; } catch (e) { return true; }
+  }
+  function setNames(on) {
+    try { localStorage.setItem(NAMES_KEY, on ? '1' : '0'); } catch (e) {}
+    document.body.classList.toggle('names-off', !on);
+  }
+
   const WHO_KEY = 'nipon26_who';
   const PEOPLE = { yuval: 'יובל', shir: 'שירשה' };
   const who = () => { try { return localStorage.getItem(WHO_KEY) || ''; } catch (e) { return ''; } };
@@ -1012,6 +1057,7 @@ window.App = (function () {
       const n = new Date(), d = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
       if (d !== bootDay) location.reload();
     });
+    document.body.classList.toggle('names-off', !namesOn());
     net();
     parallax();
     const phase = (T.dayPhase && T.days) ? (T.dayPhase[T.days[dayIndex()].st] ?? 0) : 0;
@@ -1026,5 +1072,5 @@ window.App = (function () {
     weather(phase, (m, rec) => { particles(fx, pmF(m)); decorate(m); showWx(m, rec, false); });
   }
 
-  return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

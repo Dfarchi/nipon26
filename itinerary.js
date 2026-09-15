@@ -56,15 +56,15 @@
             loading="lazy" onload="this.classList.add('on')">
           <button class="exp" data-ph="${i}" aria-expanded="${isOpen}">
             <div style="display:flex;align-items:baseline;gap:8px">
-              <div class="t" style="flex:1">${A.esc(title(p.h))}</div>
-              ${isCur ? '<span class="chip hot">כאן עכשיו</span>' : `<div class="d" style="margin:0">${A.esc(p.when)}</div>`}
+              <div class="t" style="flex:1">${A.txt(title(p.h))}</div>
+              ${isCur ? '<span class="chip hot">כאן עכשיו</span>' : `<div class="d" style="margin:0">${A.txt(p.when)}</div>`}
             </div>
-            <div class="d" style="margin-top:4px">${A.esc(p.nights)}</div>
+            <div class="d" style="margin-top:4px">${A.txt(p.nights)}</div>
           </button>`;
 
       {
         h += `<div class="ph-body"><div>
-          <div class="d" style="margin-top:8px;line-height:1.6">${A.esc(p.p)}</div>`;
+          <div class="d" style="margin-top:8px;line-height:1.6">${A.txt(p.p)}</div>`;
         if (days.length) {
           h += `<div class="steps well">` + days.map(({ d, i: di }, k) => {
             const m = String(d.t).match(/^(\d{1,2}\.\d{1,2})\s*—\s*(.*)$/);
@@ -73,7 +73,7 @@
             // הלחיצה כבר לא מנווטת אלא פותחת הצצה. השברון יורד ולא לצד,
             // כי זה מה שמבדיל "ייפתח כאן" מ"ייקח אותך למקום אחר".
             return `<button class="step day" data-d="${di}" aria-expanded="false" style="--i:${k};${style}">
-              <b>${m ? m[1] : ''}</b><span>${A.esc(clip(m ? m[2] : String(d.t), 46))}</span>
+              <b>${m ? m[1] : ''}</b><span>${A.txt(clip(m ? m[2] : String(d.t), 46))}</span>
               ${isToday ? '<i class="pip" style="background:var(--hot)"></i>' : ''}</button>`;
           }).join('') + `</div>`;
         }
@@ -109,13 +109,13 @@
   function peekFor(di) {
     const d = T.days[di], acts = d.acts || [], stay = stayOn(d.t);
     let h = '<div class="peek-in">';
-    if (d.flag) h += `<div class="pk flag"><span>${A.esc(String(d.flag).replace(/<[^>]+>/g, '')).slice(0, 150)}…</span></div>`;
+    if (d.flag) h += `<div class="pk flag"><span>${A.txt(String(d.flag).replace(/<[^>]+>/g, '')).slice(0, 150)}…</span></div>`;
     h += acts.length
       ? acts.slice(0, 6).map(a => `<div class="pk"><b>${a.ic || '·'}</b>
-          <span>${A.esc(clip(String(a.t), 52))}</span>${a.cr ? `<i>${a.cr}</i>` : ''}</div>`).join('')
+          <span>${A.txt(clip(String(a.t), 52))}</span>${a.cr ? `<i>${a.cr}</i>` : ''}</div>`).join('')
         + (acts.length > 6 ? `<div class="pk more">ועוד ${acts.length - 6}</div>` : '')
       : '<div class="pk more">יום פנוי</div>';
-    if (stay) h += `<div class="pk stay"><b>🛏</b><span>${A.esc(stay.n)}</span></div>`;
+    if (stay) h += `<div class="pk stay"><b>🛏</b><span>${A.txt(stay.n)}</span></div>`;
     h += `<a class="go" href="today.html?d=${di}">לפתוח את היום</a></div>`;
     return h;
   }

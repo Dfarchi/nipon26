@@ -60,11 +60,24 @@
         </div>
         ${addr ? `<div class="well" style="margin-top:12px">
           <div class="pk"><b>📍</b><span>איפה אתם הלילה — להקריא או להראות</span></div>
-          <div class="pk"><b></b><span class="jp" style="color:var(--ink);font-weight:700">${A.esc(addr)}</span></div>
+          <div class="pk"><b></b><span class="jp" style="color:var(--ink);font-weight:700">${A.txt(addr)}</span></div>
         </div>` : ''}
         <div class="d" style="margin-top:9px">עובדים מכל טלפון ביפן, גם נעול וגם בלי סים מקומי.</div>
       </div>`;
   }
+
+  // ---- שמות מקומיים ----
+  // לא כפתור תרגום: אין כאן מה לתרגם, הכל עברית חוץ משמות פרטיים.
+  // המתג מחליט אם השמות בסוגריים מוצגים. ביפן כן — צריך את 松島海岸駅
+  // מול השילוט. בתכנון מהבית זה רעש.
+  h += `<div class="lbl" style="margin-top:22px">שמות מקומיים<i></i></div>
+    <div class="card">
+      <button class="row-tog" id="namesTog" aria-pressed="${A.namesOn()}">
+        <span><b>יפנית ולטינית בסוגריים</b>
+          <span class="d">טוקיו (Tokyo · 東京) — להציג או להשקיט</span></span>
+        <i class="sw"></i>
+      </button>
+    </div>`;
 
   // ---- ספר החותמות ----
   // 朱印 — חותמת אדומה שאוספים במקדשים. כאן חותמת לכל אזור שישנתם בו,
@@ -87,12 +100,19 @@
         const f = FRAME[i % FRAME.length];
         return `<div class="stamp${on ? ' on' : ''}" data-f="${f}">
           <img src="assets/shuin/shuin-${f}.webp" alt="" decoding="async" loading="lazy">
-          <span>${A.esc(x.r)}</span></div>`;
+          <span>${A.txt(x.r)}</span></div>`;
       }).join('') +
       `</div><div class="d" style="margin-top:10px">חותמת לכל אזור שכבר ישנתם בו</div></div>`;
   }
 
   document.getElementById('main').innerHTML = h;
+
+  const nt = document.getElementById('namesTog');
+  if (nt) nt.onclick = () => {
+    const on = nt.getAttribute('aria-pressed') !== 'true';
+    nt.setAttribute('aria-pressed', on);
+    A.setNames(on);
+  };
   A.reveal(document.getElementById('main'));
 
   // ---- שעונים ----

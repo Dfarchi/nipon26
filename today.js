@@ -57,13 +57,13 @@
   if (acts.length) {
     const a = acts[0], tm = time(a.d) || time(a.t);
     h += `<div class="card now"><div class="lbl">עכשיו<i></i>${tm ? `<span class="big">${tm}</span>` : ''}</div>
-      <div class="t">${a.ic || ''} ${A.esc(a.t)}</div>
-      ${a.d ? `<div class="d">${A.esc(a.d).slice(0, 160)}</div>` : ''}</div>`;
+      <div class="t">${a.ic || ''} ${A.txt(a.t)}</div>
+      ${a.d ? `<div class="d">${A.txt(a.d).slice(0, 160)}</div>` : ''}</div>`;
   }
   if (acts.length > 1) {
     h += `<div style="margin-top:16px"><div class="lbl q">אחר כך<i></i></div><div class="steps">` +
       acts.slice(1, 6).map(a => `<div class="step"><b>${time(a.d) || time(a.t) || (a.ic || '·')}</b>
-        <span>${A.esc(a.t)}</span><i class="pip" style="background:${crowd(a.cr)}"></i></div>`).join('') + `</div></div>`;
+        <span>${A.txt(a.t)}</span><i class="pip" style="background:${crowd(a.cr)}"></i></div>`).join('') + `</div></div>`;
   }
   // המנה של האזור. לא "מה לאכול היום" אלא מה המקום הזה עושה טוב —
   // המפתח הוא תחילת day.st, אותו שדה נקי שממנו נגזר גם הנוף.
@@ -75,14 +75,14 @@
         onload="this.classList.add('on')">
       <div class="dish-t">
         <div class="lbl q">לאכול כאן<i></i></div>
-        <div class="t">${A.esc(dish.t)}</div>
-        <div class="d">${A.esc(dish.d)}</div>
+        <div class="t">${A.txt(dish.t)}</div>
+        <div class="d">${A.txt(dish.d)}</div>
       </div></a>`;
   }
 
   if (stay) {
     const f = A.factsFor(stay.n);
-    h += `<div class="card"><div class="lbl q">הלילה<i></i></div><div class="t">${A.esc(stay.n)}</div>
+    h += `<div class="card"><div class="lbl q">הלילה<i></i></div><div class="t">${A.txt(stay.n)}</div>
       <div class="d">${stay.d} · ${stay.nights} לילות${stay.meals ? ' · ' + stay.meals : ''}</div>
       ${f.addr ? `<div class="jp" style="margin-top:5px">${f.addr}</div>` : ''}</div>`;
   }
@@ -110,12 +110,12 @@
     (acts.length ? acts.map(a => `
       <div class="card" style="padding:12px 14px">
         <div style="display:flex;align-items:baseline;gap:8px">
-          <div class="t" style="flex:1">${a.ic || ''} ${A.esc(a.t)}</div>
+          <div class="t" style="flex:1">${a.ic || ''} ${A.txt(a.t)}</div>
           <i class="pip" style="background:${crowd(a.cr)}"></i>
         </div>
-        ${a.d ? `<div class="d" style="margin-top:5px;line-height:1.5">${A.esc(a.d)}</div>` : ''}
+        ${a.d ? `<div class="d" style="margin-top:5px;line-height:1.5">${A.txt(a.d)}</div>` : ''}
         ${(a.l || []).length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">` +
-          a.l.map(x => `<a class="chip" href="${x.u}" target="_blank" rel="noopener" style="text-decoration:none">${A.esc(x.t)}</a>`).join('') +
+          a.l.map(x => `<a class="chip" href="${x.u}" target="_blank" rel="noopener" style="text-decoration:none">${A.txt(x.t)}</a>`).join('') +
           `</div>` : ''}
       </div>`).join('') : `<div class="empty">${(window.ART && ART.onigiri) ? ART.onigiri({ w: 58 }) : ''}
         <div class="d">יום פנוי — בלי פעילויות מתוכננות</div></div>`) +
