@@ -535,3 +535,8 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 .l-village[data-kind="nagoya"],.l-village[data-kind="kyoto"]{--land:#18222c}
 body.is-day .l-village[data-kind="tokyo"],body.is-day .l-village[data-kind="osaka"],
 body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyoto"]{--land:#a69c8a}
+
+/* מזג האוויר בשורה העליונה. הבקשה רצה בטלפון ולא ניתנת לבדיקה מכאן,
+   אז היא צריכה לומר בעצמה מה חזר: מצב, מעלות, איפה נמדד, ולפני כמה זמן. */
+.wx{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56vw}
+.wx::before{content:'·';margin-inline-end:6px;color:var(--soft);opacity:.7}

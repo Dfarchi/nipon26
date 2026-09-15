@@ -115,22 +115,51 @@ window.App = (function () {
   }
   function coordsFor(phase) {
     const p = (T.mapPoints || []).find(x => x.ph === phase && x.lat) || (T.mapPoints || [])[0];
-    return p ? { lat: p.lat, lng: p.lng } : null;
+    // השם ב-mapPoints הוא "טוקיו (Tokyo · 東京)" או "יודאנקה · קופי ג'יגוקודאי".
+    // לשורה צרה צריך רק את החלק הראשון בעברית.
+    const nm = String(p && p.n || '').replace(/\s*[(（].*$/, '').split(/\s*[·\/]\s*/)[0].trim();
+    return p ? { lat: p.lat, lng: p.lng, n: nm } : null;
   }
   function weather(phase, cb) {
     let cached = null;
     try { cached = JSON.parse(localStorage.getItem(WKEY) || 'null'); } catch (e) {}
-    if (cached && Date.now() - cached.at < 36e5) return cb(cached.mode);
+    if (cached && Date.now() - cached.at < 36e5) return cb(cached.mode, cached);
     const c = coordsFor(phase);
-    if (!c || !navigator.onLine) return cb(cached ? cached.mode : 'leaves');
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&current=weather_code`)
+    if (!c || !navigator.onLine) return cb(cached ? cached.mode : 'leaves', cached);
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}` +
+          `&current=weather_code,temperature_2m`)
       .then(r => r.json())
       .then(j => {
-        const mode = modeFromCode(j && j.current && j.current.weather_code);
-        try { localStorage.setItem(WKEY, JSON.stringify({ mode, at: Date.now() })); } catch (e) {}
-        cb(mode);
+        const cur = (j && j.current) || {};
+        const rec = { mode: modeFromCode(cur.weather_code), at: Date.now(),
+                      temp: typeof cur.temperature_2m === 'number' ? Math.round(cur.temperature_2m) : null,
+                      place: c.n };
+        try { localStorage.setItem(WKEY, JSON.stringify(rec)); } catch (e) {}
+        cb(rec.mode, rec);
       })
-      .catch(() => cb(cached ? cached.mode : 'leaves'));
+      .catch(() => cb(cached ? cached.mode : 'leaves', cached));
+  }
+
+  // ===== שורת מזג האוויר =====
+  // הבקשה רצה בדפדפן של הטלפון ואי אפשר לבדוק אותה מכאן. בלי שורה שאומרת
+  // מה חזר, "עובד" הוא ניחוש. עכשיו כתוב מה נמדד, איפה, ומתי — ואם זה
+  // נכפה ב-?wx= או בא מהזיכרון, זה כתוב גם.
+  const WX_LABEL = { clear: ['☀️', 'בהיר'], leaves: ['⛅', 'מעונן'], rain: ['🌧', 'גשם'],
+                     snow: ['❄️', 'שלג'], mist: ['🌫', 'ערפל'] };
+  function showWx(mode, rec, forced) {
+    const el = document.getElementById('wx');
+    if (!el) return;
+    const [ic, name] = WX_LABEL[mode] || WX_LABEL.leaves;
+    let s = `${ic} ${name}`;
+    if (rec && typeof rec.temp === 'number') s += ` ${rec.temp}°`;
+    if (rec && rec.place) s += ` · ${rec.place}`;
+    if (forced) s += ' · נכפה';
+    else if (rec && rec.at) {
+      const min = Math.round((Date.now() - rec.at) / 6e4);
+      s += min < 2 ? ' · עכשיו' : ` · לפני ${min} דק׳`;
+    } else s += ' · אין נתון';
+    el.textContent = s;
+    el.hidden = false;
   }
 
   // ===== חלקיקים: עלים / גשם / שלג =====
@@ -890,12 +919,12 @@ window.App = (function () {
     const fx = document.getElementById('fx');
     const forced = q.get('wx');
     const pmF = m => m === 'clear' ? 'leaves' : m;
-    if (forced) { particles(fx, pmF(forced)); decorate(forced); return; }
+    if (forced) { particles(fx, pmF(forced)); decorate(forced); showWx(forced, null, true); return; }
     // decorate מקבל את המצב האמיתי (הוא מכוון שמש/ערפל), אבל החלקיקים
     // מתרגמים "בהיר" לשלכת: clear היה n:0, כלומר שום דבר לא נפל ביום בהיר
     // באוקטובר — בדיוק העונה שבשבילה נוסעים.
     particles(fx, 'leaves'); decorate('clear');         // ברירת מחדל מיידית
-    weather(phase, m => { particles(fx, pmF(m)); decorate(m); });
+    weather(phase, (m, rec) => { particles(fx, pmF(m)); decorate(m); showWx(m, rec, false); });
   }
 
   return { T, q, theme, esc, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
