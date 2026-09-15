@@ -97,7 +97,7 @@ nagoya-castle. יחס אחד־לאחד ל-`LM` ב-`app.js`.
 `A.cat` — אם זה נראה מודבק, נשארים על הווקטור בסצנה ומשתמשים
 בתמונות רק בכרטיסים הגדולים.
 
-### שלב 6 — המנה היומית  `assets/food/`
+### ✅ שלב 6 — המנה היומית  `assets/food/`
 `ramen`, `gyutan`, `takoyaki`, `onigiri`, `nigiri-salmon`, `matcha`,
 `dango`, `yaki-imo`.
 

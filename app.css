@@ -627,3 +627,19 @@ body.is-day .l-chars .cat-img{filter:none}
 .l-chars .ch:has(.cat-img.on) .cat-fallback{opacity:0;transition:opacity .4s var(--e-out)}
 @media (prefers-reduced-motion:reduce){
   .l-chars .cat-img{transition:none}}
+
+/* ===== כרטיס המנה =====
+   התמונה היא חצי מהכרטיס, לא אייקון קטן לצד טקסט. בגודל הזה (288px
+   מקור, ~96 מוצג) האיור נושא את עצמו, וטקסט לצדו הוא ההסבר. */
+.card.dish{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;
+  padding:12px 14px;overflow:hidden}
+.card.dish img{height:84px;width:auto;max-width:44%;flex:none;opacity:0;
+  transform:scale(.92) rotate(-3deg);transform-origin:50% 60%;
+  transition:opacity .45s var(--e-out),transform .5s var(--e-spring)}
+.card.dish img.on{opacity:1;transform:none}
+.card.dish .dish-t{flex:1;min-width:0}
+.card.dish .lbl{margin-bottom:4px}
+.card.dish .d{margin-top:3px;line-height:1.45}
+.card.dish:active{transform:scale(.985);box-shadow:var(--shLo)}
+@media (prefers-reduced-motion:reduce){
+  .card.dish img{transition:none;transform:none}}

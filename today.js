@@ -65,6 +65,21 @@
       acts.slice(1, 6).map(a => `<div class="step"><b>${time(a.d) || time(a.t) || (a.ic || '·')}</b>
         <span>${A.esc(a.t)}</span><i class="pip" style="background:${crowd(a.cr)}"></i></div>`).join('') + `</div></div>`;
   }
+  // המנה של האזור. לא "מה לאכול היום" אלא מה המקום הזה עושה טוב —
+  // המפתח הוא תחילת day.st, אותו שדה נקי שממנו נגזר גם הנוף.
+  const region = String(cur.st || '').replace(/\s*·.*$/, '').trim();
+  const dish = (T.dish || {})[region];
+  if (dish) {
+    h += `<a class="card dish" href="tools.html#dish">
+      <img src="assets/food/${dish.a}.webp" alt="" decoding="async" loading="lazy"
+        onload="this.classList.add('on')">
+      <div class="dish-t">
+        <div class="lbl q">לאכול כאן<i></i></div>
+        <div class="t">${A.esc(dish.t)}</div>
+        <div class="d">${A.esc(dish.d)}</div>
+      </div></a>`;
+  }
+
   if (stay) {
     const f = A.factsFor(stay.n);
     h += `<div class="card"><div class="lbl q">הלילה<i></i></div><div class="t">${A.esc(stay.n)}</div>

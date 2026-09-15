@@ -2,7 +2,7 @@
    קליפה: cache-first (מהיר, עובד אופליין).
    trip.json: network-first (תוכן הטיול זז כל יום — רוצים את הטרי, עם נפילה לעותק).
    מארחים חיצוניים (leaflet, אריחי מפה): לא נוגעים — הם לא זמינים אופליין ממילא. */
-const V = '2026091529';
+const V = '2026091532';
 const SHELL = 'nipon26-shell-' + V;
 const DATA  = 'nipon26-data-' + V;
 
@@ -28,7 +28,11 @@ const SHELL_FILES = [
   './assets/street/utility-pole.webp', './assets/street/vending-machine.webp',
   './assets/street/water-tank.webp', './assets/cats/bellatrix-sit.webp',
   './assets/cats/cat-sleep.webp', './assets/cats/cat-tail-up.webp',
-  './assets/cats/morgana-sit.webp', './assets/sky/birds.webp',
+  './assets/cats/morgana-sit.webp', './assets/food/dango.webp',
+  './assets/food/gyutan.webp', './assets/food/matcha.webp',
+  './assets/food/nigiri-salmon.webp', './assets/food/onigiri.webp',
+  './assets/food/ramen.webp', './assets/food/takoyaki.webp',
+  './assets/food/yaki-imo.webp', './assets/sky/birds.webp',
   './assets/sky/clouds-day.webp', './assets/sky/clouds-night.webp',
   './assets/sky/leaf-1.webp', './assets/sky/leaf-2.webp',
   './assets/sky/leaf-3.webp', './assets/sky/leaf-4.webp',
