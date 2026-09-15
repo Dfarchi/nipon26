@@ -544,3 +544,19 @@ body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyo
    אז היא צריכה לומר בעצמה מה חזר: מצב, מעלות, איפה נמדד, ולפני כמה זמן. */
 .wx{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56vw}
 .wx::before{content:'·';margin-inline-end:6px;color:var(--soft);opacity:.7}
+
+/* ===== ציון הדרך =====
+   שכבה נפרדת ולא בתוך .l-village, כי שם preserveAspectRatio="none" מותח
+   הכל ×1.144 לרוחב — נתיב SVG לא אכפת לו, תמונה מתעוותת.
+   אותה מערכת צירים כמו .l-chars, אותו עודף 28px לכל צד, אותו עומק. */
+.l-lm{position:absolute;right:-28px;left:-28px;bottom:30px;height:74px;
+  pointer-events:none;will-change:transform}
+.l-lm img{position:absolute;transform:translateX(-50%);width:auto;
+  opacity:0;transition:opacity .35s var(--e-out)}
+.l-lm img.on{opacity:1}
+/* הציור הווקטורי נשאר מתחת כגיבוי — אין הבזק בטעינה ראשונה, ואם
+   הקובץ לא הגיע נשאר משהו על המסך. נעלם ברגע שהתמונה נטענה. */
+.scene:has(.l-lm img.on) .l-village .lm-fallback{opacity:0;transition:opacity .35s var(--e-out)}
+@media (prefers-reduced-motion:reduce){
+  .l-lm img{transition:none}
+  .scene:has(.l-lm img.on) .l-village .lm-fallback{transition:none}}

@@ -215,7 +215,7 @@ window.App = (function () {
   let LAYERS = null, ticking = false, lastOp = 1;
 
   // עומק לכל שכבה: [בורר, מקדם גלילה]
-  const DEPTH = [['.l-sky', 0.06], ['.l-far', 0.12], ['.l-village', 0.42], ['.l-chars', 0.42]];
+  const DEPTH = [['.l-sky', 0.06], ['.l-far', 0.12], ['.l-village', 0.42], ['.l-lm', 0.42], ['.l-chars', 0.42]];
 
   // נקרא גם אחרי decorate(), שמחליף את .l-chars ומשאיר הפניה מתה
   function cacheLayers() {
@@ -592,6 +592,26 @@ window.App = (function () {
     `<path d="M${cx - half - 4},${y + drop} Q${cx - half},${y + drop - 3} ${cx - half + 3},${y + drop - 4} ` +
     `L${cx},${y} L${cx + half - 3},${y + drop - 4} Q${cx + half},${y + drop - 3} ${cx + half + 4},${y + drop} Z"/>`;
 
+  // ---- ציוני דרך: התמונות ----
+  // גובה לכל אחד בנפרד, כי הם לא באמת באותו סדר גודל: מגדל טוקיו מתנשא
+  // מעל העיר, תורי בקושי מעל גג. base הוא כמה הבסיס יושב מעל קו הקרקע —
+  // התורי של המקדש עומד על מדרגה, המגדל ניצב על הקרקע.
+  const LM_IMG = {
+    // ‎tokyo-tower-night הגיע כציור שלם עם גלים, שמש ועצי אדר במקום צללית.
+    // עד שיוחלף — הקובץ הצבעוני בשתי הערכות. הוא נקרא סביר גם על שמי יום.
+    tokyo:  { f: 'tokyo-tower',   h: 86, base: 0, solo: 'day' },
+    osaka:  { f: 'tsutenkaku',    h: 74, base: 0 },
+    nagoya: { f: 'nagoya-castle', h: 46, base: 0 },
+    kyoto:  { f: 'pagoda',        h: 62, base: 0 },
+    torii:  { f: 'torii',         h: 34, base: 0 }
+  };
+  // הקבצים נקראים ‎-day (צבעוני) ו-‎-night (צללית כהה), וזה הפוך ממה
+  // שצריך: צללית כהה נעלמת על שמי לילה, וצבעוני בולט עליהם. בפועל —
+  // ביום הצללית, בלילה הצבעוני. זה גם נכון למציאות: מגדל טוקיו והפגודה
+  // מוארים בלילה. נבדק ברינדור: הפגודה והתורי הכהים פשוט לא נראו.
+  const lmFile = kind => { const c = LM_IMG[kind];
+    return `assets/landmarks/${c.f}-${c.solo || (theme === 'day' ? 'night' : 'day')}.webp`; };
+
   // ---- ציוני דרך ----
   const LM = {
     tokyo: cx => `<g fill="var(--torii)">
@@ -786,9 +806,11 @@ window.App = (function () {
     const fill = P.gassho || !P.flat ? 'var(--tile)' : 'var(--roof)';
     return {
       svg: `${GROUND}${back}<g fill="var(--tree)">${trees}</g>` +
-           `<g fill="${fill}" class="plate">${body}</g>${LM[P.lm](lmX)}` +
+           `<g fill="${fill}" class="plate">${body}</g>` +
+           `<g class="lm-fallback">${LM[P.lm](lmX)}</g>` +
            `<g opacity=".9">${lights}</g>${P.canal ? canalAt(R, litX) : ROAD}${extra}${street}`,
-      seats
+      seats,
+      lm: { kind: P.lm, x: lmX }
     };
   }
 
@@ -827,6 +849,20 @@ window.App = (function () {
     </svg>`;
   }
 
+  // ---- שכבת ציון הדרך ----
+  // תמונה לא נכנסת ל-.l-village: היא נמתחת שם ×1.144 לרוחב ומתעוותת.
+  // לכן שכבת div משלה, באותו עומק פארלקס, ובאותה המרת קואורדינטות
+  // שהחתולות משתמשות בה: left = x/3.9%  ·  bottom = 74 − y.
+  function lmLayer() {
+    const lm = SCENE && SCENE.lm;
+    if (!lm || !LM_IMG[lm.kind]) return '<div class="l-lm"></div>';
+    const c = LM_IMG[lm.kind];
+    const src = lmFile(lm.kind);
+    return `<div class="l-lm"><img src="${src}" alt="" decoding="async"
+      style="left:${(lm.x / 3.9).toFixed(1)}%;bottom:${c.base}px;height:${c.h}px"
+      onload="this.classList.add('on')"></div>`;
+  }
+
   // ---- ציור הסצנה ----
   function scene(host) {
     const r = document.documentElement.style;
@@ -836,6 +872,7 @@ window.App = (function () {
     host.innerHTML = `<div class="art"></div>${skyLayer()}<div class="fx" id="fx"></div>
       ${farSVG()}
       ${villageSVG()}
+      ${lmLayer()}
       ${charLayer('')}<div class="haze" id="haze"></div><div class="hem"></div>`;
   }
 

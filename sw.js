@@ -2,7 +2,7 @@
    קליפה: cache-first (מהיר, עובד אופליין).
    trip.json: network-first (תוכן הטיול זז כל יום — רוצים את הטרי, עם נפילה לעותק).
    מארחים חיצוניים (leaflet, אריחי מפה): לא נוגעים — הם לא זמינים אופליין ממילא. */
-const V = '2026091506';
+const V = '2026091509';
 const SHELL = 'nipon26-shell-' + V;
 const DATA  = 'nipon26-data-' + V;
 
@@ -13,7 +13,14 @@ const SHELL_FILES = [
   './styles.css', './data.js', './basemap.js', './delight.js', './mapexport.js',
   './pwa.js', './app.css', './app.js', './art.js', './today.js', './wallet.js', './tasks.js',
   './itinerary.js', './documents.js', './tools.js', './manifest.webmanifest',
-  './icon-192.png', './icon-512.png'
+  './icon-192.png', './icon-512.png',
+  // ציוני דרך — בלי אלה הסצנה חסרה אופליין. נכנסים לכאן
+  // ככל שקבוצות נוספות מ-assets/ מתחברות לאפליקציה.
+  './assets/landmarks/nagoya-castle-day.webp', './assets/landmarks/nagoya-castle-night.webp',
+  './assets/landmarks/pagoda-day.webp', './assets/landmarks/pagoda-night.webp',
+  './assets/landmarks/tokyo-tower-day.webp', './assets/landmarks/tokyo-tower-night.webp',
+  './assets/landmarks/torii-day.webp', './assets/landmarks/torii-night.webp',
+  './assets/landmarks/tsutenkaku-day.webp', './assets/landmarks/tsutenkaku-night.webp'
 ];
 
 self.addEventListener('install', e => {
