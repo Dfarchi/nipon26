@@ -24,6 +24,10 @@ TABLE = {
                         'matcha', 'dango', 'yaki-imo']),
     'shuin':     (320, ['shuin']),
     'special':   (0,   ['ridges', 'washi-texture']),
+    # הציורים המלאים שהגיעו לפני שביקשנו אלמנטים בודדים. הם לא מתאימים
+    # לסצנה — הם מביאים רקע משלהם — אבל הם יפים, ויובל ביקש שייכנסו.
+    # מקומם הוא ראש כרטיס, לא שורת הבניינים.
+    'vignettes': (512, ['vig']),
 }
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
 

@@ -215,7 +215,8 @@ window.App = (function () {
   let LAYERS = null, ticking = false, lastOp = 1;
 
   // עומק לכל שכבה: [בורר, מקדם גלילה]
-  const DEPTH = [['.l-sky', 0.06], ['.l-far', 0.12], ['.l-village', 0.42], ['.l-lm', 0.42], ['.l-chars', 0.42]];
+  const DEPTH = [['.l-sky', 0.06], ['.l-far', 0.12], ['.l-back', 0.42],
+                 ['.l-village', 0.42], ['.l-art', 0.42], ['.l-chars', 0.42]];
 
   // נקרא גם אחרי decorate(), שמחליף את .l-chars ומשאיר הפניה מתה
   function cacheLayers() {
@@ -532,9 +533,9 @@ window.App = (function () {
     <rect x="${x + 1}" y="76.8" width="24" height="1.4" fill="var(--tile)"/>`;
 
   // מכונת משקאות, פנס אבן ונורן — שלושה דברים שרואים ביפן כל יום
-  const STREET = { tokyo: [vending, vending, norenAt], osaka: [vending, norenAt, vending],
-                   nagoya: [vending, norenAt, toro], kyoto: [toro, norenAt, toro],
-                   village: [toro, norenAt, toro], mountain: [toro, toro, norenAt] };
+  const STREET = { tokyo: ['vending', 'vending', 'noren'], osaka: ['vending', 'noren', 'vending'],
+                   nagoya: ['vending', 'noren', 'toro'], kyoto: ['toro', 'noren', 'toro'],
+                   village: ['toro', 'noren', 'toro'], mountain: ['toro', 'toro', 'noren'] };
 
   // הכביש: פס בהיר שמפריד בין הבתים לקדמה, אחרת הכל צף על מישור אחד
   const ROAD = '<path fill="var(--wire)" opacity=".13" d="M-30,84 C90,81 200,86 300,82 L420,84 L420,104 L-30,104 Z"/>';
@@ -580,17 +581,30 @@ window.App = (function () {
       `M${(cx - h).toFixed(1)},${(y - 1.1).toFixed(1)} l0,-3 l2,3 Z ` +
       `M${(cx + h).toFixed(1)},${(y - 1.1).toFixed(1)} l0,-3 l-2,3 Z"/>`; };
 
-  // עשן מארובה. שלוש נשיפות שעולות ונמוגות — התנועה היחידה בקומת הכפר.
-  const chimney = (x, y) => `<rect x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}" width="5" height="11" rx=".8" fill="var(--ridge2)"/>` +
-    `<rect x="${(x - 1).toFixed(1)}" y="${(y - 9.4).toFixed(1)}" width="7" height="2" rx=".6" fill="var(--ridge2)"/>` +
-    `<g class="smoke" fill="var(--smoke)">` +
-    `<circle cx="${(x + 2.5).toFixed(1)}" cy="${(y - 11).toFixed(1)}" r="3.6"/>` +
-    `<circle cx="${(x + 1.4).toFixed(1)}" cy="${(y - 11).toFixed(1)}" r="4.6"/>` +
-    `<circle cx="${(x + 3.4).toFixed(1)}" cy="${(y - 11).toFixed(1)}" r="5.6"/></g>`;
+  // הארובה נשארת SVG (היא חלק מהגג), העשן מגיע כתמונה ב-.l-art
+  const chimneyStack = (x, y) =>
+    `<rect x="${x.toFixed(1)}" y="${(y - 8).toFixed(1)}" width="5" height="11" rx=".8" fill="var(--ridge2)"/>` +
+    `<rect x="${(x - 1).toFixed(1)}" y="${(y - 9.4).toFixed(1)}" width="7" height="2" rx=".6" fill="var(--ridge2)"/>`;
 
   const tileRoof2 = (cx, y, half, drop) =>
     `<path d="M${cx - half - 4},${y + drop} Q${cx - half},${y + drop - 3} ${cx - half + 3},${y + drop - 4} ` +
     `L${cx},${y} L${cx + half - 3},${y + drop - 4} Q${cx + half},${y + drop - 3} ${cx + half + 4},${y + drop} Z"/>`;
+
+  // ---- נכסי הרחוב ----
+  // h הוא גובה ביחידות הסצנה (74 = קו הקרקע). y הוא היכן הבסיס יושב:
+  // 96 = על המדרכה לפני הבתים, 74 = על קו הקרקע, 62 = על גג.
+  // הרוחב נגזר מיחס התמונה ולכן לא מופיע כאן — אחרת הוא מתעוות.
+  const PROP = {
+    vending: { f: 'street/vending-machine', h: 30, y: 98 },
+    toro:    { f: 'street/toro',            h: 27, y: 98 },
+    noren:   { f: 'street/noren',           h: 24, y: 96 },
+    pole:    { f: 'street/utility-pole',    h: 27, y: 75 },
+    tank:    { f: 'street/water-tank',      h: 10, y: 0  },   // y מגיע מהגג
+    brolly:  { f: 'street/red-umbrella',    h: 22, y: 97 },
+    smoke:   { f: 'street/chimney-smoke',   h: 30, y: 0  },
+    pine:    { f: 'street/black-pine',      h: 30, y: 76 },
+    maple:   { f: 'street/maple-tree',      h: 32, y: 76 }
+  };
 
   // ---- ציוני דרך: התמונות ----
   // גובה לכל אחד בנפרד, כי הם לא באמת באותו סדר גודל: מגדל טוקיו מתנשא
@@ -655,10 +669,10 @@ window.App = (function () {
 
   // ---- פרופיל לכל אזור ----
   const PROFILE = {
-    tokyo:    { lm: 'tokyo',  n: [9, 11], hi: [14, 46], flat: 1, tank: .5, pole: 2, tree: 0, sign: 3 },
-    osaka:    { lm: 'osaka',  n: [9, 12], hi: [34, 56], flat: 1, tank: .6, pole: 3, tree: 0, sign: 5 },
-    nagoya:   { lm: 'nagoya', n: [8, 10], hi: [38, 58], flat: 1, tank: .35, pole: 2, tree: 1, sign: 2 },
-    kyoto:    { lm: 'kyoto',  n: [7, 9],  hi: [44, 58], flat: 0, tank: 0, pole: 2, tree: 2, sign: 1, canal: 1 },
+    tokyo:    { lm: 'tokyo',  n: [9, 11], hi: [14, 46], flat: 1, tank: .22, pole: 1, tree: 0, sign: 3 },
+    osaka:    { lm: 'osaka',  n: [9, 12], hi: [34, 56], flat: 1, tank: .26, pole: 1, tree: 0, sign: 5 },
+    nagoya:   { lm: 'nagoya', n: [8, 10], hi: [38, 58], flat: 1, tank: .18, pole: 1, tree: 1, sign: 2 },
+    kyoto:    { lm: 'kyoto',  n: [7, 9],  hi: [44, 58], flat: 0, tank: 0, pole: 1, tree: 2, sign: 1, canal: 1 },
     village:  { lm: 'torii',  n: [6, 8],  hi: [46, 60], flat: 0, tank: 0, pole: 1, tree: 2, sign: 0, smoke: 1 },
     mountain: { lm: 'torii',  n: [5, 7],  hi: [36, 56], flat: 0, gassho: 1, tank: 0, pole: 0, tree: 6, sign: 0, smoke: 1 }
   };
@@ -713,7 +727,7 @@ window.App = (function () {
     let body = '', lights = '', extra = '';
     const perch = [];
     let smoked = 0;
-    const litX = [];
+    const litX = [], front = [], back2 = [];
     slots.forEach((s, i) => {
       const cx = s.x + s.w / 2;
       if (P.gassho) {
@@ -730,7 +744,7 @@ window.App = (function () {
         body += `<path d="M${s.x.toFixed(1)},74 L${s.x.toFixed(1)},${s.top.toFixed(1)} ` +
                 `L${(s.x + s.w).toFixed(1)},${s.top.toFixed(1)} L${(s.x + s.w).toFixed(1)},74 Z"/>`;
         lights += grid(s.x, s.top, s.w, 74 - s.top, R);
-        if (R() < P.tank) extra += tank(cx - 4.5, s.top);
+        if (R() < P.tank) front.push({ p: 'tank', x: cx, y: s.top + 2 });
         // מעקה גג ואנטנה — הצללית של גג עירוני, לא קו ישר
         else if (R() < .45) extra += `<rect x="${(s.x + 1).toFixed(1)}" y="${(s.top - 2).toFixed(1)}" ` +
           `width="${(s.w - 2).toFixed(1)}" height="2" fill="var(--roof)"/>`;
@@ -755,7 +769,9 @@ window.App = (function () {
       if (P.smoke && !smoked && cx > 60 && cx < 320 && R() < .5) {
         // לא על הרכס: שם יושבת החתולה. מעט הצידה, על המדרון.
         const dx = s.w * .17, ry = s.top + (P.gassho ? (74 - s.top) * .34 : 4);
-        extra += chimney(cx + dx, ry); smoked = 1;
+        extra += chimneyStack(cx + dx, ry);
+        front.push({ p: 'smoke', x: cx + dx + 2.5, y: ry - 9 });
+        smoked = 1;
       }
       // מועמד למושב: גג שלא נחתך בקצה ולא מתחת לציון הדרך
       if (cx > 56 && cx < 322 && Math.abs(cx - lmX) > 34) perch.push({ x: cx, y: s.top });
@@ -763,10 +779,14 @@ window.App = (function () {
     });
     if (P.smoke && !smoked && slots.length) {
       const s = slots[Math.floor(slots.length / 2)];
-      extra += chimney(s.x + s.w * .67, s.top + (74 - s.top) * .34);
+      const cy = s.top + (74 - s.top) * .34, cxx = s.x + s.w * .67;
+      extra += chimneyStack(cxx, cy);
+      front.push({ p: 'smoke', x: cxx + 2.5, y: cy - 9 });
     }
 
-    for (let i = 0; i < P.pole; i++) extra += pole(30 + R() * 330, 34 + R() * 16);
+    for (let i = 0; i < P.pole; i++)
+      front.push({ p: 'pole', x: R() < .5 ? 24 + R() * 40 : 326 + R() * 40,
+                   h: PROP.pole.h * (.85 + R() * .3), flip: R() < .5 });
     // שלטים נתלים על חזיתות. קודם הם ריחפו באמצע האוויר.
     let signs = P.sign || 0;
     for (const s of slots.slice().sort(() => R() - .5)) {
@@ -785,17 +805,21 @@ window.App = (function () {
       if (g1 - g0 > 6) gaps.push({ x: (g0 + g1) / 2, w: g1 - g0 });
     }
     gaps.sort((a, b) => b.w - a.w);
-    let trees = '';
     for (let i = 0; i < P.tree; i++) {
       const g = gaps[i % Math.max(1, gaps.length)];
       const tx = g && Math.abs(g.x - lmX) > 26 ? g.x : 14 + R() * 362;
-      trees += treeAt(tx, 20 + R() * 16, R);
+      const k = R() < .5 ? 'pine' : 'maple';
+      back2.push({ p: k, x: tx, h: PROP[k].h * (.72 + R() * .5), flip: R() < .5 });
     }
 
     // קומת הרחוב — שלושה עצמים, פרוסים על שליש־שליש־שליש
-    let street = '';
-    (STREET[kind] || STREET.village).forEach((fn, i) => {
-      street += fn(26 + i * 122 + R() * 70);
+    let shop = '';
+    (STREET[kind] || STREET.village).forEach((k, i) => {
+      const x = 34 + i * 112 + R() * 54;
+      if (k === 'noren') shop += `<path fill="var(--roof)" d="M${x - 13},96 L${x - 13},74 ` +
+        `L${x + 13},74 L${x + 13},96 Z"/><path fill="var(--tile)" d="M${x - 15},75 L${x + 15},75 ` +
+        `L${x + 15},71.5 L${x - 15},71.5 Z"/>`;
+      front.push({ p: k, x, flip: R() < .4 });
     });
 
     // שלושה מושבים, מפוזרים: שמאל, אמצע, ימין
@@ -805,11 +829,11 @@ window.App = (function () {
 
     const fill = P.gassho || !P.flat ? 'var(--tile)' : 'var(--roof)';
     return {
-      svg: `${GROUND}${back}<g fill="var(--tree)">${trees}</g>` +
+      svg: `${GROUND}${back}` +
            `<g fill="${fill}" class="plate">${body}</g>` +
            `<g class="lm-fallback">${LM[P.lm](lmX)}</g>` +
-           `<g opacity=".9">${lights}</g>${P.canal ? canalAt(R, litX) : ROAD}${extra}${street}`,
-      seats,
+           `<g opacity=".9">${lights}</g>${P.canal ? canalAt(R, litX) : ROAD}${shop}${extra}`,
+      seats, front, back: back2,
       lm: { kind: P.lm, x: lmX }
     };
   }
@@ -849,19 +873,40 @@ window.App = (function () {
     </svg>`;
   }
 
-  // ---- שכבת ציון הדרך ----
-  // תמונה לא נכנסת ל-.l-village: היא נמתחת שם ×1.144 לרוחב ומתעוותת.
-  // לכן שכבת div משלה, באותו עומק פארלקס, ובאותה המרת קואורדינטות
-  // שהחתולות משתמשות בה: left = x/3.9%  ·  bottom = 74 − y.
+  // ---- שכבות הנכסים ----
+  // תמונה לא נכנסת ל-.l-village: שם preserveAspectRatio="none" מותח הכל
+  // ×1.144 לרוחב, ונתיב SVG לא אכפת לו אבל תמונה מתעוותת. לכן שתי שכבות
+  // div משלהן — אחת מאחורי הבניינים (עצים) ואחת לפניהם (רחוב, ציון דרך) —
+  // באותו עומק פארלקס ובאותה המרת קואורדינטות של .l-chars:
+  //     left = x / 3.9 %   ·   bottom = 74 − y
+  const atXY = (x, y) => `left:${(x / 3.9).toFixed(1)}%;bottom:${(74 - y).toFixed(1)}px`;
+
+  function propTag(o) {
+    const c = PROP[o.p];
+    if (!c) return '';
+    const h = o.h || c.h, y = o.y != null ? o.y : c.y;
+    return `<img src="assets/${c.f}.webp" alt="" decoding="async" class="${o.p === 'smoke' ? 'puff' : ''}"
+      style="${atXY(o.x, y)};height:${h.toFixed(1)}px${o.flip ? ';--fx:-1' : ''}"
+      onload="this.classList.add('on')">`;
+  }
+
+  function propLayer(cls, list) {
+    return `<div class="${cls}">${(list || []).map(propTag).join('')}</div>`;
+  }
+
   function lmLayer() {
     const lm = SCENE && SCENE.lm;
-    if (!lm || !LM_IMG[lm.kind]) return '<div class="l-lm"></div>';
-    const c = LM_IMG[lm.kind];
-    const src = lmFile(lm.kind);
-    return `<div class="l-lm"><img src="${src}" alt="" decoding="async"
-      style="left:${(lm.x / 3.9).toFixed(1)}%;bottom:${c.base}px;height:${c.h}px"
-      onload="this.classList.add('on')"></div>`;
+    let s = '';
+    if (lm && LM_IMG[lm.kind]) {
+      const c = LM_IMG[lm.kind];
+      s = `<img src="${lmFile(lm.kind)}" alt="" decoding="async"
+        style="${atXY(lm.x, 74 - c.base)};height:${c.h}px" onload="this.classList.add('on')">`;
+    }
+    return `<div class="l-art">${s}${((SCENE && SCENE.front) || []).map(propTag).join('')}</div>`;
   }
+
+  // עצים מאחורי הבניינים: גג מסתיר עץ ולא להפך
+  function backLayer() { return propLayer('l-back', (SCENE && SCENE.back) || []); }
 
   // ---- ציור הסצנה ----
   function scene(host) {
@@ -869,9 +914,13 @@ window.App = (function () {
     document.body.classList.toggle('is-day', theme === 'day');
     const mt = document.querySelector('meta[name=theme-color]');
     if (mt) mt.content = theme === 'day' ? '#f3ece0' : '#0b0e14';
+    // הסדר כאן קריטי: villageSVG() הוא שקובע את SCENE, וכל השכבות
+    // האחרות נשענות עליו. בתבנית אחת הן היו נקראות משמאל לימין
+    // ו-backLayer() היה מקבל את הסצנה של הרינדור הקודם.
+    const village = villageSVG();
     host.innerHTML = `<div class="art"></div>${skyLayer()}<div class="fx" id="fx"></div>
       ${farSVG()}
-      ${villageSVG()}
+      ${backLayer()}${village}
       ${lmLayer()}
       ${charLayer('')}<div class="haze" id="haze"></div><div class="hem"></div>`;
   }

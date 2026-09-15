@@ -549,14 +549,32 @@ body.is-day .l-village[data-kind="nagoya"],body.is-day .l-village[data-kind="kyo
    שכבה נפרדת ולא בתוך .l-village, כי שם preserveAspectRatio="none" מותח
    הכל ×1.144 לרוחב — נתיב SVG לא אכפת לו, תמונה מתעוותת.
    אותה מערכת צירים כמו .l-chars, אותו עודף 28px לכל צד, אותו עומק. */
-.l-lm{position:absolute;right:-28px;left:-28px;bottom:30px;height:74px;
-  pointer-events:none;will-change:transform}
-.l-lm img{position:absolute;transform:translateX(-50%);width:auto;
-  opacity:0;transition:opacity .35s var(--e-out)}
-.l-lm img.on{opacity:1}
 /* הציור הווקטורי נשאר מתחת כגיבוי — אין הבזק בטעינה ראשונה, ואם
    הקובץ לא הגיע נשאר משהו על המסך. נעלם ברגע שהתמונה נטענה. */
-.scene:has(.l-lm img.on) .l-village .lm-fallback{opacity:0;transition:opacity .35s var(--e-out)}
+.scene:has(.l-art img.on) .l-village .lm-fallback{opacity:0;transition:opacity .35s var(--e-out)}
 @media (prefers-reduced-motion:reduce){
-  .l-lm img{transition:none}
-  .scene:has(.l-lm img.on) .l-village .lm-fallback{transition:none}}
+  .l-back img,.l-art img{transition:none}
+  .scene:has(.l-art img.on) .l-village .lm-fallback{transition:none}}
+
+/* ===== נכסי הסצנה =====
+   שתי שכבות div, אחת מכל צד של .l-village: תמונה שנכנסת ל-SVG נמתחת
+   שם ×1.144 לרוחב ומתעוותת. אותה מערכת צירים כמו .l-chars ואותו עודף
+   28px לכל צד, כך שהאחוזים מתיישרים בין השכבות. */
+.l-back,.l-art{position:absolute;right:-28px;left:-28px;bottom:30px;height:74px;
+  pointer-events:none;will-change:transform}
+.l-back img,.l-art img{position:absolute;width:auto;
+  transform:translateX(-50%) scaleX(var(--fx,1));
+  opacity:0;transition:opacity .35s var(--e-out)}
+.l-back img.on,.l-art img.on{opacity:1}
+/* עצים מאחור נסוגים אל האובך, כמו השורה האחורית של הבניינים */
+.l-back img.on{opacity:.82}
+/* העשן עולה ונמוג — התנועה היחידה בקומת הכפר */
+.l-art img.puff{transform-origin:50% 100%;animation:rise 9s linear infinite}
+.l-art img.puff.on{opacity:1}
+@keyframes rise{
+  0%{opacity:0;transform:translateX(-50%) translateY(6px) scale(.55)}
+  18%{opacity:.5}
+  100%{opacity:0;transform:translateX(-50%) translateY(-26px) scale(1.25)}}
+@media (prefers-reduced-motion:reduce){
+  .l-back img,.l-art img{transition:none}
+  .l-art img.puff{animation:none;opacity:.3}}
