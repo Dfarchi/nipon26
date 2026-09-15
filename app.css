@@ -643,3 +643,21 @@ body.is-day .l-chars .cat-img{filter:none}
 .card.dish:active{transform:scale(.985);box-shadow:var(--shLo)}
 @media (prefers-reduced-motion:reduce){
   .card.dish img{transition:none;transform:none}}
+
+/* ===== ספר החותמות =====
+   朱印 אמיתית היא חותם ארגמן על נייר. המסגרת מגיעה כתמונה ושם האזור
+   יושב במרכזה. חותמת שלא נזכתה עדיין מופיעה חיוורת — רואים מה נשאר. */
+.shuin{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stamp{position:relative;display:flex;align-items:center;justify-content:center;
+  aspect-ratio:1;opacity:.26;filter:grayscale(.75);transition:opacity .4s var(--e-out),filter .4s var(--e-out)}
+.stamp.on{opacity:1;filter:none}
+.stamp img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.stamp span{position:relative;z-index:1;font-size:var(--fs-micro);font-weight:700;
+  line-height:1.15;text-align:center;color:var(--hi);max-width:58%;
+  overflow-wrap:anywhere;text-wrap:balance}
+/* המסגרות לא סימטריות אנכית: במשולש החלק הרחב נמצא למטה, ובפרח
+   ובעיגול המרכז הוא הרחב. הטקסט יורד אליו. */
+.stamp[data-f="mountain"] span{margin-top:42%;max-width:44%;font-size:.625rem}
+.stamp[data-f="wave"] span,.stamp[data-f="flower"] span{max-width:52%}
+body.is-day .stamp span{color:var(--hi)}
+@media (prefers-reduced-motion:reduce){.stamp{transition:none}}

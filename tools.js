@@ -66,6 +66,32 @@
       </div>`;
   }
 
+  // ---- ספר החותמות ----
+  // 朱印 — חותמת אדומה שאוספים במקדשים. כאן חותמת לכל אזור שישנתם בו,
+  // והזכייה נגזרת מהתאריך ולא נשמרת בשום מקום: מה שעבר עבר. אין מה
+  // לאבד כשמוחקים את נתוני הדפדפן, ואין מה לזייף.
+  const FRAME = ['circle', 'square', 'octagon', 'flower', 'mountain', 'wave'];
+  const regions = [];
+  T.days.forEach((d, i) => {
+    const r = String(d.st || '').replace(/\s*·.*$/, '').trim();
+    if (r && !regions.some(x => x.r === r)) regions.push({ r, first: i });
+  });
+  if (regions.length) {
+    const now = A.dayIndex(), before = A.beforeTrip;   // ערך, לא פונקציה
+    const got = regions.filter(x => !before && now >= x.first).length;
+    h += `<div class="lbl" style="margin-top:22px">ספר החותמות<i></i>
+      <span class="d">${got} מתוך ${regions.length}</span></div>
+      <div class="card"><div class="shuin">` +
+      regions.map((x, i) => {
+        const on = !before && now >= x.first;
+        const f = FRAME[i % FRAME.length];
+        return `<div class="stamp${on ? ' on' : ''}" data-f="${f}">
+          <img src="assets/shuin/shuin-${f}.webp" alt="" decoding="async" loading="lazy">
+          <span>${A.esc(x.r)}</span></div>`;
+      }).join('') +
+      `</div><div class="d" style="margin-top:10px">חותמת לכל אזור שכבר ישנתם בו</div></div>`;
+  }
+
   document.getElementById('main').innerHTML = h;
   A.reveal(document.getElementById('main'));
 
