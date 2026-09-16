@@ -515,11 +515,19 @@ body.is-day .scene::after{opacity:.11;mix-blend-mode:multiply}
 .fxrow input::placeholder{color:var(--soft);font-weight:400;opacity:.7}
 .fxrow > b{color:var(--soft);font-size:var(--fs-lead)}
 .fxq{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+/* ‎direction:ltr על השבב עצמו: בהקשר RTL הסימן ‎+ לפני מספר נדחף לסופו,
+   ו-"¥500+" נקרא כמו סכום ועוד־משהו במקום כמו פעולת הוספה. */
+.fxq .chip.fxp{direction:ltr}
 .fxq .chip{border:1px solid color-mix(in srgb,var(--hot) 32%,transparent);
   background:color-mix(in srgb,var(--hot) 8%,transparent);color:var(--ink);
   padding:5px 11px;border-radius:99px;font:inherit;font-size:var(--fs-micro);
   font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .fxq .chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent)}
+/* האיפוס נדחף לקצה השני של השורה: הוא לא עוד סכום, הוא ההפך מהם. */
+.fxq .chip.fxz{margin-inline-start:auto;border-color:var(--line);
+  background:var(--well);color:var(--dim)}
+.fxq .chip.fxz:active{background:var(--rule)}
+.fxq .chip.fxz:disabled{opacity:.4;cursor:default}
 
 /* שני שעונים זה מול זה. ההפרש הוא מה שמפיל הזמנה שנפתחת ב-09:00 ביפן. */
 .clk{display:flex;align-items:center;gap:14px}
@@ -785,9 +793,9 @@ body.names-off .d,body.names-off .t{word-spacing:normal}
 .tel::after{content:'';position:absolute;inset:-6px -10px}
 
 /* שבבי אנשים וכפתורי סכום במחשבון */
-.ping .chip,.chip.fxp{min-height:40px;display:inline-flex;align-items:center;
+.ping .chip,.chip.fxp,.chip.fxz{min-height:40px;display:inline-flex;align-items:center;
   position:relative}
-.ping .chip::after,.chip.fxp::after{content:'';position:absolute;inset:-7px -4px}
+.ping .chip::after,.chip.fxp::after,.chip.fxz::after{content:'';position:absolute;inset:-7px -4px}
 
 /* בורר היום — היה 24px, והוא הדבר שמנווטים בו בין 45 ימים */
 .pick{min-height:40px;padding:8px 11px}

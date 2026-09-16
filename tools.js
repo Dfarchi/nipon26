@@ -30,9 +30,11 @@
           <label><span>₪</span><input id="fxIls" type="text" inputmode="decimal" placeholder="19.20"></label>
         </div>
         <div class="fxq">` +
-          [500, 1000, 3000, 10000].map(v => `<button class="chip fxp" data-v="${v}">¥${v.toLocaleString()}</button>`).join('') +
-        `</div>
-        <div class="d" style="margin-top:9px">השער נבדק ${fx.asOf || '—'}. כרטיס אשראי מוסיף כ-2%.</div>
+          [500, 1000, 3000, 10000].map(v =>
+            `<button type="button" class="chip fxp" data-v="${v}">+¥${v.toLocaleString()}</button>`).join('') +
+          `<button type="button" class="chip fxz" id="fxClear" disabled>איפוס</button>
+        </div>
+        <div class="d" style="margin-top:9px">כל לחיצה מוסיפה לסכום. השער נבדק ${fx.asOf || '—'}. כרטיס אשראי מוסיף כ-2%.</div>
       </div>`;
   }
 
@@ -151,11 +153,21 @@
   if (j && s && fx.jpy) {
     const num = v => { const n = parseFloat(String(v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : null; };
     const fmt = n => n.toLocaleString('he-IL', { maximumFractionDigits: 2 });
-    j.addEventListener('input', () => { const n = num(j.value); s.value = n === null ? '' : fmt(n * fx.jpy); });
-    s.addEventListener('input', () => { const n = num(s.value); j.value = n === null ? '' : fmt(Math.round(n / fx.jpy)); });
+    const clr = document.getElementById('fxClear');
+    const idle = () => { if (clr) clr.disabled = !j.value && !s.value; };
+    // כפתורי הסכום מצטברים: בקופה סופרים שטרות, לא בוחרים אחד. לחיצה
+    // שנייה על ¥1,000 היא ¥2,000, ו-¥500 אחריה היא ¥2,500. לכן צריך גם
+    // דרך לחזור לאפס, ולכן הכפתור שלידם.
+    const setJpy = n => {
+      j.value = n === null ? '' : Math.round(n).toLocaleString('he-IL');
+      s.value = n === null ? '' : fmt(n * fx.jpy);
+      idle();
+    };
+    j.addEventListener('input', () => { const n = num(j.value); s.value = n === null ? '' : fmt(n * fx.jpy); idle(); });
+    s.addEventListener('input', () => { const n = num(s.value); j.value = n === null ? '' : fmt(Math.round(n / fx.jpy)); idle(); });
     document.querySelectorAll('.fxp').forEach(b => b.addEventListener('click', () => {
-      j.value = (+b.dataset.v).toLocaleString('he-IL');
-      s.value = fmt(+b.dataset.v * fx.jpy);
+      setJpy((num(j.value) || 0) + (+b.dataset.v));
     }));
+    if (clr) clr.addEventListener('click', () => { setJpy(null); j.focus(); });
   }
 })();
