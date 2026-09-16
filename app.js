@@ -1268,6 +1268,25 @@ window.App = (function () {
       if (d !== bootDay) location.reload();
     });
     document.body.classList.toggle('names-off', !namesOn());
+
+    // ===== חיבור הגיליון בקישור אחד =====
+    // ‎?sheet=<כתובת> שומר אותה במכשיר ומוחק את עצמו מהכתובת. כך אפשר
+    // לשלוח לינק אחד לשני הטלפונים במקום להקליא כתובת של 120 תווים
+    // באצבע — ובלי שהכתובת תיכנס לריפו, שהוא ציבורי.
+    if (q.has('sheet')) {
+      const u = (q.get('sheet') || '').trim();
+      if (/^https:\/\/script\.google\.com\/macros\//.test(u)) {
+        spend.setUrl(u);
+        spend.sync(() => {});
+      }
+      // מנקים מיד: קישור עם מפתח כתיבה לא צריך להישאר בהיסטוריה
+      // ולא להישלח הלאה כשמשתפים את הדף.
+      try {
+        q.delete('sheet');
+        const rest = q.toString();
+        history.replaceState(null, '', location.pathname + (rest ? '?' + rest : ''));
+      } catch (e) {}
+    }
     net();
     parallax();
     const phase = (T.dayPhase && T.days) ? (T.dayPhase[T.days[dayIndex()].st] ?? 0) : 0;
