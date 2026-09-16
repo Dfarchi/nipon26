@@ -11,6 +11,12 @@
  * הכתובת לא נכנסת לריפו — הוא ציבורי. מדביקים אותה פעם אחת בכל טלפון.
  */
 
+/* אם יצרת את הסקריפט מתוך הגיליון (Extensions → Apps Script) — להשאיר
+ * ריק, הוא מוצא אותו לבד. אם יצרת אותו ב-script.google.com כפרויקט
+ * עצמאי, ‎getActiveSpreadsheet מחזיר null והוא לא ימצא כלום: אז שים כאן
+ * את המזהה מכתובת הגיליון, החלק שבין ‎/d/ ל-‎/edit. */
+var SHEET_ID = '';
+
 var TAB = 'הוצאות', SUM = 'סיכום';
 var HEAD = ['id', 'נרשם', 'תאריך', 'מי שילם', 'סכום', 'מטבע', 'שער', '₪',
             'על מה', 'איך', 'הערה'];
@@ -26,8 +32,15 @@ var INK = '#3a2f26', PAPER = '#faf3e6', LINE = '#e0d4bd', HOT = '#b4551f';
 
 /* ---------- הלשונית הראשית ---------- */
 
-function sheet_() {
+function ss_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss && SHEET_ID) ss = SpreadsheetApp.openById(SHEET_ID);
+  if (!ss) throw new Error('הסקריפט לא מחובר לגיליון. מלא את SHEET_ID למעלה.');
+  return ss;
+}
+
+function sheet_() {
+  var ss = ss_();
   var sh = ss.getSheetByName(TAB);
   if (!sh) {
     // גיליון חדש נפתח עם "Sheet1" ריקה. עדיף לשנות לה שם מאשר להשאיר
