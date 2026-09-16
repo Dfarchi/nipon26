@@ -186,8 +186,10 @@
 
     const st = document.getElementById('spSt');
     if (st) {
+      // "מקומי בלבד" נשמע כמו מבוי סתום. בפועל שום דבר לא הולך לאיבוד:
+      // התור נשמר, ובשנייה שמחברים גיליון הוא נשלח כולו.
       const q = A.spend.queue().length;
-      st.textContent = !A.spend.url() ? 'מקומי בלבד'
+      st.textContent = !A.spend.url() ? (q ? `בטלפון · ${q} יחכו לגיליון` : 'נשמר בטלפון')
         : q ? q + ' ממתינות לשליחה' : 'מסונכרן';
     }
 
@@ -230,7 +232,9 @@
     f.dataset.mode = 'cfg';
     f.innerHTML = `<div style="margin-top:12px">
       <div class="d">כתובת ה-Apps Script של הגיליון. מדביקים פעם אחת בכל טלפון —
-        היא נשמרת כאן בלבד ולא בריפו. ההוראות ב-SHEETS.md.</div>
+        היא נשמרת כאן בלבד ולא בריפו. ההוראות ב-SHEETS.md.<br>
+        <b>אפשר להמשיך בלי זה.</b> כל מה שנרשם נשמר בטלפון, ובשנייה
+        שמחברים גיליון הכל נשלח אליו — גם מה שנרשם שבועות קודם.</div>
       <input id="spUrl" type="url" inputmode="url" placeholder="https://script.google.com/…/exec"
         value="${A.esc(A.spend.url())}"
         style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid var(--line);
