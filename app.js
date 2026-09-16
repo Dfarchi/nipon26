@@ -169,8 +169,30 @@ window.App = (function () {
     if (c === 0 || c === 1) return 'clear';
     return 'leaves';
   }
+  // איפה אתם היום. ‎st הוא השדה הנקי ("אוסקה · 5–11.11 ✅" → "אוסקה") —
+  // אותו שדה ש-dayPhase ו-dish ממופים לפיו. כותרת היום לבדה לא מספיקה:
+  // ב-9.11 היא אומרת "טבע במינו", שאינו שם של סיכה במפה.
+  function whereToday() {
+    const d = (T.days || [])[dayIndex()] || {};
+    const out = [String(d.st || '').split('·')[0].trim()];
+    const rest = String(d.t).split('—').slice(1).join('—').trim();
+    let c = rest.split('(')[0].replace(/\s*·.*$/, '').trim();
+    if (c.includes('→')) c = c.split('→').pop().trim();
+    out.push(c);
+    return out.filter(Boolean);
+  }
   function coordsFor(phase) {
-    const p = (T.mapPoints || []).find(x => x.ph === phase && x.lat) || (T.mapPoints || [])[0];
+    const pts = (T.mapPoints || []).filter(x => x.ph === phase && x.lat);
+    // הסיכה הראשונה בשלב היא לא בהכרח המקום שבו אתם. באוסקה ב-7.11
+    // השורה העליונה הראתה "נגויה" — הסיכה הראשונה של שלב 2, 140 ק"מ משם.
+    // זה לא היה שקר (שם המקום הופיע), אבל זה היה מזג אוויר של עיר אחרת.
+    const all = T.mapPoints || [];
+    let p = null;
+    for (const w of whereToday()) {
+      p = pts.find(x => String(x.n).includes(w)) || all.find(x => x.lat && String(x.n).includes(w));
+      if (p) break;
+    }
+    p = p || pts[0] || all[0];
     // השם ב-mapPoints הוא "טוקיו (Tokyo · 東京)" או "יודאנקה · קופי ג'יגוקודאי".
     // לשורה צרה צריך רק את החלק הראשון בעברית.
     const nm = String(p && p.n || '').replace(/\s*[(（].*$/, '').split(/\s*[·\/]\s*/)[0].trim();
@@ -179,8 +201,11 @@ window.App = (function () {
   function weather(phase, cb) {
     let cached = null;
     try { cached = JSON.parse(localStorage.getItem(WKEY) || 'null'); } catch (e) {}
-    if (cached && Date.now() - cached.at < 36e5) return cb(cached.mode, cached);
     const c = coordsFor(phase);
+    // המטמון תקף לשעה — אבל רק לאותו מקום. ביום מעבר בין ערים, מטמון
+    // של העיר הקודמת היה נשאר על המסך עד שעה אחרי שעברתם.
+    if (cached && Date.now() - cached.at < 36e5 && (!c || cached.place === c.n))
+      return cb(cached.mode, cached);
     if (!c || !navigator.onLine) return cb(cached ? cached.mode : 'leaves', cached);
     fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}` +
           `&current=weather_code,temperature_2m`)
