@@ -165,6 +165,7 @@
                '♨️ אונסן',
                '🛏️ לינה',
                '🪭 שטויות יפניות'];
+  const PAY = ['💴 מזומן', '💳 אשראי'];
 
   function jpyRate() {
     const f = (T.budget || {}).fx || {};
@@ -197,6 +198,9 @@
       </div>
       ${per.length ? `<div class="d" style="margin-top:6px">${
         per.map(([w, v]) => `${w} ${shek(v)}`).join(' · ')}</div>` : ''}
+      ${rows.length ? `<div class="d" style="margin-top:3px">${
+        PAY.map(c => [c, rows.filter(r => r.pay === c).reduce((a, r) => a + ils(r), 0)])
+           .filter(x => x[1] > 0).map(([c, v]) => `${c} ${shek(v)}`).join(' · ') || ''}</div>` : ''}
       <div class="sprow">
         <button class="chip" id="spAdd">+ הוספה</button>
         ${A.spend.url() ? `<button class="chip" id="spSync">סנכרון</button>` : ''}
@@ -260,6 +264,8 @@
         `<button class="chip spw${i === 0 ? ' on' : ''}" data-w="${A.esc(w)}">${w}</button>`).join('')}</div>
       <div class="fxq" style="margin-top:7px">${CAT.map((c, i) =>
         `<button class="chip spc${i === 0 ? ' on' : ''}" data-c="${A.esc(c)}">${c}</button>`).join('')}</div>
+      <div class="fxq" style="margin-top:7px">${PAY.map((c, i) =>
+        `<button class="chip spp${i === 0 ? ' on' : ''}" data-p="${A.esc(c)}">${c}</button>`).join('')}</div>
       <input id="spNote" type="text" placeholder="הערה (לא חובה)"
         style="width:100%;margin-top:9px;padding:10px;border-radius:10px;border:1px solid var(--line);
                background:var(--well);color:var(--ink);font:inherit;font-size:var(--fs-meta)">
@@ -271,7 +277,7 @@
       f.querySelectorAll(sel).forEach(x => x.classList.remove('on'));
       b.classList.add('on');
     });
-    pick('.spw'); pick('.spc');
+    pick('.spw'); pick('.spc'); pick('.spp');
     document.getElementById('spSwap').onclick = () => {
       cur = cur === 'JPY' ? 'ILS' : 'JPY';
       document.getElementById('spCur').textContent = cur === 'JPY' ? '¥' : '₪';
@@ -290,6 +296,7 @@
         // בנובמבר אינם אותו סכום בשקלים, ובסוף הטיול רוצים את האמת.
         rate: cur === 'JPY' ? jpyRate() : 1,
         category: (f.querySelector('.spc.on') || {}).dataset ? f.querySelector('.spc.on').dataset.c : CAT[0],
+        pay: (f.querySelector('.spp.on') || {}).dataset ? f.querySelector('.spp.on').dataset.p : PAY[0],
         note: document.getElementById('spNote').value.trim()
       });
       f.innerHTML = ''; f.dataset.mode = '';

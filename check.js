@@ -111,5 +111,29 @@ vers.size > 1
     : ok(`כל ${files.length} קבצי הקליפה קיימים`);
 }
 
+// ===== הרשימות המשותפות של ההוצאות =====
+// WHO, CAT ו-PAY חיים גם ב-wallet.js וגם ב-apps-script.gs. אם הם
+// מתפצלים, ה-SUMIF בלשונית "סיכום" מחפש מחרוזת שלא קיימת ומחזיר אפס
+// בלי להתלונן — כלומר תקלה שקטה בדיוק בסוג שקשה לתפוס בעין.
+{
+  console.log('=== רשימות ההוצאות זהות בקוד ובסקריפט ===');
+  const gs = fs.readFileSync('apps-script.gs', 'utf8');
+  const js = fs.readFileSync('wallet.js', 'utf8');
+  const pull = (src, kw, name) => {
+    const m = src.match(new RegExp(kw + '\\s+' + name + ' = \\[([\\s\\S]*?)\\];'));
+    return m ? m[1].replace(/\n/g, '').split(',').map(w => w.trim().replace(/^'|'$/g, '')).filter(Boolean) : null;
+  };
+  let drift = 0;
+  ['WHO', 'CAT', 'PAY'].forEach(n => {
+    const a = pull(gs, 'var', n), b = pull(js, 'const', n);
+    if (!a || !b) { fail(`${n} לא נמצא באחד הקבצים`); drift++; return; }
+    if (a.join('|') !== b.join('|')) {
+      fail(`${n} שונה בין apps-script.gs ל-wallet.js — הסיכום בגיליון יחזיר אפס`);
+      drift++;
+    }
+  });
+  if (!drift) ok('WHO, CAT ו-PAY זהים בשני הקבצים');
+}
+
 console.log(bad ? `\n*** ${bad} בעיות — לא לדחוף ***` : '\n✅ הכל עקבי');
 process.exit(bad ? 1 : 0);
