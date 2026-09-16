@@ -32,7 +32,11 @@
   const chosen = n => Array.isArray(store[n]) ? store[n] : (store[n] !== undefined ? [store[n]] : []);
 
   function render() {
-    let h = `<div class="head"><div class="kicker">${openDec.length} החלטות · ${openTask.length} משימות</div>
+    // הכותרת ספרה 26 משימות גם אחרי שסומנו — כלומר המספר לא זז לעולם,
+    // וזה בדיוק המספר שמסתכלים עליו כדי לדעת אם מתקדמים.
+    const doneN = openTask.filter(i => done(i.n)).length;
+    let h = `<div class="head"><div class="kicker">${openDec.length} החלטות · ${
+      openTask.length - doneN} משימות${doneN ? ' · ' + doneN + ' סומנו' : ''}</div>
       <div class="h1">מה פתוח</div></div>`;
 
     if (urgent.length) {
@@ -78,11 +82,15 @@
       });
     }
 
-    h += `<div class="lbl q" style="margin-top:22px">משימות<i></i><span class="d">${rest.length}</span></div>`;
-    rest.forEach(i => {
+    // מה שסומן יורד לתחתית. הוא עדיין שם — אפשר לבטל סימון — אבל הוא
+    // לא עומד בין שתי משימות פתוחות.
+    const ordered = rest.filter(i => !done(i.n)).concat(rest.filter(i => done(i.n)));
+    h += `<div class="lbl q" style="margin-top:22px">משימות<i></i><span class="d">${
+      rest.length - rest.filter(i => done(i.n)).length}</span></div>`;
+    ordered.forEach(i => {
       h += `<a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="margin-top:7px;align-items:flex-start;cursor:pointer;text-decoration:none;color:inherit">
         <b style="min-width:34px">${i.n}</b>
-        <span>${clip(A.txt(i.q), 150)}</span>
+        <span>${clip(A.txt(i.q), 95)}</span>
         ${i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : ''}
         <span class="chip ok flag">בוצע</span></a>`;
     });
