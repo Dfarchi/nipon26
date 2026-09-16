@@ -21,7 +21,10 @@
     return Object.assign({}, b, { sd, ed, cur: sd && ed && dd >= sd && dd < ed, f: A.factsFor(b.n) });
   }).sort((a, b) => (a.sd || 0) - (b.sd || 0));
 
-  const cur = booked.find(b => b.cur) || booked.find(b => b.sd && b.sd >= A.today0) || booked[0];
+  // ‎|| booked[0] היה נפילה אחורה ללינה הראשונה בטיול — ובשישה הלילות
+  // האחרונים, שעדיין לא הוזמנו, הכרטיס הראה מלון מ-14.10 בלי שום סימן.
+  // כתובת שגויה מול נהג מונית גרועה מ"אין כתובת".
+  const cur = booked.find(b => b.cur) || booked.find(b => b.sd && b.sd >= A.today0) || null;
 
   let h = `<div class="head"><div class="kicker">הכל שמור במכשיר</div><div class="h1">הארנק</div></div>`;
 
@@ -37,6 +40,10 @@
         ${cur.f.phone ? `<div class="ph">${cur.f.phone}</div>` : ''}
       </div>
       <div class="d" style="margin-top:6px;text-align:center">בהיר בכוונה — זה המסך היחיד שזר קורא</div>`;
+  } else if (!cur) {
+    // שתיקה כאן נקראת כמו "אין מה להראות". עדיף לומר למה.
+    h += `<div class="lbl" style="margin-top:16px">להראות לנהג<i></i></div>
+      <div class="card"><div class="d">אין לינה מוזמנת ללילה הזה — אין כתובת להראות.</div></div>`;
   }
 
   // ---- דדליינים קרובים ----

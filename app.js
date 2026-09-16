@@ -13,10 +13,15 @@ window.App = (function () {
     const m = String(d.t).match(/^(\d{1,2})\.(\d{1,2})/);
     return { i, d, date: m ? new Date(YEAR, +m[2] - 1, +m[1]) : null };
   });
+  // יום קויאסאן הוא היחיד מ-45 שכותרתו לא נפתחת בתאריך, והוא חצי השני
+  // של 4.11. בלי התאריך הזה כל מי שקורא ‎dated[idx].date קיבל null וקרס.
+  dated.forEach((x, i) => { if (!x.date && i) x.date = dated[i - 1].date; });
   const firstDay = (dated.find(x => x.date) || {}).date;
 
   function dayIndex() {
-    if (q.has('d')) return Math.max(0, Math.min(T.days.length - 1, +q.get('d')));
+    // ‎?d=abc נתן NaN, ומשם T.days[NaN] ומסך לבן. קישור שבור לא מפיל מסך.
+    const n = parseInt(q.get('d'), 10);
+    if (Number.isFinite(n)) return Math.max(0, Math.min(T.days.length - 1, n));
     const hit = dated.find(x => x.date && x.date.getTime() === today0.getTime());
     if (hit) return hit.i;
     return today0 < firstDay ? 0 : T.days.length - 1;
@@ -84,7 +89,9 @@ window.App = (function () {
       addr:  (line.match(/[一-龯ぁ-んァ-ヶ][一-龯ぁ-んァ-ヶ0-9０-９\-ー－]{3,}(?:[市町村区][^\s,)·]*)?[0-9０-９][0-9０-９\-ー－]*/) || [])[0]
           || (line.match(/[一-龯]{2,}[市町村区][^\s,)·]{0,20}/) || [])[0] || '',
       phone: (line.match(/0\d{1,4}-\d{2,4}-\d{4}/) || [])[0] || '',
-      free:  (line.match(/(?:ביטול )?חינם עד ([0-9.]+)/) || [])[1] || ''
+      // ‎[0-9.]+ בלע גם נקודת סוף משפט, ו-"19.10." לא עבר את dl() — שני
+      // דדליינים לביטול חינם פשוט לא הופיעו בשום מקום.
+      free:  (line.match(/(?:ביטול )?חינם עד ([0-9]{1,2}\.[0-9]{1,2})/) || [])[1] || ''
     };
   }
 

@@ -97,5 +97,19 @@ vers.size > 1
   ? fail(`יש יותר ממחרוזת מטמון אחת: ${[...vers].join(', ')} — יובל יראה גרסה ישנה`)
   : ok(`מחרוזת מטמון אחידה: ${[...vers][0] || 'אין'}`);
 
+// ===== קליפת ה-service worker =====
+// ההתקנה היא addAll אטומי: קובץ אחד חסר מפיל את כל ההתקנה, ולכן הבדיקה
+// הזו היא מה שמחליף את ה-catch הריק שהיה שם קודם.
+{
+  console.log('=== קבצי הקליפה ב-sw.js קיימים בדיסק ===');
+  const src = fs.readFileSync('sw.js', 'utf8');
+  const blk = (src.match(/const SHELL_FILES = \[([\s\S]*?)\];/) || [])[1] || '';
+  const files = [...blk.matchAll(/'\.\/([^']*)'/g)].map(m => m[1]).filter(Boolean);
+  const gone = files.filter(f => !fs.existsSync(f));
+  gone.length
+    ? fail(`${gone.length} קבצים ב-SHELL_FILES לא קיימים (${gone.slice(0, 3).join(', ')}) — ההתקנה תיכשל והאפליקציה לא תעבוד אופליין`)
+    : ok(`כל ${files.length} קבצי הקליפה קיימים`);
+}
+
 console.log(bad ? `\n*** ${bad} בעיות — לא לדחוף ***` : '\n✅ הכל עקבי');
 process.exit(bad ? 1 : 0);

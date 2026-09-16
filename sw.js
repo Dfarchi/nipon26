@@ -2,7 +2,7 @@
    קליפה: cache-first (מהיר, עובד אופליין).
    trip.json: network-first (תוכן הטיול זז כל יום — רוצים את הטרי, עם נפילה לעותק).
    מארחים חיצוניים (leaflet, אריחי מפה): לא נוגעים — הם לא זמינים אופליין ממילא. */
-const V = '2026091606';
+const V = '2026091608';
 const SHELL = 'nipon26-shell-' + V;
 const DATA  = 'nipon26-data-' + V;
 
@@ -54,8 +54,11 @@ const SHELL_FILES = [
 self.addEventListener('install', e => {
   e.waitUntil((async () => {
     const c = await caches.open(SHELL);
-    // addAll נכשל כולו אם קובץ אחד נופל — מוסיפים אחד-אחד כדי לא לאבד הכל
-    await Promise.all(SHELL_FILES.map(f => c.add(f).catch(() => {})));
+    // addAll אטומי: אם קובץ אחד נופל, ההתקנה כולה נכשלת — וזו ההתנהגות
+    // הרצויה. הגרסה הקודמת הוסיפה אחד-אחד עם catch ריק, ולכן התקנה מול
+    // ויפיי שמחזיר 503 "הצליחה" עם אפס קבצים, ומיד אחריה activate מחק את
+    // הקאש הישן התקין. כישלון כאן משאיר את ה-SW הישן והקאש שלו חיים.
+    await c.addAll(SHELL_FILES);
     // trip.json נשמר בקאש הנתונים כבר בהתקנה, כדי שיהיה שם גם אם אף דף לא ביקש אותו עדיין
     await caches.open(DATA).then(d => d.add('./trip.json')).catch(() => {});
     await self.skipWaiting();

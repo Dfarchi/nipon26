@@ -5,7 +5,10 @@
   const idx = A.dayIndex(), cur = T.days[idx], dd = A.dated[idx].date;
 
   const head = String(cur.t).split('—');
-  const rest = head.slice(1).join('—').trim();
+  // רוב הכותרות הן "30.10 — עיר (Latin · 漢字)". יום קויאסאן נפתח בשם
+  // העיר, ולכן שם החלק הראשון הוא כבר התיאור ואין מה לקלף ממנו.
+  const hasDate = /^\d{1,2}\.\d{1,2}/.test(head[0].trim());
+  const rest = hasDate ? head.slice(1).join('—').trim() : String(cur.t);
   let city = rest.split('(')[0].replace(/\s*·.*$/, '').trim();
   if (city.includes('→')) city = city.split('→').pop().trim();
   const jp = (rest.match(/·\s*([^)]*[　-鿿][^)]*)\)/) || [])[1] || '';
@@ -13,7 +16,9 @@
 
   const acts = (cur.acts || []).filter(a => a && a.t);
   const crowd = c => c === '🔴' ? 'var(--warn)' : c === '🟡' ? 'var(--hot)' : 'var(--ok)';
-  const time = s => (String(s).match(/\b([0-2]?\d:[0-5]\d)\b/) || [])[1] || '';
+  // ‎(~2:15) הוא משך נסיעה ולא שעה. בלי ההחרגה הזו מסך 19.11 פתח ב-"עכשיו
+  // 2:15 · קיוטו → טוקיו" והחביא את כל פעילויות הבוקר מאחורי "זהו להיום".
+  const time = s => (String(s).match(/(?<![~(\d:])\b([0-2]?\d:[0-5]\d)\b/) || [])[1] || '';
 
   const stay = (T.budget.booked || []).find(b => {
     const p = String(b.d).split(/[–-]/);
@@ -38,8 +43,8 @@
   }
   h += `<div class="head"${A.beforeTrip ? ' style="padding-top:clamp(30px,8vh,70px)"' : ''}>
     <div class="kicker">יום ${idx + 1} · מתוך ${T.days.length}${cur.st ? ' · ' + cur.st : ''}</div>
-    <div class="row"><div class="dnum">${head[0].trim()}</div>
-      <div class="d" style="padding-bottom:6px">${A.DOW[dd.getDay()]}</div><div style="flex:1"></div>
+    <div class="row"><div class="dnum">${hasDate ? head[0].trim() : (dd ? dd.getDate() + '.' + (dd.getMonth() + 1) : '')}</div>
+      <div class="d" style="padding-bottom:6px">${dd ? A.DOW[dd.getDay()] : ''}</div><div style="flex:1"></div>
       <div style="display:flex;align-items:baseline;gap:7px;padding-bottom:5px">
         <div class="city">${city || latin}</div>${jp ? `<div class="jp">${jp}</div>` : ''}</div></div></div>`;
 
@@ -114,10 +119,13 @@
   }
 
   if (stay) {
+    // ‎stayAddr הוא הכתובת שהוקלדה ואומתה; factsFor הוא ניחוש ברג׳קס
+    // שמחזיר לפעמים שבר משם המלון. הראשון קודם, כמו בארנק ובכלים.
     const f = A.factsFor(stay.n);
+    const addr = (T.stayAddr || {})[stay.n] || f.addr;
     h += `<div class="card"><div class="lbl q">הלילה<i></i></div><div class="t">${A.txt(stay.n)}</div>
       <div class="d">${stay.d} · ${stay.nights} לילות${stay.meals ? ' · ' + stay.meals : ''}</div>
-      ${f.addr ? `<div class="jp" style="margin-top:5px">${f.addr}</div>` : ''}</div>`;
+      ${addr ? `<div class="jp" style="margin-top:5px">${addr}</div>` : ''}</div>`;
   }
 
   // יעד הניווט, מהמדויק לכללי. אין יעד מדויק — אין כפתור: עדיף בלי, מאשר
