@@ -88,6 +88,13 @@
     </div>`;
   });
 
+  // ---- הוצאות ----
+  // הסכום עצמו נבנה כאן פעם אחת; אחרי כל הוספה מרעננים רק את הבלוק
+  // הזה, כדי שלא לבנות מחדש 13 כרטיסי לינה בכל לחיצה.
+  h += `<div class="lbl q" style="margin-top:22px">הוצאות<i></i>
+      <span class="d" id="spSt"></span></div>
+    <div id="spend"></div>`;
+
   // ---- מסמכים ----
   if ((T.docs || []).length) {
     h += `<div class="lbl q" style="margin-top:22px">מסמכים<i></i></div>`;
@@ -115,5 +122,148 @@
     card.classList.add('open');
   });
 
+  // ===== הוצאות =====
+  // מה שנכנס כאן הולך לגיליון המשותף, כדי ששני הטלפונים יראו אותו סכום.
+  // בלי כתובת גיליון זה עדיין עובד — רק מקומית, ועם שורה שאומרת את זה.
+  const WHO = ['יובל', 'שיר', 'משותף'];
+  const CAT = ['אוכל', 'תחבורה', 'כניסות', 'לינה', 'קניות', 'אחר'];
 
+  function jpyRate() {
+    const f = (T.budget || {}).fx || {};
+    return LIVE_JPY || f.jpy || 0;
+  }
+  let LIVE_JPY = 0;
+  A.fxRate(r => { if (r && r.jpy) { LIVE_JPY = r.jpy; paintSpend(); } });
+
+  const ils = r => Number(r.amount) * (Number(r.rate) || 0);
+  const shek = n => '₪' + Math.round(n).toLocaleString('he-IL');
+
+  function paintSpend() {
+    const box = document.getElementById('spend');
+    if (!box) return;
+    const rows = A.spend.all();
+    const total = rows.reduce((a, r) => a + ils(r), 0);
+    const per = WHO.map(w => [w, rows.filter(r => r.who === w).reduce((a, r) => a + ils(r), 0)])
+      .filter(x => x[1] > 0);
+
+    const st = document.getElementById('spSt');
+    if (st) {
+      const q = A.spend.queue().length;
+      st.textContent = !A.spend.url() ? 'מקומי בלבד'
+        : q ? q + ' ממתינות לשליחה' : 'מסונכרן';
+    }
+
+    box.innerHTML = `<div class="card" style="padding:14px 15px">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div class="h1" style="font-size:var(--fs-title);margin:0">${shek(total)}</div>
+        <div class="d" style="margin:0;flex:1">${rows.length ? rows.length + ' רישומים' : 'עוד לא נרשם כלום'}</div>
+      </div>
+      ${per.length ? `<div class="d" style="margin-top:6px">${
+        per.map(([w, v]) => `${w} ${shek(v)}`).join(' · ')}</div>` : ''}
+      <div class="sprow">
+        <button class="chip" id="spAdd">+ הוספה</button>
+        ${A.spend.url() ? `<button class="chip" id="spSync">סנכרון</button>` : ''}
+        <button class="chip" id="spCfg">${A.spend.url() ? 'גיליון' : 'לחבר גיליון'}</button>
+      </div>
+      <div id="spForm"></div>
+    </div>
+    ${rows.length ? `<div class="well" style="margin-top:8px">${rows.slice(0, 6).map(r =>
+      `<div class="step" style="margin-top:6px"><b style="min-width:62px">${shek(ils(r))}</b>
+        <span style="flex:1">${A.txt(String(r.category || ''))}${r.note ? ' · ' + A.txt(String(r.note)) : ''}</span>
+        <span class="chip">${A.txt(String(r.who || ''))}</span></div>`).join('')}</div>` : ''}`;
+
+    const add = document.getElementById('spAdd');
+    if (add) add.onclick = () => openForm();
+    const sy = document.getElementById('spSync');
+    if (sy) sy.onclick = () => { sy.textContent = 'שולח…';
+      A.spend.sync(ok => { paintSpend(); if (!ok) { const s2 = document.getElementById('spSt');
+        if (s2) s2.textContent = 'לא הצליח להתחבר'; } }); };
+    const cfg = document.getElementById('spCfg');
+    if (cfg) cfg.onclick = () => openCfg();
+  }
+
+  function openCfg() {
+    const f = document.getElementById('spForm');
+    if (!f) return;
+    if (f.dataset.mode === 'cfg') { f.innerHTML = ''; f.dataset.mode = ''; return; }
+    f.dataset.mode = 'cfg';
+    f.innerHTML = `<div style="margin-top:12px">
+      <div class="d">כתובת ה-Apps Script של הגיליון. מדביקים פעם אחת בכל טלפון —
+        היא נשמרת כאן בלבד ולא בריפו. ההוראות ב-SHEETS.md.</div>
+      <input id="spUrl" type="url" inputmode="url" placeholder="https://script.google.com/…/exec"
+        value="${A.esc(A.spend.url())}"
+        style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid var(--line);
+               background:var(--well);color:var(--ink);font:inherit;font-size:var(--fs-meta)">
+      <div style="display:flex;gap:8px;margin-top:9px">
+        <button class="chip" id="spSave">שמירה</button>
+        <button class="chip" id="spClr">ניתוק</button>
+      </div></div>`;
+    document.getElementById('spSave').onclick = () => {
+      A.spend.setUrl(document.getElementById('spUrl').value);
+      f.innerHTML = ''; f.dataset.mode = '';
+      A.spend.sync(() => paintSpend());
+    };
+    document.getElementById('spClr').onclick = () => {
+      A.spend.setUrl(''); f.innerHTML = ''; f.dataset.mode = ''; paintSpend();
+    };
+  }
+
+  function openForm() {
+    const f = document.getElementById('spForm');
+    if (!f) return;
+    if (f.dataset.mode === 'add') { f.innerHTML = ''; f.dataset.mode = ''; return; }
+    f.dataset.mode = 'add';
+    f.innerHTML = `<div style="margin-top:12px">
+      <div class="fxrow">
+        <label><span id="spCur">¥</span>
+          <input id="spAmt" type="text" inputmode="numeric" placeholder="1,200"></label>
+        <button class="chip" id="spSwap">להחליף ל-₪</button>
+      </div>
+      <div class="fxq" style="margin-top:9px">${WHO.map((w, i) =>
+        `<button class="chip spw${i === 0 ? ' on' : ''}" data-w="${A.esc(w)}">${w}</button>`).join('')}</div>
+      <div class="fxq" style="margin-top:7px">${CAT.map((c, i) =>
+        `<button class="chip spc${i === 0 ? ' on' : ''}" data-c="${A.esc(c)}">${c}</button>`).join('')}</div>
+      <input id="spNote" type="text" placeholder="הערה (לא חובה)"
+        style="width:100%;margin-top:9px;padding:10px;border-radius:10px;border:1px solid var(--line);
+               background:var(--well);color:var(--ink);font:inherit;font-size:var(--fs-meta)">
+      <button class="cloud" id="spOk" style="margin-top:11px;width:100%">לשמור</button>
+    </div>`;
+
+    let cur = 'JPY';
+    const pick = (sel, attr) => f.querySelectorAll(sel).forEach(b => b.onclick = () => {
+      f.querySelectorAll(sel).forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+    });
+    pick('.spw'); pick('.spc');
+    document.getElementById('spSwap').onclick = () => {
+      cur = cur === 'JPY' ? 'ILS' : 'JPY';
+      document.getElementById('spCur').textContent = cur === 'JPY' ? '¥' : '₪';
+      document.getElementById('spSwap').textContent = cur === 'JPY' ? 'להחליף ל-₪' : 'להחליף ל-¥';
+    };
+    document.getElementById('spOk').onclick = () => {
+      const n = parseFloat(String(document.getElementById('spAmt').value).replace(/[^\d.]/g, ''));
+      if (!isFinite(n) || n <= 0) { document.getElementById('spAmt').focus(); return; }
+      const d = A.dated[A.dayIndex()] && A.dated[A.dayIndex()].date;
+      const iso = (d || new Date());
+      A.spend.add({
+        date: iso.getFullYear() + '-' + ('0' + (iso.getMonth() + 1)).slice(-2) + '-' + ('0' + iso.getDate()).slice(-2),
+        who: (f.querySelector('.spw.on') || {}).dataset ? f.querySelector('.spw.on').dataset.w : WHO[0],
+        amount: n, currency: cur,
+        // השער נשמר עם השורה ולא מחושב בדיעבד: ‎¥1,000 באוקטובר ו-¥1,000
+        // בנובמבר אינם אותו סכום בשקלים, ובסוף הטיול רוצים את האמת.
+        rate: cur === 'JPY' ? jpyRate() : 1,
+        category: (f.querySelector('.spc.on') || {}).dataset ? f.querySelector('.spc.on').dataset.c : CAT[0],
+        note: document.getElementById('spNote').value.trim()
+      });
+      f.innerHTML = ''; f.dataset.mode = '';
+      paintSpend();
+      A.spend.sync(() => paintSpend());
+    };
+  }
+
+  // נקרא כאן ולא ליד ‎innerHTML: ‎WHO ו-CAT הם const באותו סקופ, וקריאה
+  // מוקדמת יותר נופלת ב-TDZ לפני שהשורות שלהם רצו.
+  paintSpend();
+  if (A.spend.url()) A.spend.sync(() => paintSpend());
+  addEventListener('online', () => { if (A.spend.url()) A.spend.sync(() => paintSpend()); });
 })();

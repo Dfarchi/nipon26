@@ -374,6 +374,17 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
 .nav a.on{color:var(--hot);font-weight:700}
 .nav a.on::before{content:'';position:absolute;inset:0 12% auto;height:100%;border-radius:12px;
   background:color-mix(in srgb,var(--hot) 11%,transparent);z-index:-1}
+/* כפתורי ההוצאות. אותו מראה כמו שבבי המחשבון — שניהם "פעולה קטנה
+   בתוך כרטיס", ואין סיבה שייראו שונה. */
+.sprow{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.sprow .chip{min-height:40px;display:inline-flex;align-items:center;padding:0 14px;
+  border-radius:99px;border:1px solid color-mix(in srgb,var(--hot) 32%,transparent);
+  background:color-mix(in srgb,var(--hot) 8%,transparent);color:var(--ink);
+  font:inherit;font-size:var(--fs-micro);font-weight:700;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+.sprow .chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent)}
+.spw.on,.spc.on{border-color:var(--hot);background:color-mix(in srgb,var(--hot) 26%,transparent)}
+
 /* בורר היום יושב בשורת "יום 17 · מתוך 45" ולא צף בפינה. כשהוא היה
    ‎fixed הוא כיסה קבוע את סיכום המעבר של היום. */
 .kline{display:flex;align-items:center;gap:10px}

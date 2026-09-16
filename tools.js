@@ -145,8 +145,14 @@
     document.getElementById('open9').textContent =
       `09:00 ביפן = ${String(loc).padStart(2, '0')}:00 כאן — זו השעה שבה נפתחות הזמנות האוטובוס`;
   }
+  // השעון רץ כל 20 שניות. בטיול של 42 יום הטלפון הוא גם המפה וגם הכרטיס,
+  // ואין סיבה שהוא יתקתק כשהמסך מכובה או כשאתם במסך אחר.
   tick();
-  setInterval(tick, 20000);
+  let clk = setInterval(tick, 20000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { clearInterval(clk); clk = null; }
+    else if (!clk) { tick(); clk = setInterval(tick, 20000); }
+  });
 
   // ---- המרה: שני שדות שמזינים זה את זה, בלי כפתור "חשב" ----
   const j = document.getElementById('fxJpy'), s = document.getElementById('fxIls');

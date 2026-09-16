@@ -158,6 +158,63 @@ window.App = (function () {
   }
 
 
+  // ===== הוצאות =====
+  // שני טלפונים, בלי שרת משלנו ובלי התחברות: הגיליון הוא המקום היחיד
+  // שבו שניכם רואים את אותו דבר. כתובת הקצה של Apps Script נשמרת
+  // ב-‎localStorage בכל מכשיר בנפרד ולא נכנסת לריפו — הוא ציבורי,
+  // וכתובת בקוד פירושה שכל אחד יכול לכתוב לגיליון שלכם.
+  //
+  // כל הוצאה נכתבת קודם מקומית ורק אחר כך נשלחת. באזור בלי קליטה
+  // התור מצטבר ונשלח כשחוזרים — ולכן לכל שורה יש ‎id, והסקריפט בצד
+  // השני מתעלם מ-id שכבר ראה. בלי זה חזרה לקליטה הייתה מכפילה הכל.
+  const SP_URL = 'nipon26_spend_url', SP_Q = 'nipon26_spend_q', SP_ROWS = 'nipon26_spend_rows';
+  const lsGet = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+  const spend = {
+    url: () => { try { return localStorage.getItem(SP_URL) || ''; } catch (e) { return ''; } },
+    setUrl(v) {
+      try { v ? localStorage.setItem(SP_URL, String(v).trim()) : localStorage.removeItem(SP_URL); } catch (e) {}
+    },
+    queue: () => lsGet(SP_Q, []),
+    synced: () => lsGet(SP_ROWS, []),
+    // מה שמוצג: מה שחזר מהגיליון, ועליו מה שעוד לא נשלח.
+    all() {
+      const seen = {}, out = [];
+      this.synced().concat(this.queue()).forEach(r => {
+        if (!r || !r.id || seen[r.id]) return; seen[r.id] = 1; out.push(r);
+      });
+      return out.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    },
+    add(rec) {
+      const id = 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      const row = Object.assign({ id }, rec);
+      lsSet(SP_Q, this.queue().concat([row]));
+      return row;
+    },
+    // שליחה וקבלה בבקשה אחת. ‎text/plain בכוונה: Apps Script לא עונה
+    // ל-OPTIONS, ו-‎application/json היה מפעיל preflight ונופל.
+    sync(cb) {
+      const done = (ok, err) => cb && cb(ok, err);
+      const u = this.url();
+      if (!u) return done(false, 'אין כתובת');
+      if (!navigator.onLine) return done(false, 'אין רשת');
+      const q = this.queue();
+      fetch(u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                 body: JSON.stringify({ rows: q }) })
+        .then(r => r.json())
+        .then(j => {
+          if (!j || !j.ok || !Array.isArray(j.rows)) throw 0;
+          lsSet(SP_ROWS, j.rows);
+          // מנקים מהתור רק מה שבאמת מופיע בגיליון עכשיו.
+          const have = {}; j.rows.forEach(r => { have[r.id] = 1; });
+          lsSet(SP_Q, q.filter(r => !have[r.id]));
+          done(true);
+        })
+        .catch(() => done(false, 'הגיליון לא ענה'));
+    }
+  };
+
   // ===== מזג אוויר: מגדיר את מצב הסצנה. Open-Meteo, בלי מפתח. =====
   // הבקשה רצה בדפדפן של המשתמש, לא אצלי — אם היא נכשלת נופלים ל"עלים".
   const WKEY = 'nipon26_wx';
@@ -1211,5 +1268,5 @@ window.App = (function () {
     fxRate(() => {});   // מחמם את המטמון בכל מסך, כדי שהמחשבון ייפתח עם השער של היום
   }
 
-  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, afterTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, afterTrip, spend, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();
