@@ -17,6 +17,21 @@
  * את המזהה מכתובת הגיליון, החלק שבין ‎/d/ ל-‎/edit. */
 var SHEET_ID = '';
 
+/* סיסמה אופציונלית. "כל מי שיש לו הקישור" הוא בדיוק מה שהוא אומר:
+ * הכתובת היא מחרוזת אקראית ארוכה ואף אחד לא ינחש אותה, אבל מי שכן
+ * משיג אותה יכול לקרוא ולכתוב. מילה כאן סוגרת גם את זה.
+ *
+ * איך: לשים מילה כלשהי (למשל 'momiji26'), ואז להוסיף אותה לכתובת
+ * שמדביקים בטלפון:  .../exec?k=momiji26
+ * ריק = בלי בדיקה, כמו קודם. לא נכנס לריפו — הוא ציבורי. */
+var SECRET = '';
+
+function guard_(e) {
+  if (!SECRET) return;
+  var k = (e && e.parameter && e.parameter.k) || '';
+  if (k !== SECRET) throw new Error('סיסמה שגויה');
+}
+
 var TAB = 'הוצאות', SUM = 'סיכום';
 var HEAD = ['id', 'נרשם', 'תאריך', 'מי שילם', 'סכום', 'מטבע', 'שער', '₪',
             'על מה', 'איך', 'הערה'];
@@ -173,13 +188,15 @@ function json_(o) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function doGet() {
+function doGet(e) {
+  guard_(e);
   return json_({ ok: true, rows: rows_(sheet_()) });
 }
 
 /* האפליקציה שולחת text/plain בכוונה: Apps Script לא עונה ל-OPTIONS,
  * ובקשה עם application/json הייתה מפעילה preflight ונופלת. */
 function doPost(e) {
+  guard_(e);
   var sh = sheet_();
   var body = {};
   try { body = JSON.parse(e.postData.contents); } catch (err) { body = {}; }
