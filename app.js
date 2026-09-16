@@ -114,7 +114,7 @@ window.App = (function () {
   }
 
   const WHO_KEY = 'nipon26_who';
-  const PEOPLE = { yuval: 'יובל', shir: 'שירשה' };
+  const PEOPLE = { yuval: 'יובו', shir: 'שירשה' };
   const who = () => { try { return localStorage.getItem(WHO_KEY) || ''; } catch (e) { return ''; } };
   const setWho = v => { try { localStorage.setItem(WHO_KEY, v); } catch (e) {} };
 
@@ -131,8 +131,8 @@ window.App = (function () {
     const w = who(), nm = PEOPLE[w];
     if (!w) {
       return `<div class="ping ask">מי פותח?
-        <button class="chip pick-who" data-who="yuval">יובל</button>
-        <button class="chip pick-who" data-who="shir">שיר</button>
+        <button class="chip pick-who" data-who="yuval">יובו</button>
+        <button class="chip pick-who" data-who="shir">שירשה</button>
         <button class="chip skip pick-who" data-who="-">דלג</button></div>`;
     }
     const name = nm ? `, ${nm}` : '';

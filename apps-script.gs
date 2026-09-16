@@ -16,7 +16,7 @@ var HEAD = ['id', 'נרשם', 'תאריך', 'מי שילם', 'סכום', 'מטב
             'על מה', 'איך', 'הערה'];
 
 // חייב להתאים ל-WHO ול-CAT ב-wallet.js, אחרת הסינון בסיכום מפספס שורות.
-var WHO = ['יובל', 'שיר', 'על שנינו'];
+var WHO = ['יובו', 'שירשה'];
 var CAT = ['🍜 ארוחות', '🍡 נשנושים', '🚃 נסיעות', '⛩️ כניסות', '🎁 מתנות',
            '🏪 קומביני', '♨️ אונסן', '🛏️ לינה', '🪭 שטויות יפניות'];
 // ביפן זה לא פרט טכני: מזומן הוא מה שנגמר בארנק, ואשראי מוסיף כ-2%.
@@ -84,47 +84,51 @@ function summary_(ss) {
   var sh = ss.getSheetByName(SUM) || ss.insertSheet(SUM);
   sh.clear();
   var q = "'" + TAB + "'!";
-  var rows = [
-    ['כמה יצא לנו עד עכשיו', '=IFERROR(SUM(' + q + 'H2:H),0)'],
-    ['כמה רישומים', '=COUNTA(' + q + 'C2:C)'],
-    ['ימים שבהם הוצאנו', '=IFERROR(COUNTUNIQUE(' + q + 'C2:C),0)'],
-    ['ממוצע ליום פעיל', '=IFERROR(B1/B3,0)'],
-    ['', ''],
-    ['מי שילם', 'סכום']
-  ];
+
+  // השורות נגזרות ולא מונחות. הגרסה הקודמת החזיקה אינדקסים קשיחים,
+  // ורגע שירדה קטגוריית "על שנינו" כל ההדגשות הצביעו שורה אחת מעל.
+  var rows = [], at = {};
+  function put(label, formula, key) {
+    rows.push([label, formula === undefined ? '' : formula]);
+    if (key) at[key] = rows.length;
+    return rows.length;
+  }
+
+  put('כמה יצא לנו עד עכשיו', '=IFERROR(SUM(' + q + 'H2:H),0)', 'total');
+  put('כמה רישומים', '=COUNTA(' + q + 'C2:C)');
+  put('ימים שבהם הוצאנו', '=IFERROR(COUNTUNIQUE(' + q + 'C2:C),0)', 'days');
+  put('ממוצע ליום פעיל', '=IFERROR(B' + at.total + '/B' + at.days + ',0)');
+  put('');
+  put('מי שילם', 'סכום', 'hWho');
   WHO.forEach(function (w) {
-    rows.push([w, '=IFERROR(SUMIF(' + q + 'D:D,A' + (rows.length + 1) + ',' + q + 'H:H),0)']);
+    put(w, '=IFERROR(SUMIF(' + q + 'D:D,A' + (rows.length + 1) + ',' + q + 'H:H),0)', 'w' + w);
   });
-  rows.push(['', '']);
-  // מי חייב למי: חצי מהסכום המשותף על כל אחד, ומה שמעבר לזה הוא
-  // בעצם הלוואה. הנוסחה מניחה ש"על שנינו" מתחלק שווה בשווה.
-  var iY = 7, iS = 8, iB = 9;
-  rows.push(['ההפרש ביניכם',
-    '=IFERROR(ABS((B' + iY + '+B' + iB + '/2)-(B' + iS + '+B' + iB + '/2)),0)']);
-  rows.push(['מי שילם יותר',
-    '=IF(B' + iY + '>B' + iS + ',"' + WHO[0] + '",IF(B' + iS + '>B' + iY + ',"' + WHO[1] + '","תיקו"))']);
-  rows.push(['', '']);
-  rows.push(['איך שילמנו', 'סכום']);
+  // אין קופה משותפת: כל הוצאה שייכת לאחד מהשניים, וההפרש הוא בדיוק
+  // חצי ממנו — מה שאחד צריך להחזיר לשני כדי שייצא שווה.
+  put('ההפרש ביניכם', '=IFERROR(ABS(B' + at['w' + WHO[0]] + '-B' + at['w' + WHO[1]] + '),0)');
+  put('מי שצריך להחזיר', '=IF(B' + at['w' + WHO[0]] + '>B' + at['w' + WHO[1]] +
+      ',"' + WHO[1] + '",IF(B' + at['w' + WHO[1]] + '>B' + at['w' + WHO[0]] + ',"' + WHO[0] + '","תיקו"))', 'settle');
+  put('כמה להחזיר', '=IFERROR(ABS(B' + at['w' + WHO[0]] + '-B' + at['w' + WHO[1]] + ')/2,0)');
+  put('');
+  put('איך שילמנו', 'סכום', 'hPay');
   PAY.forEach(function (w) {
-    rows.push([w, '=IFERROR(SUMIF(' + q + 'J:J,A' + (rows.length + 1) + ',' + q + 'H:H),0)']);
+    put(w, '=IFERROR(SUMIF(' + q + 'J:J,A' + (rows.length + 1) + ',' + q + 'H:H),0)', 'p' + w);
   });
   // הערכה ולא עובדה: האחוז תלוי בכרטיס. מסומן ככזה בשם השורה.
-  var iCard = rows.length;   // השורה של "💳 אשראי"
-  rows.push(['תוספת משוערת על האשראי (2%)', '=IFERROR(B' + iCard + '*0.02,0)']);
-  rows.push(['', '']);
-  rows.push(['על מה', 'סכום']);
+  put('תוספת משוערת על האשראי (2%)', '=IFERROR(B' + at['p' + PAY[1]] + '*0.02,0)');
+  put('');
+  put('על מה', 'סכום', 'hCat');
   CAT.forEach(function (c) {
-    rows.push([c, '=IFERROR(SUMIF(' + q + 'I:I,A' + (rows.length + 1) + ',' + q + 'H:H),0)']);
+    put(c, '=IFERROR(SUMIF(' + q + 'I:I,A' + (rows.length + 1) + ',' + q + 'H:H),0)');
   });
 
   sh.getRange(1, 1, rows.length, 2).setValues(rows);
-  sh.setColumnWidth(1, 200); sh.setColumnWidth(2, 130);
+  sh.setColumnWidth(1, 210); sh.setColumnWidth(2, 130);
   sh.getRange('B:B').setNumberFormat('₪#,##0.00');
   sh.getRange('B2:B3').setNumberFormat('#,##0');
-  // מפת השורות: 7-9 מי שילם · 11 ההפרש · 12 מי שילם יותר · 14 כותרת "על מה"
-  sh.getRange('B' + (iB + 3)).setNumberFormat('@');       // "מי שילם יותר" הוא טקסט
+  sh.getRange('B' + at.settle).setNumberFormat('@');
   sh.getRange('A1:B1').setFontWeight('bold').setFontSize(13).setFontColor(HOT);
-  [6, iB + 5, iB + 10].forEach(function (r) {
+  [at.hWho, at.hPay, at.hCat].forEach(function (r) {
     sh.getRange(r, 1, 1, 2).setFontWeight('bold').setBackground(PAPER).setFontColor(INK);
   });
   sh.setFrozenRows(1);

@@ -155,7 +155,12 @@
   // בלי כתובת גיליון זה עדיין עובד — רק מקומית, ועם שורה שאומרת את זה.
   // חייב להיות זהה ל-WHO ול-CAT ב-apps-script.gs, אחרת ה-SUMIF בלשונית
   // "סיכום" מחפש מחרוזת שלא קיימת ומחזיר אפס בלי להתלונן.
-  const WHO = ['יובל', 'שיר', 'על שנינו'];
+  const WHO = ['יובו', 'שירשה'];
+  // מי משלם זה תמיד אחד מהשניים, ורוב הפעם זה מי שמחזיק את הטלפון.
+  // "מי פותח?" כבר יודע את זה, אז השם שלו בא ראשון ונבחר מראש — לחיצה
+  // אחת פחות, שלוש פעמים ביום, ארבעים ושניים יום.
+  const mine = A.who() === 'shir' ? 'שירשה' : 'יובו';
+  const WHO_UI = WHO.slice().sort((a, b) => (a === mine ? -1 : b === mine ? 1 : 0));
   const CAT = ['🍜 ארוחות',
                '🍡 נשנושים',
                '🚃 נסיעות',
@@ -264,7 +269,7 @@
           <input id="spAmt" type="text" inputmode="numeric" placeholder="1,200"></label>
         <button class="chip" id="spSwap">להחליף ל-₪</button>
       </div>
-      <div class="fxq" style="margin-top:9px">${WHO.map((w, i) =>
+      <div class="fxq" style="margin-top:9px">${WHO_UI.map((w, i) =>
         `<button class="chip spw${i === 0 ? ' on' : ''}" data-w="${A.esc(w)}">${w}</button>`).join('')}</div>
       <div class="fxq" style="margin-top:7px">${CAT.map((c, i) =>
         `<button class="chip spc${i === 0 ? ' on' : ''}" data-c="${A.esc(c)}">${c}</button>`).join('')}</div>
@@ -294,7 +299,7 @@
       const iso = (d || new Date());
       A.spend.add({
         date: iso.getFullYear() + '-' + ('0' + (iso.getMonth() + 1)).slice(-2) + '-' + ('0' + iso.getDate()).slice(-2),
-        who: (f.querySelector('.spw.on') || {}).dataset ? f.querySelector('.spw.on').dataset.w : WHO[0],
+        who: (f.querySelector('.spw.on') || {}).dataset ? f.querySelector('.spw.on').dataset.w : mine,
         amount: n, currency: cur,
         // השער נשמר עם השורה ולא מחושב בדיעבד: ‎¥1,000 באוקטובר ו-¥1,000
         // בנובמבר אינם אותו סכום בשקלים, ובסוף הטיול רוצים את האמת.
