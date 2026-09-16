@@ -398,6 +398,18 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
   background:color-mix(in srgb,var(--hot) 28%,transparent);
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--hot) 45%,transparent)}
 
+/* מחיקת הוצאה: השורה עצמה הופכת לשאלה. בלי דיאלוג, בלי סימן ✕ קבוע
+   שמזמין לחיצה בטעות, ובלי מחיקה בלחיצה אחת. */
+.rrow{cursor:pointer}
+.rrow:active{opacity:.75}
+.rmb{min-height:38px;display:inline-flex;align-items:center;padding:0 15px;
+  margin-inline-start:7px;border-radius:99px;border:1px solid var(--line);
+  background:var(--well);color:var(--ink);font:inherit;font-size:var(--fs-micro);
+  font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rmb.yes{border-color:var(--warn);color:var(--warn);
+  background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.rmb:active{opacity:.7}
+
 /* כפתור השמירה. ‎.cloud לבדו הוא מסגרת לציור ענן — בלי ה-SVG הוא נראה
    כמו תיבה ריקה עם מילה. */
 .spsave{display:flex;align-items:center;justify-content:center;

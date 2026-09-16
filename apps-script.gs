@@ -217,6 +217,17 @@ function doPost(e) {
   var body = {};
   try { body = JSON.parse(e.postData.contents); } catch (err) { body = {}; }
 
+  // מחיקות קודם, כדי ש-seen ייבנה על מה שנשאר. מלמטה למעלה, אחרת כל
+  // מחיקה מזיזה את האינדקסים של מה שמתחתיה.
+  var kill = body.del || [];
+  var removed = 0;
+  if (kill.length && sh.getLastRow() > 1) {
+    var ids = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues();
+    for (var i = ids.length - 1; i >= 0; i--) {
+      if (kill.indexOf(String(ids[i][0])) >= 0) { sh.deleteRow(i + 2); removed++; }
+    }
+  }
+
   // id שכבר קיים לא נכתב שוב. הטלפון שולח מחדש את כל התור עד שהוא
   // מקבל אישור, ובלי זה חזרה מאזור בלי קליטה הייתה מכפילה כל הוצאה.
   var seen = {};
@@ -224,7 +235,8 @@ function doPost(e) {
 
   var add = [];
   (body.rows || []).forEach(function (r) {
-    if (!r || !r.id || seen[r.id]) return;
+    // שורה שנמחקה לא חוזרת דרך תור ששלח אותה שוב באותה בקשה.
+    if (!r || !r.id || seen[r.id] || kill.indexOf(String(r.id)) >= 0) return;
     seen[r.id] = true;
     var amount = Number(r.amount) || 0, rate = Number(r.rate) || 0;
     add.push([String(r.id), new Date(), parseDate_(r.date), String(r.who || ''),
@@ -232,11 +244,9 @@ function doPost(e) {
               Math.round(amount * rate * 100) / 100,
               String(r.category || ''), String(r.pay || ''), String(r.note || '')]);
   });
-  if (add.length) {
-    sh.getRange(sh.getLastRow() + 1, 1, add.length, HEAD.length).setValues(add);
-    summary_(sh.getParent());
-  }
-  return json_({ ok: true, added: add.length, rows: rows_(sh) });
+  if (add.length) sh.getRange(sh.getLastRow() + 1, 1, add.length, HEAD.length).setValues(add);
+  if (add.length || removed) summary_(sh.getParent());
+  return json_({ ok: true, added: add.length, removed: removed, rows: rows_(sh) });
 }
 
 // "2026-10-30" → Date, כדי שהעמודה תהיה תאריך אמיתי ואפשר יהיה למיין

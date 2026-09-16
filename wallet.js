@@ -216,7 +216,8 @@
       <div id="spForm"></div>
     </div>
     ${rows.length ? `<div class="well" style="margin-top:8px">${rows.slice(0, 6).map(r =>
-      `<div class="step" style="margin-top:6px"><b style="min-width:62px">${shek(ils(r))}</b>
+      `<div class="step rrow" data-x="${A.esc(r.id)}" style="margin-top:6px">
+        <b style="min-width:62px">${shek(ils(r))}</b>
         <span style="flex:1">${A.txt(String(r.category || ''))}${r.note ? ' · ' + A.txt(String(r.note)) : ''}</span>
         <span class="chip">${A.txt(String(r.who || ''))}</span></div>`).join('')}</div>` : ''}`;
 
@@ -228,6 +229,27 @@
         if (s2) s2.textContent = 'לא הצליח להתחבר'; } }); };
     const cfg = document.getElementById('spCfg');
     if (cfg) cfg.onclick = () => openCfg();
+
+    // מחיקה בשתי לחיצות ולא באחת. ¥12,000 במקום ¥1,200 קורה, אבל גם
+    // אצבע על שורה בזמן גלילה — ומחיקה בלחיצה אחת הייתה מוחקת הוצאה
+    // אמיתית בלי שאף אחד ישים לב.
+    box.querySelectorAll('.rrow').forEach(el => { el.onclick = () => askRemove(el); });
+  }
+
+  function askRemove(el) {
+    const id = el.dataset.x;
+    el.innerHTML = `<b style="min-width:62px;color:var(--warn)">למחוק?</b>
+      <span style="flex:1"></span>
+      <button class="rmb yes" type="button">כן</button>
+      <button class="rmb" type="button">לא</button>`;
+    const [yes, no] = el.querySelectorAll('.rmb');
+    yes.onclick = e => {
+      e.stopPropagation();
+      A.spend.remove(id);
+      paintSpend();
+      A.spend.sync(() => paintSpend());
+    };
+    no.onclick = e => { e.stopPropagation(); paintSpend(); };
   }
 
   function openCfg() {

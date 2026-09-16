@@ -167,7 +167,8 @@ window.App = (function () {
   // כל הוצאה נכתבת קודם מקומית ורק אחר כך נשלחת. באזור בלי קליטה
   // התור מצטבר ונשלח כשחוזרים — ולכן לכל שורה יש ‎id, והסקריפט בצד
   // השני מתעלם מ-id שכבר ראה. בלי זה חזרה לקליטה הייתה מכפילה הכל.
-  const SP_URL = 'nipon26_spend_url', SP_Q = 'nipon26_spend_q', SP_ROWS = 'nipon26_spend_rows';
+  const SP_URL = 'nipon26_spend_url', SP_Q = 'nipon26_spend_q',
+        SP_ROWS = 'nipon26_spend_rows', SP_DEL = 'nipon26_spend_del';
   const lsGet = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 
@@ -186,6 +187,16 @@ window.App = (function () {
       });
       return out.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     },
+    dels: () => lsGet(SP_DEL, []),
+    // מחיקה עובדת גם בלי רשת: שורה שעוד לא נשלחה פשוט יורדת מהתור,
+    // ושורה שכבר בגיליון נעלמת מהמסך מיד ומצטרפת לתור מחיקות שנשלח
+    // בפעם הבאה. אחרת "מחקתי" היה נשאר תלוי עד שתחזור קליטה.
+    remove(id) {
+      const q = this.queue(), left = q.filter(r => r.id !== id);
+      if (left.length !== q.length) { lsSet(SP_Q, left); return; }
+      lsSet(SP_ROWS, this.synced().filter(r => r.id !== id));
+      if (this.dels().indexOf(id) < 0) lsSet(SP_DEL, this.dels().concat([id]));
+    },
     add(rec) {
       const id = 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
       const row = Object.assign({ id }, rec);
@@ -199,9 +210,11 @@ window.App = (function () {
       const u = this.url();
       if (!u) return done(false, 'אין כתובת');
       if (!navigator.onLine) return done(false, 'אין רשת');
-      const q = this.queue();
+      // גם כשאין מה לשלוח שולחים: התשובה מחזירה את כל השורות, וכך
+      // רואים מה הטלפון השני הוסיף.
+      const q = this.queue(), d = this.dels();
       fetch(u, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                 body: JSON.stringify({ rows: q }) })
+                 body: JSON.stringify({ rows: q, del: d }) })
         .then(r => r.json())
         .then(j => {
           if (!j || !j.ok || !Array.isArray(j.rows)) throw 0;
@@ -209,6 +222,8 @@ window.App = (function () {
           // מנקים מהתור רק מה שבאמת מופיע בגיליון עכשיו.
           const have = {}; j.rows.forEach(r => { have[r.id] = 1; });
           lsSet(SP_Q, q.filter(r => !have[r.id]));
+          // מחיקה שהתקבלה = ה-id כבר לא חוזר מהגיליון.
+          lsSet(SP_DEL, d.filter(id => have[id]));
           done(true);
         })
         .catch(() => done(false, 'הגיליון לא ענה'));
