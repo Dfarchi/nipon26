@@ -185,6 +185,43 @@ window.App = (function () {
       .catch(() => cb(cached ? cached.mode : 'leaves', cached));
   }
 
+  // ===== שער המטבע =====
+  // השער ב-‎data.js הוא עוגן: התקציב מחושב לפיו, ‎check.js מאמת אותו, והוא
+  // לא זז מעצמו. אבל מחשבון הכיס רוצה את השער של היום, ולכן הוא נמשך פעם
+  // ביום — באותה הזדמנות שבה נבדק מזג האוויר, כי זו ממילא הבקשה היחידה
+  // שהאפליקציה עושה החוצה.
+  //
+  // שתי הגנות, כי שער שגוי גרוע משער ישן: התשובה נבדקת מול טווח שפוי
+  // לפני שהיא נכנסת, ואם משהו נכשל נשארים על העוגן. אף פעם לא על מספר
+  // מומצא — אותו כלל כמו בשורת מזג האוויר.
+  const FKEY = 'nipon26_fx';
+  const FX0 = (T.budget && T.budget.fx) || {};
+  const sane = (v, lo, hi) => typeof v === 'number' && isFinite(v) && v > lo && v < hi;
+  let fxWait = null;   // ‎boot ומסך הכלים שואלים שניהם — בקשה אחת, שני עונים
+  function fxRate(cb) {
+    const anchor = { jpy: FX0.jpy, usd: FX0.usd, asOf: FX0.asOf || '', live: false };
+    let c = null;
+    try { c = JSON.parse(localStorage.getItem(FKEY) || 'null'); } catch (e) {}
+    if (c && Date.now() - c.at < 72e6) return cb(c);        // 20 שעות — לפחות פעם ביום
+    if (!navigator.onLine) return cb(c || anchor);
+    if (fxWait) { fxWait.push(cb); return; }
+    fxWait = [cb];
+    const done = rec => { const q = fxWait; fxWait = null; q.forEach(f => f(rec)); };
+    // ILS כבסיס ולא JPY: קריאה אחת מחזירה את שני השערים שהאפליקציה
+    // מכירה, וההיפוך נותן "כמה שקלים שווה ין אחד" — היחידה של data.js.
+    fetch('https://api.frankfurter.app/latest?from=ILS&to=JPY,USD')
+      .then(r => r.json())
+      .then(j => {
+        const r = (j && j.rates) || {};
+        const jpy = 1 / r.JPY, usd = 1 / r.USD;
+        if (!sane(jpy, .008, .05) || !sane(usd, 2, 6)) throw 0;
+        const rec = { jpy, usd, asOf: j.date || '', at: Date.now(), live: true };
+        try { localStorage.setItem(FKEY, JSON.stringify(rec)); } catch (e) {}
+        done(rec);
+      })
+      .catch(() => done(c || anchor));
+  }
+
   // ===== שורת מזג האוויר =====
   // הבקשה רצה בדפדפן של הטלפון ואי אפשר לבדוק אותה מכאן. בלי שורה שאומרת
   // מה חזר, "עובד" הוא ניחוש. עכשיו כתוב מה נמדד, איפה, ומתי — ואם זה
@@ -1135,7 +1172,8 @@ window.App = (function () {
     // באוקטובר — בדיוק העונה שבשבילה נוסעים.
     particles(fx, 'leaves'); decorate('clear');         // ברירת מחדל מיידית
     weather(phase, (m, rec) => { particles(fx, pmF(m)); decorate(m); showWx(m, rec, false); });
+    fxRate(() => {});   // מחמם את המטמון בכל מסך, כדי שהמחשבון ייפתח עם השער של היום
   }
 
-  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

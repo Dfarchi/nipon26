@@ -22,7 +22,7 @@
   // ---- ין → שקל ----
   if (fx.jpy) {
     h += `<div class="lbl" style="margin-top:20px">כמה זה בשקלים<i></i>
-      <span class="d">¥100 = ₪${(fx.jpy * 100).toFixed(2)}</span></div>
+      <span class="d" id="fxHead">¥100 = ₪${(fx.jpy * 100).toFixed(2)}</span></div>
       <div class="card fxc">
         <div class="fxrow">
           <label><span>¥</span><input id="fxJpy" type="text" inputmode="numeric" placeholder="1,000"></label>
@@ -34,7 +34,7 @@
             `<button type="button" class="chip fxp" data-v="${v}">+¥${v.toLocaleString()}</button>`).join('') +
           `<button type="button" class="chip fxz" id="fxClear" disabled>איפוס</button>
         </div>
-        <div class="d" style="margin-top:9px">כל לחיצה מוסיפה לסכום. השער נבדק ${fx.asOf || '—'}. כרטיס אשראי מוסיף כ-2%.</div>
+        <div class="d" style="margin-top:9px" id="fxNote">השער נבדק ${fx.asOf || '—'}. כרטיס אשראי מוסיף כ-2%.</div>
       </div>`;
   }
 
@@ -151,6 +151,7 @@
   // ---- המרה: שני שדות שמזינים זה את זה, בלי כפתור "חשב" ----
   const j = document.getElementById('fxJpy'), s = document.getElementById('fxIls');
   if (j && s && fx.jpy) {
+    let JPY = fx.jpy;   // העוגן מ-data.js, עד שהשער של היום מגיע
     const num = v => { const n = parseFloat(String(v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : null; };
     const fmt = n => n.toLocaleString('he-IL', { maximumFractionDigits: 2 });
     const clr = document.getElementById('fxClear');
@@ -160,14 +161,30 @@
     // דרך לחזור לאפס, ולכן הכפתור שלידם.
     const setJpy = n => {
       j.value = n === null ? '' : Math.round(n).toLocaleString('he-IL');
-      s.value = n === null ? '' : fmt(n * fx.jpy);
+      s.value = n === null ? '' : fmt(n * JPY);
       idle();
     };
-    j.addEventListener('input', () => { const n = num(j.value); s.value = n === null ? '' : fmt(n * fx.jpy); idle(); });
-    s.addEventListener('input', () => { const n = num(s.value); j.value = n === null ? '' : fmt(Math.round(n / fx.jpy)); idle(); });
+    j.addEventListener('input', () => { const n = num(j.value); s.value = n === null ? '' : fmt(n * JPY); idle(); });
+    s.addEventListener('input', () => { const n = num(s.value); j.value = n === null ? '' : fmt(Math.round(n / JPY)); idle(); });
     document.querySelectorAll('.fxp').forEach(b => b.addEventListener('click', () => {
       setJpy((num(j.value) || 0) + (+b.dataset.v));
     }));
     if (clr) clr.addEventListener('click', () => { setJpy(null); j.focus(); });
+
+    // השער של היום, מאותה בדיקה יומית שמביאה את מזג האוויר. מגיע אחרי
+    // הציור ולכן מעדכן במקום: הכותרת, ההערה, והשדה שכבר מוצג.
+    A.fxRate(rec => {
+      if (!rec || !rec.jpy || rec.jpy === JPY) return;
+      JPY = rec.jpy;
+      const head = document.getElementById('fxHead');
+      if (head) head.textContent = `¥100 = ₪${(JPY * 100).toFixed(2)}`;
+      const note = document.getElementById('fxNote');
+      if (note && rec.live) {
+        const d = String(rec.asOf).split('-');
+        note.textContent = `שער ${d[2] ? +d[2] + '.' + +d[1] : 'היום'} · מתעדכן יומית. כרטיס אשראי מוסיף כ-2%.`;
+      }
+      const n = num(j.value);
+      if (n !== null) s.value = fmt(n * JPY);
+    });
   }
 })();
