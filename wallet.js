@@ -133,7 +133,6 @@
     return LIVE_JPY || f.jpy || 0;
   }
   let LIVE_JPY = 0;
-  A.fxRate(r => { if (r && r.jpy) { LIVE_JPY = r.jpy; paintSpend(); } });
 
   const ils = r => Number(r.amount) * (Number(r.rate) || 0);
   const shek = n => '₪' + Math.round(n).toLocaleString('he-IL');
@@ -261,9 +260,11 @@
     };
   }
 
-  // נקרא כאן ולא ליד ‎innerHTML: ‎WHO ו-CAT הם const באותו סקופ, וקריאה
-  // מוקדמת יותר נופלת ב-TDZ לפני שהשורות שלהם רצו.
+  // כל ההפעלות כאן ולא למעלה: ‎WHO, CAT, shek ו-ils הם const באותו סקופ,
+  // וכל קריאה מוקדמת יותר נופלת ב-TDZ. ‎A.fxRate נראה אסינכרוני אבל הוא
+  // חוזר מיד כשאין רשת — וזה נתפס רק בבדיקת אופליין, לא במסך רגיל.
   paintSpend();
+  A.fxRate(r => { if (r && r.jpy) { LIVE_JPY = r.jpy; paintSpend(); } });
   if (A.spend.url()) A.spend.sync(() => paintSpend());
   addEventListener('online', () => { if (A.spend.url()) A.spend.sync(() => paintSpend()); });
 })();
