@@ -374,6 +374,10 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
 .nav a.on{color:var(--hot);font-weight:700}
 .nav a.on::before{content:'';position:absolute;inset:0 12% auto;height:100%;border-radius:12px;
   background:color-mix(in srgb,var(--hot) 11%,transparent);z-index:-1}
+/* פס התקציב. אחוז מהיעד, לא מספר נוסף לקרוא. */
+.bbar{margin-top:10px;height:7px;border-radius:99px;background:var(--rule);overflow:hidden}
+.bbar i{display:block;height:100%;border-radius:99px;background:var(--hot)}
+
 /* כפתורי ההוצאות. אותו מראה כמו שבבי המחשבון — שניהם "פעולה קטנה
    בתוך כרטיס", ואין סיבה שייראו שונה. */
 .sprow{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}

@@ -88,6 +88,34 @@
     </div>`;
   });
 
+  // ---- כמה זה עולה ----
+  // אותו חישוב בדיוק כמו ב-budget.html ובבדיקת check.js: לינה סגורה
+  // ועוד תחזית, בלי טיסות. שני מקומות שמחשבים אחרת היו נותנים שני
+  // מספרים שונים לאותה שאלה.
+  {
+    const B = T.budget || {}, fx = B.fx || {};
+    const nisOf = x => x.ils || (x.jpy ? x.jpy * fx.jpy : x.usd ? x.usd * fx.usd : 0);
+    const bk = (B.booked || []).reduce((a, r) => a + nisOf(r), 0);
+    const bkN = (B.booked || []).reduce((a, r) => a + (r.nights || 0), 0);
+    const ahead = (B.forecast || []).reduce((a, r) => a + nisOf(r), 0);
+    const total = bk + ahead, gap = total - (B.target || 0);
+    const pct = B.target ? Math.min(100, Math.round(total / B.target * 100)) : 0;
+    const nis = n => '₪' + Math.round(n).toLocaleString('he-IL');
+    h += `<div class="lbl q" style="margin-top:22px">כמה זה עולה<i></i>
+        <span class="d">לזוג · ${B.nights || 42} לילות · בלי טיסות</span></div>
+      <div class="card" style="padding:14px 15px">
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div class="h1" style="font-size:var(--fs-title);margin:0">${nis(total)}</div>
+          <div class="d" style="margin:0;flex:1">סה״כ צפוי</div>
+        </div>
+        <div class="bbar"><i style="width:${pct}%"></i></div>
+        <div class="d" style="margin-top:7px">לינה סגורה ${nis(bk)} · ${bkN} מתוך ${
+          B.nights || 42} לילות · לפנינו ${nis(ahead)}</div>
+        <div class="d" style="margin-top:3px;color:${gap > 0 ? 'var(--warn)' : 'var(--ok)'}">יעד ${
+          nis(B.target || 0)} — ${gap > 0 ? 'חריגה של ' + nis(gap) : 'מרווח של ' + nis(-gap)}</div>
+      </div>`;
+  }
+
   // ---- הוצאות ----
   // הסכום עצמו נבנה כאן פעם אחת; אחרי כל הוספה מרעננים רק את הבלוק
   // הזה, כדי שלא לבנות מחדש 13 כרטיסי לינה בכל לחיצה.
