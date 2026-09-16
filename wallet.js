@@ -153,8 +153,18 @@
   // ===== הוצאות =====
   // מה שנכנס כאן הולך לגיליון המשותף, כדי ששני הטלפונים יראו אותו סכום.
   // בלי כתובת גיליון זה עדיין עובד — רק מקומית, ועם שורה שאומרת את זה.
-  const WHO = ['יובל', 'שיר', 'משותף'];
-  const CAT = ['אוכל', 'תחבורה', 'כניסות', 'לינה', 'קניות', 'אחר'];
+  // חייב להיות זהה ל-WHO ול-CAT ב-apps-script.gs, אחרת ה-SUMIF בלשונית
+  // "סיכום" מחפש מחרוזת שלא קיימת ומחזיר אפס בלי להתלונן.
+  const WHO = ['יובל', 'שיר', 'על שנינו'];
+  const CAT = ['🍜 ארוחות',
+               '🍡 נשנושים',
+               '🚃 נסיעות',
+               '⛩️ כניסות',
+               '🎁 מתנות',
+               '🏪 קומביני',
+               '♨️ אונסן',
+               '🛏️ לינה',
+               '🪭 שטויות יפניות'];
 
   function jpyRate() {
     const f = (T.budget || {}).fx || {};
@@ -253,7 +263,7 @@
       <input id="spNote" type="text" placeholder="הערה (לא חובה)"
         style="width:100%;margin-top:9px;padding:10px;border-radius:10px;border:1px solid var(--line);
                background:var(--well);color:var(--ink);font:inherit;font-size:var(--fs-meta)">
-      <button class="cloud" id="spOk" style="margin-top:11px;width:100%">לשמור</button>
+      <button class="spsave" id="spOk">לשמור</button>
     </div>`;
 
     let cur = 'JPY';

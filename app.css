@@ -387,7 +387,25 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
   font:inherit;font-size:var(--fs-micro);font-weight:700;cursor:pointer;
   -webkit-tap-highlight-color:transparent}
 .sprow .chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent)}
-.spw.on,.spc.on{border-color:var(--hot);background:color-mix(in srgb,var(--hot) 26%,transparent)}
+/* שבבי "מי שילם" ו"על מה" יורשים את הסגנון הקטן של המחשבון, ושם הם
+   5px גובה מרופד. כאן לוחצים עליהם עם אגודל, בעמידה, ולכן 40 ועוד
+   שוליים נסתרים — כמו כל יעד מגע אחר באפליקציה. */
+.spw,.spc{min-height:40px;display:inline-flex;align-items:center;position:relative}
+.spw::after,.spc::after{content:'';position:absolute;inset:-5px -4px}
+/* ‎.fxq .chip מוגדר אחרי זה ובאותה ספציפיות, ולכן דרס את הבחירה —
+   השבב הנבחר נראה בדיוק כמו השאר. */
+.fxq .spw.on,.fxq .spc.on{border-color:var(--hot);color:var(--ink);
+  background:color-mix(in srgb,var(--hot) 28%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--hot) 45%,transparent)}
+
+/* כפתור השמירה. ‎.cloud לבדו הוא מסגרת לציור ענן — בלי ה-SVG הוא נראה
+   כמו תיבה ריקה עם מילה. */
+.spsave{display:flex;align-items:center;justify-content:center;
+  width:100%;margin-top:11px;min-height:50px;border:0;border-radius:14px;
+  font:inherit;font-size:var(--fs-lead);font-weight:800;
+  color:var(--onHot);background:var(--hot);box-shadow:var(--shLo);
+  cursor:pointer;-webkit-tap-highlight-color:transparent}
+.spsave:active{transform:scale(.98);box-shadow:none}
 
 /* בורר היום יושב בשורת "יום 17 · מתוך 45" ולא צף בפינה. כשהוא היה
    ‎fixed הוא כיסה קבוע את סיכום המעבר של היום. */
