@@ -42,7 +42,8 @@
       <div class="d">ימים${fl.airline ? ' · ' + fl.airline : ''}${fl.code ? ' ' + fl.code : ''}${when ? ' · ' + when : ''}</div></div>`;
   }
   h += `<div class="head"${A.beforeTrip ? ' style="padding-top:clamp(30px,8vh,70px)"' : ''}>
-    <div class="kicker">יום ${idx + 1} · מתוך ${T.days.length}${cur.st ? ' · ' + cur.st : ''}</div>
+    <div class="kline"><div class="kicker">יום ${idx + 1} · מתוך ${T.days.length}${cur.st ? ' · ' + cur.st : ''}</div>
+      <span id="pickSlot"></span></div>
     <div class="row"><div class="dnum">${hasDate ? head[0].trim() : (dd ? dd.getDate() + '.' + (dd.getMonth() + 1) : '')}</div>
       <div class="d" style="padding-bottom:6px">${dd ? A.DOW[dd.getDay()] : ''}</div><div style="flex:1"></div>
       <div style="display:flex;align-items:baseline;gap:7px;padding-bottom:5px">
@@ -56,8 +57,6 @@
     const slot = document.getElementById('hello');
     if (slot) { slot.outerHTML = A.hello(tail); A.wireWho(document.querySelector('.ping.ask'), tail); }
   }
-
-  if (cur.flag) h += `<div class="flagnote">${A.rich(cur.flag)}</div>`;
 
   // ===== מה עכשיו באמת =====
   // הכרטיס הזה הציג תמיד את acts[0] — כלומר ב-20:00 בטוקיו הוא עדיין
@@ -92,6 +91,10 @@
       <div class="t">${a.ic || ''} ${A.txt(a.t)}</div>
       ${a.d ? `<div class="d">${A.txt(String(a.d).slice(0, 160))}</div>` : ''}</div>`;
   }
+
+  // הפסקה המסבירה יורדת אל מתחת לכרטיס. היא חשובה, אבל היא 196 פיקסלים
+  // של טקסט רץ — ומי שפותח את המסך ברחוב רוצה קודם את השורה שעונה.
+  if (cur.flag) h += `<div class="flagnote">${A.rich(cur.flag)}</div>`;
   const after = acts.filter((_, i) => i > cursor).slice(0, 5);
   // אחרי הפעילות האחרונה המסך פשוט נגמר. שורה שאומרת את זה טובה מריק.
   if (!after.length && acts.length && lead === 'עכשיו') {
@@ -172,7 +175,11 @@
     if (!w.hidden) w.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // הבורר היה ‎position:fixed בפינה, ולכן ישב קבוע על טקסט היום. מקומו
+  // הוא ליד "יום 17 · מתוך 45" — זה מה שהוא משנה.
   const pick = document.getElementById('pick');
-  pick.innerHTML = T.days.map((d, i) => `<option value="${i}"${i === idx ? ' selected' : ''}>${i + 1}. ${String(d.t).slice(0, 20)}</option>`).join('');
+  const slot = document.getElementById('pickSlot');
+  if (slot && pick) slot.appendChild(pick);
+  pick.innerHTML = T.days.map((d, i) => `<option value="${i}"${i === idx ? ' selected' : ''}>${i + 1}. ${String(d.t).slice(0, 14)}</option>`).join('');
   pick.onchange = () => { A.q.set('d', pick.value); location.search = A.q.toString(); };
 })();

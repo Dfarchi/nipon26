@@ -374,8 +374,12 @@ a.chip:active{background:color-mix(in srgb,var(--hot) 20%,transparent);color:var
 .nav a.on{color:var(--hot);font-weight:700}
 .nav a.on::before{content:'';position:absolute;inset:0 12% auto;height:100%;border-radius:12px;
   background:color-mix(in srgb,var(--hot) 11%,transparent);z-index:-1}
-.pick{font-size:var(--fs-micro);position:fixed;bottom:calc(62px + env(safe-area-inset-bottom));left:8px;z-index:6;max-width:44vw;
-  background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:9px;
+/* בורר היום יושב בשורת "יום 17 · מתוך 45" ולא צף בפינה. כשהוא היה
+   ‎fixed הוא כיסה קבוע את סיכום המעבר של היום. */
+.kline{display:flex;align-items:center;gap:10px}
+.kline .kicker{flex:1;min-width:0}
+.pick{font-size:var(--fs-micro);max-width:38vw;
+  background:var(--well);border:1px solid var(--line);border-radius:9px;
   padding:4px 7px;font-family:inherit;color:var(--soft)}
 .scene .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .scene .l-far,.scene .l-village,.scene .l-chars,.scene .l-sky{will-change:transform}
@@ -708,7 +712,10 @@ body.is-day .card.ph > .vig.on{opacity:.26}
    מכונות המשקאות. במסכים שמתחילים בכותרת (מסלול, משימות, כלים) הכותרת
    מקבלת מרווח שמוריד את התוכן מתחת לסצנה. במסך "היום" הילד הראשון הוא
    כרטיס הספירה ולא ‎.head, ולכן שם שום דבר לא זז. */
-#main > .head:first-child{margin-top:calc(var(--sceneH) - 176px)}
+/* ה-margin כבר מוריד את הכותרת אל מתחת לסצנה, ולכן ה-padding של ‎.head
+   הוא ספירה כפולה: 129 ועוד 146 פיקסלים של ריק, ובמסך היום זה דחף את
+   כרטיס "עכשיו" אל מתחת לקפל. */
+#main > .head:first-child{margin-top:calc(var(--sceneH) - 176px);padding-top:clamp(80px,18vh,140px)}
 
 /* ===== שורת הבתים =====
    הבתים הם תמונות ולכן שכבת div משלהם, מתחת לציון הדרך ולקומת הרחוב.
