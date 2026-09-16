@@ -66,7 +66,7 @@
           <div class="t" style="flex:1">${A.txt(b.n)}</div>
           <div class="d" style="margin:0">${money(b)}</div></div>
         <div class="d">${b.d} · ${b.nights} לילות${b.meals ? ' · ' + b.meals : ''}${b.est ? ' · הערכה' : ''}
-          ${b.cur ? '<span class="chip hot">כאן הלילה</span>' : ''}</div>
+          ${b.cur && !A.beforeTrip && !A.afterTrip ? '<span class="chip hot">כאן הלילה</span>' : ''}</div>
       </button>
       <div class="ph-body"><div class="bkd">
         <div class="well" style="margin-top:0">

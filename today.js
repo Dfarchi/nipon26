@@ -41,6 +41,11 @@
       <div class="n">${toGo}</div>
       <div class="d">ימים${fl.airline ? ' · ' + fl.airline : ''}${fl.code ? ' ' + fl.code : ''}${when ? ' · ' + when : ''}</div></div>`;
   }
+  // הטיול נגמר, והמסך ממשיך להראות את יום 45 בלשון הווה.
+  if (A.afterTrip) h += `<div class="card" style="text-align:center">
+    <div class="lbl q" style="justify-content:center">הטיול הסתיים<i></i></div>
+    <div class="d" style="margin-top:4px">42 לילות, 14.10–25.11.2026. מה שלמטה הוא היום האחרון.</div></div>`;
+
   h += `<div class="head"${A.beforeTrip ? ' style="padding-top:clamp(30px,8vh,70px)"' : ''}>
     <div class="kline"><div class="kicker">יום ${idx + 1} · מתוך ${T.days.length}${cur.st ? ' · ' + cur.st : ''}</div>
       <span id="pickSlot"></span></div>

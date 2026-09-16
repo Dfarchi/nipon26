@@ -27,6 +27,10 @@ window.App = (function () {
     return today0 < firstDay ? 0 : T.days.length - 1;
   }
   const beforeTrip = firstDay && today0 < firstDay;
+  // אחרי 25.11 המסך נתקע לנצח על היום האחרון, ובלי לדעת את זה כל מסך
+  // ממשיך לדבר בלשון הווה על טיול שנגמר.
+  const lastDay = (dated.slice().reverse().find(x => x.date) || {}).date;
+  const afterTrip = !!(lastDay && today0 > lastDay);
 
   // ---- ערכה ----
   const theme = q.get('theme') || (now.getHours() >= 6 && now.getHours() < 17 ? 'day' : 'night');
@@ -1182,5 +1186,5 @@ window.App = (function () {
     fxRate(() => {});   // מחמם את המטמון בכל מסך, כדי שהמחשבון ייפתח עם השער של היום
   }
 
-  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, afterTrip, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();
