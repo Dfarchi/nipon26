@@ -51,6 +51,41 @@
   // שמישהו יפעל לפיו. הנתון עצמו נשאר ב-‎data.js וב-‎A.dl — "משימות"
   // עדיין משתמש בו לתאריכי יעד אמיתיים.
 
+  // ---- כמה זה עולה ----
+  // אותו חישוב בדיוק כמו ב-budget.html ובבדיקת check.js: לינה סגורה
+  // ועוד תחזית, בלי טיסות. שני מקומות שמחשבים אחרת היו נותנים שני
+  // מספרים שונים לאותה שאלה.
+  {
+    const B = T.budget || {}, fx = B.fx || {};
+    const nisOf = x => x.ils || (x.jpy ? x.jpy * fx.jpy : x.usd ? x.usd * fx.usd : 0);
+    const bk = (B.booked || []).reduce((a, r) => a + nisOf(r), 0);
+    const bkN = (B.booked || []).reduce((a, r) => a + (r.nights || 0), 0);
+    const ahead = (B.forecast || []).reduce((a, r) => a + nisOf(r), 0);
+    const total = bk + ahead, gap = total - (B.target || 0);
+    const pct = B.target ? Math.min(100, Math.round(total / B.target * 100)) : 0;
+    const nis = n => '₪' + Math.round(n).toLocaleString('he-IL');
+    h += `<div class="lbl q" style="margin-top:22px">כמה זה עולה<i></i>
+        <span class="d">לזוג · ${B.nights || 42} לילות · בלי טיסות</span></div>
+      <div class="card" style="padding:14px 15px">
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div class="h1" style="font-size:var(--fs-title);margin:0">${nis(total)}</div>
+          <div class="d" style="margin:0;flex:1">סה״כ צפוי</div>
+        </div>
+        <div class="bbar"><i style="width:${pct}%"></i></div>
+        <div class="d" style="margin-top:7px">לינה סגורה ${nis(bk)} · ${bkN} מתוך ${
+          B.nights || 42} לילות · לפנינו ${nis(ahead)}</div>
+        <div class="d" style="margin-top:3px;color:${gap > 0 ? 'var(--warn)' : 'var(--ok)'}">יעד ${
+          nis(B.target || 0)} — ${gap > 0 ? 'חריגה של ' + nis(gap) : 'מרווח של ' + nis(-gap)}</div>
+      </div>`;
+  }
+
+  // ---- הוצאות ----
+  // הסכום עצמו נבנה כאן פעם אחת; אחרי כל הוספה מרעננים רק את הבלוק
+  // הזה, כדי שלא לבנות מחדש 13 כרטיסי לינה בכל לחיצה.
+  h += `<div class="lbl q" style="margin-top:22px">הוצאות<i></i>
+      <span class="d" id="spSt"></span></div>
+    <div id="spend"></div>`;
+
   // ---- כל הלינות ----
   h += `<div class="lbl q" style="margin-top:22px">לינות<i></i><span class="d">${booked.length} מוזמנות</span></div>`;
   // כל הזמנה היא כרטיסייה שנפתחת, ובתוכה גם כרטיס הנהג של אותו מלון —
@@ -88,41 +123,6 @@
     </div>`;
   });
 
-  // ---- כמה זה עולה ----
-  // אותו חישוב בדיוק כמו ב-budget.html ובבדיקת check.js: לינה סגורה
-  // ועוד תחזית, בלי טיסות. שני מקומות שמחשבים אחרת היו נותנים שני
-  // מספרים שונים לאותה שאלה.
-  {
-    const B = T.budget || {}, fx = B.fx || {};
-    const nisOf = x => x.ils || (x.jpy ? x.jpy * fx.jpy : x.usd ? x.usd * fx.usd : 0);
-    const bk = (B.booked || []).reduce((a, r) => a + nisOf(r), 0);
-    const bkN = (B.booked || []).reduce((a, r) => a + (r.nights || 0), 0);
-    const ahead = (B.forecast || []).reduce((a, r) => a + nisOf(r), 0);
-    const total = bk + ahead, gap = total - (B.target || 0);
-    const pct = B.target ? Math.min(100, Math.round(total / B.target * 100)) : 0;
-    const nis = n => '₪' + Math.round(n).toLocaleString('he-IL');
-    h += `<div class="lbl q" style="margin-top:22px">כמה זה עולה<i></i>
-        <span class="d">לזוג · ${B.nights || 42} לילות · בלי טיסות</span></div>
-      <div class="card" style="padding:14px 15px">
-        <div style="display:flex;align-items:baseline;gap:10px">
-          <div class="h1" style="font-size:var(--fs-title);margin:0">${nis(total)}</div>
-          <div class="d" style="margin:0;flex:1">סה״כ צפוי</div>
-        </div>
-        <div class="bbar"><i style="width:${pct}%"></i></div>
-        <div class="d" style="margin-top:7px">לינה סגורה ${nis(bk)} · ${bkN} מתוך ${
-          B.nights || 42} לילות · לפנינו ${nis(ahead)}</div>
-        <div class="d" style="margin-top:3px;color:${gap > 0 ? 'var(--warn)' : 'var(--ok)'}">יעד ${
-          nis(B.target || 0)} — ${gap > 0 ? 'חריגה של ' + nis(gap) : 'מרווח של ' + nis(-gap)}</div>
-      </div>`;
-  }
-
-  // ---- הוצאות ----
-  // הסכום עצמו נבנה כאן פעם אחת; אחרי כל הוספה מרעננים רק את הבלוק
-  // הזה, כדי שלא לבנות מחדש 13 כרטיסי לינה בכל לחיצה.
-  h += `<div class="lbl q" style="margin-top:22px">הוצאות<i></i>
-      <span class="d" id="spSt"></span></div>
-    <div id="spend"></div>`;
-
   // ---- מסמכים ----
   if ((T.docs || []).length) {
     h += `<div class="lbl q" style="margin-top:22px">מסמכים<i></i></div>`;
@@ -134,7 +134,9 @@
   }
   document.getElementById('main').innerHTML = h;
   A.reveal(document.getElementById('main'));
-  A.jumpBar();
+  // בלי סרגל קפיצה כאן. מאז שהכסף עלה לראש המסך, שני הדברים שמסתכלים
+  // עליהם יושבים בשני המסכים הראשונים — וסרגל שמוביל למה שכבר רואים
+  // הוא רק עוד שורה של כפתורים.
 
   // פתיחה במקום, בלי בנייה מחדש — אותו מנגנון כמו שלב במסלול
   document.getElementById('main').addEventListener('click', e => {
