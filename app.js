@@ -140,13 +140,22 @@ window.App = (function () {
   }
 
   // הלחיצה מחליפה את הברכה במקום, בלי לטעון מחדש
-  function wireWho(host, tail) {
+  // ‎#hello היה מוחלף ב-outerHTML, כלומר האלמנט עצמו נעלם — וברגע שהמסך
+  // מצויר מחדש בלי טעינת דף, אין לאן לכתוב. עכשיו המכולה קבועה, נכתב
+  // לתוכה, והמאזין יושב עליה ומוסמך פנימה.
+  let greetTail = '';
+  function greet(tail) {
+    const host = document.getElementById('hello');
     if (!host) return;
+    greetTail = tail || '';
+    host.innerHTML = hello(greetTail);
+    if (host.dataset.wired) return;
+    host.dataset.wired = '1';
     host.addEventListener('click', e => {
       const b = e.target.closest('.pick-who');
       if (!b) return;
       setWho(b.dataset.who === '-' ? 'skip' : b.dataset.who);
-      host.outerHTML = hello(tail);
+      host.innerHTML = hello(greetTail);
     });
   }
 
@@ -1192,6 +1201,70 @@ window.App = (function () {
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>${label}</a>`).join('');
   }
 
+  // ===== מסך אחד, תוכן מתחלף =====
+  // כל מסך רושם פונקציית ציור במקום לרוץ מעצמו בטעינת הדף, וכל הקבצים
+  // נטענים בכל עמוד. מעבר לשונית מצייר מחדש רק את ‎#main — הסצנה, השמיים,
+  // החתולות והפארלקס נשארים בדיוק כמו שהיו, כי המסמך לא נטען מחדש.
+  //
+  // ‎#main מוחלף באלמנט חדש ולא רק מנוקה: מסכים תולים עליו מאזינים
+  // מוסמכים, ובלי החלפה הם היו מצטברים בכל מעבר.
+  const SCREENS = {};
+  let leavers = [];
+  function screen(page, fn) { SCREENS[page] = fn; }
+  // מסך שמשאיר אחריו טיימר או מאזין גלובלי רושם כאן איך לנקות אותו.
+  function onLeave(fn) { leavers.push(fn); }
+
+  const pageOf = () => (location.pathname.split('/').pop() || 'today.html');
+
+  function paint(page) {
+    leavers.forEach(f => { try { f(); } catch (e) {} });
+    leavers = [];
+
+    const old = document.getElementById('main');
+    if (old) {
+      const fresh = document.createElement('div');
+      fresh.id = 'main';
+      old.replaceWith(fresh);
+    }
+    const hi = document.getElementById('hello');
+    if (hi) hi.innerHTML = '';
+    const jb = document.querySelector('.jump');
+    if (jb) jb.remove();
+
+    const brand = document.querySelector('.brand, .seal'), ch = SEAL[page];
+    if (brand && ch) { brand.className = 'seal'; brand.textContent = ch; brand.title = 'NIPON26'; }
+    document.title = (NAV.find(n => n[0] === page) || [, 'NIPON26'])[1] + ' · NIPON26';
+    nav(document.getElementById('nav'), page);
+
+    const fn = SCREENS[page] || SCREENS['today.html'];
+    if (fn) fn();
+  }
+
+  // מעבר בלי טעינת דף. הכתובת אמיתית, ולכן קישור ישיר, רענון וכפתור
+  // החזרה ממשיכים לעבוד בדיוק כמו קודם.
+  function goto(href) {
+    const [path, qs] = String(href).split('?');
+    const page = path.split('/').pop();
+    if (!SCREENS[page]) { location.href = href; return; }
+    const next = new URLSearchParams(qs || '');
+    // ‎?d= ו-?theme= נשמרים במעבר לשונית, אחרת "מסלול" מיום 17 היה
+    // מחזיר אותך להיום.
+    ['d', 'theme', 'wx'].forEach(k => { if (!next.has(k) && q.has(k)) next.set(k, q.get(k)); });
+    const search = next.toString();
+    history.pushState({}, '', page + (search ? '?' + search : ''));
+    syncQ();
+    scrollTo(0, 0);
+    paint(page);
+  }
+
+  // ‎q נבנה פעם אחת בטעינה. אחרי pushState הוא חייב להתעדכן, אחרת כל
+  // מי שקורא ‎?d= ימשיך לראות את הערך הישן.
+  function syncQ() {
+    const fresh = new URLSearchParams(location.search);
+    [...q.keys()].forEach(k => q.delete(k));
+    fresh.forEach((v, k) => q.set(k, v));
+  }
+
   // ===== החלקה בין לשוניות =====
   // חמישה מסכים ושורת ניווט בתחתית: להגיע מ"היום" ל"כלים" זו לחיצה
   // מדויקת על יעד ברוחב 76px, ביד אחת, בתנועה. אצבע שמחליקה על המסך
@@ -1199,15 +1272,18 @@ window.App = (function () {
   //
   // התוכן זז עם האצבע: החלקה ימינה דוחפת את המסך ימינה וחושפת את מה
   // שמשמאלו — וב-RTL זה הפריט הבא בסרגל. הכיוון ההפוך נבדק והרגיש הפוך.
-  function swipeNav(page) {
-    const i = NAV.findIndex(n => n[0] === page);
-    if (i < 0 || !('ontouchstart' in window)) return;
+  let swipeWired = false;
+  function swipeNav() {
+    if (!('ontouchstart' in window) || swipeWired) return;
+    swipeWired = true;
 
     let x0 = 0, y0 = 0, live = false;
     const go = d => {
+      const i = NAV.findIndex(n => n[0] === pageOf());
+      if (i < 0) return;
       const t = NAV[i + d];
       // בלי גלגול מהקצה: "כלים" הוא הסוף, ולא ההתחלה מהצד השני.
-      if (t) location.href = t[0] + (q.has('theme') ? '?theme=' + theme : '');
+      if (t) goto(t[0]);
     };
 
     addEventListener('touchstart', e => {
@@ -1291,16 +1367,29 @@ window.App = (function () {
   const SEAL = { 'today.html': '今', 'itinerary.html': '道',
                  'wallet.html': '財', 'tasks.html': '事', 'tools.html': '具', 'documents.html': '書' };
 
+  // מה שקורה פעם אחת לכל טעינת מסמך: הסצנה, השמיים, החלקיקים, הפארלקס,
+  // מזג האוויר והשער. מעבר לשונית לא נוגע באף אחד מהם.
   function boot(page) {
-    const brand = document.querySelector('.brand'), ch = SEAL[page];
-    if (brand && ch) { brand.className = 'seal'; brand.textContent = ch; brand.title = 'NIPON26'; }
+    page = page || pageOf();
     scene(document.getElementById('scene'));
     if (!document.querySelector('.bloom')) {
       const bl = document.createElement('div'); bl.className = 'bloom';
       document.body.insertBefore(bl, document.body.firstChild);
     }
-    nav(document.getElementById('nav'), page);
-    swipeNav(page);
+    swipeNav();
+    // כפתור החזרה של המערכת. בלי זה מעבר בלי טעינה היה שובר אותו.
+    addEventListener('popstate', () => { syncQ(); paint(pageOf()); });
+    // קישור בתוך הניווט מצויר, לא נטען. כל שאר הקישורים — כרגיל.
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[href]');
+      if (!a || a.target || a.hasAttribute('download')) return;
+      const href = a.getAttribute('href') || '';
+      if (/^(https?:|mailto:|tel:|#)/.test(href)) return;
+      const pg = href.split('?')[0].split('/').pop();
+      if (!SCREENS[pg]) return;
+      e.preventDefault();
+      goto(href);
+    });
     // today0 מחושב פעם אחת בטעינת הסקריפט. PWA שנשאר פתוח בטלפון וחוצה חצות
     // ימשיך להציג את הספירה של אתמול — אז כשחוזרים אליו, אם התאריך זז, טוענים.
     const bootDay = today0.getTime();
@@ -1342,7 +1431,13 @@ window.App = (function () {
     particles(fx, 'leaves'); decorate('clear');         // ברירת מחדל מיידית
     weather(phase, (m, rec) => { particles(fx, pmF(m)); decorate(m); showWx(m, rec, false); });
     fxRate(() => {});   // מחמם את המטמון בכל מסך, כדי שהמחשבון ייפתח עם השער של היום
+    paint(page);
   }
 
-  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, afterTrip, spend, factsFor, rich, dl, hello, wireWho, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  // כל קבצי המסכים נטענים אחרי app.js ורק רושמים את עצמם. ‎boot רץ פעם
+  // אחת כשה-DOM מוכן, ומחליט איזה מסך לצייר לפי הכתובת — כך שאותו שלד
+  // HTML משרת את כל החמישה ואין קובץ שקורא ל-boot בשם עצמו.
+  addEventListener('DOMContentLoaded', () => { try { boot(); } catch (e) { console.error(e); } });
+
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, afterTrip, spend, screen, onLeave, goto, greet, factsFor, rich, dl, hello, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

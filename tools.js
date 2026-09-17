@@ -1,6 +1,5 @@
-(function () {
+App.screen('tools.html', function () {
   const A = App, T = A.T;
-  A.boot('tools.html');
 
   const fx = (T.budget && T.budget.fx) || {};
   let h = `<div class="head"><div class="kicker">בשליפה, בלי רשת</div><div class="h1">כלים</div></div>`;
@@ -149,10 +148,14 @@
   // ואין סיבה שהוא יתקתק כשהמסך מכובה או כשאתם במסך אחר.
   tick();
   let clk = setInterval(tick, 20000);
-  document.addEventListener('visibilitychange', () => {
+  const onVis = () => {
     if (document.hidden) { clearInterval(clk); clk = null; }
     else if (!clk) { tick(); clk = setInterval(tick, 20000); }
-  });
+  };
+  document.addEventListener('visibilitychange', onVis);
+  // יציאה מהמסך עוצרת את השעון: בלי זה כל ביקור ב"כלים" היה משאיר
+  // אחריו עוד טיימר שרץ לנצח.
+  A.onLeave(() => { clearInterval(clk); document.removeEventListener('visibilitychange', onVis); });
 
   // ---- המרה: שני שדות שמזינים זה את זה, בלי כפתור "חשב" ----
   const j = document.getElementById('fxJpy'), s = document.getElementById('fxIls');
@@ -193,4 +196,4 @@
       if (n !== null) s.value = fmt(n * JPY);
     });
   }
-})();
+});

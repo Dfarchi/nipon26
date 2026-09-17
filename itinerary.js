@@ -1,6 +1,5 @@
-(function () {
+App.screen('itinerary.html', function () {
   const A = App, T = A.T;
-  A.boot('itinerary.html');
   const idx = A.dayIndex();
   // קיצוץ על גבול מילה. חיתוך באמצע מילה ("היום הכי…") נראה כמו תקלה.
   const clip = (s, n) => { s = String(s); if (s.length <= n) return s;
@@ -159,4 +158,4 @@
       setTimeout(() => card.classList.remove('just-open'), 1200);
     }
   });
-})();
+});

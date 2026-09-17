@@ -1,6 +1,5 @@
-(function () {
+App.screen('tasks.html', function () {
   const A = App, T = A.T;
-  A.boot('tasks.html');
   const items = (T.decisions || []).flatMap(g => (g.items || []).map(i => Object.assign({ g: g.g }, i)))
     .filter(i => !i.cut);
   const openDec  = items.filter(i => i.open === true && i.todo !== true);
@@ -140,4 +139,4 @@
       save(); paintTodo(n);
     }
   });
-})();
+});

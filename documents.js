@@ -1,6 +1,5 @@
-(function () {
+App.screen('documents.html', function () {
   const A = App, T = A.T;
-  A.boot('documents.html');
 
   const row = d => `<a href="${d.url}" target="_blank" rel="noopener" class="step" style="margin-top:7px;text-decoration:none;color:inherit">
     <b class="ic">${d.ic || '📄'}</b>
@@ -22,4 +21,4 @@
 
   document.getElementById('main').innerHTML = h;
   A.reveal(document.getElementById('main'));
-})();
+});

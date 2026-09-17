@@ -1,6 +1,5 @@
-(function () {
+App.screen('wallet.html', function () {
   const A = App, T = A.T;
-  A.boot('wallet.html');
   const idx = A.dayIndex(), dd = A.dated[idx].date;
   const money = b => b.jpy ? '¥' + b.jpy.toLocaleString() : b.usd ? '$' + b.usd : b.ils ? '₪' + b.ils : '';
 
@@ -344,5 +343,9 @@
   paintSpend();
   A.fxRate(r => { if (r && r.jpy) { LIVE_JPY = r.jpy; paintSpend(); } });
   if (A.spend.url()) A.spend.sync(() => paintSpend());
-  addEventListener('online', () => { if (A.spend.url()) A.spend.sync(() => paintSpend()); });
-})();
+  // מאזין ברמת window שורד החלפת ‎#main, ולכן הוא היה מצטבר בכל חזרה
+  // לארנק. נרשם לניקוי ביציאה מהמסך.
+  const onNet = () => { if (A.spend.url()) A.spend.sync(() => paintSpend()); };
+  addEventListener('online', onNet);
+  A.onLeave(() => removeEventListener('online', onNet));
+});

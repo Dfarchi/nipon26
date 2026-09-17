@@ -1,7 +1,6 @@
-(function () {
+App.screen('today.html', function () {
   const MON = ['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצמ'];
   const A = App, T = A.T;
-  A.boot('today.html');
   const idx = A.dayIndex(), cur = T.days[idx], dd = A.dated[idx].date;
 
   const head = String(cur.t).split('—');
@@ -48,7 +47,7 @@
 
   h += `<div class="head"${A.beforeTrip ? ' style="padding-top:clamp(30px,8vh,70px)"' : ''}>
     <div class="kline"><div class="kicker">יום ${idx + 1} · מתוך ${T.days.length}${cur.st ? ' · ' + cur.st : ''}</div>
-      <span id="pickSlot"></span></div>
+      <select class="pick" id="pick" title="לבחור יום"></select></div>
     <div class="row"><div class="dnum">${hasDate ? head[0].trim() : (dd ? dd.getDate() + '.' + (dd.getMonth() + 1) : '')}</div>
       <div class="d" style="padding-bottom:6px">${dd ? A.DOW[dd.getDay()] : ''}</div><div style="flex:1"></div>
       <div style="display:flex;align-items:baseline;gap:7px;padding-bottom:5px">
@@ -59,8 +58,7 @@
     const tail = A.beforeTrip
       ? `${toGo} ימים לטיסה`
       : `יום ${idx + 1} · ${city || latin || ''}`.trim().replace(/ ·\s*$/, '');
-    const slot = document.getElementById('hello');
-    if (slot) { slot.outerHTML = A.hello(tail); A.wireWho(document.querySelector('.ping.ask'), tail); }
+    A.greet(tail);
   }
 
   // ===== מה עכשיו באמת =====
@@ -182,9 +180,9 @@
 
   // הבורר היה ‎position:fixed בפינה, ולכן ישב קבוע על טקסט היום. מקומו
   // הוא ליד "יום 17 · מתוך 45" — זה מה שהוא משנה.
+  // הבורר נוצר בתוך הכותרת ולא מועבר לשם מגוף העמוד: מאז שהמסך מצויר
+  // מחדש בלי טעינה, אלמנט שחי מחוץ ל-#main פשוט נמחק במעבר לשונית.
   const pick = document.getElementById('pick');
-  const slot = document.getElementById('pickSlot');
-  if (slot && pick) slot.appendChild(pick);
   pick.innerHTML = T.days.map((d, i) => `<option value="${i}"${i === idx ? ' selected' : ''}>${i + 1}. ${String(d.t).slice(0, 14)}</option>`).join('');
-  pick.onchange = () => { A.q.set('d', pick.value); location.search = A.q.toString(); };
-})();
+  pick.onchange = () => { A.goto('today.html?d=' + pick.value); };
+});
