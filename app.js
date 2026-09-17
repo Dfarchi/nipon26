@@ -1192,6 +1192,47 @@ window.App = (function () {
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>${label}</a>`).join('');
   }
 
+  // ===== החלקה בין לשוניות =====
+  // חמישה מסכים ושורת ניווט בתחתית: להגיע מ"היום" ל"כלים" זו לחיצה
+  // מדויקת על יעד ברוחב 76px, ביד אחת, בתנועה. אצבע שמחליקה על המסך
+  // עושה את זה בלי לכוון.
+  //
+  // הסדר הוא סדר הניווט, ולכן ב-RTL החלקה שמאלה מקדמת ימינה ברשימה —
+  // בדיוק כמו שהעין קוראת את הסרגל.
+  function swipeNav(page) {
+    const i = NAV.findIndex(n => n[0] === page);
+    if (i < 0 || !('ontouchstart' in window)) return;
+
+    let x0 = 0, y0 = 0, live = false;
+    const go = d => {
+      const t = NAV[i + d];
+      // בלי גלגול מהקצה: "כלים" הוא הסוף, ולא ההתחלה מהצד השני.
+      if (t) location.href = t[0] + (q.has('theme') ? '?theme=' + theme : '');
+    };
+
+    addEventListener('touchstart', e => {
+      if (e.touches.length !== 1) { live = false; return; }
+      const t = e.touches[0];
+      // לא לחטוף מחווה מאלמנט שגולל לרוחב בעצמו (סרגל הקפיצה), ולא
+      // משדה טקסט או בורר — שם החלקה היא בחירה, לא ניווט.
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      if (el && el.closest('input,textarea,select,.jump,.tcard')) { live = false; return; }
+      x0 = t.clientX; y0 = t.clientY; live = true;
+    }, { passive: true });
+
+    addEventListener('touchend', e => {
+      if (!live) return;
+      live = false;
+      const t = (e.changedTouches || [])[0];
+      if (!t) return;
+      const dx = t.clientX - x0, dy = t.clientY - y0;
+      // הסף כפול: מרחק מספיק, וגם אופקי משמעותית יותר מאנכי. בלי
+      // התנאי השני כל גלילה מהירה באלכסון הייתה מחליפה מסך.
+      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+      go(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
+
   // ===== סרגל קפיצה =====
   // "משימות" הוא 4,600 פיקסלים — שבעה מסכים בלי שום דרך לקפוץ, ורשימה
   // אחת בתוכו תופסת 3,300 מהם. הסרגל נבנה מכותרות ה-‎.lbl שכבר קיימות
@@ -1259,6 +1300,7 @@ window.App = (function () {
       document.body.insertBefore(bl, document.body.firstChild);
     }
     nav(document.getElementById('nav'), page);
+    swipeNav(page);
     // today0 מחושב פעם אחת בטעינת הסקריפט. PWA שנשאר פתוח בטלפון וחוצה חצות
     // ימשיך להציג את הספירה של אתמול — אז כשחוזרים אליו, אם התאריך זז, טוענים.
     const bootDay = today0.getTime();
