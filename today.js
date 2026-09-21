@@ -92,6 +92,7 @@ App.screen('today.html', function () {
     const a = acts[cursor], tm = time(a.d) || time(a.t);
     h += `<div class="card now"><div class="lbl">${lead}<i></i>${tm ? `<span class="big">${tm}</span>` : ''}</div>
       <div class="t">${a.ic || ''} ${A.txt(a.t)}</div>
+      ${a.mv ? `<div class="mv">${A.txt(a.mv)}</div>` : ''}
       ${a.d ? `<div class="d">${A.txt(String(a.d).slice(0, 160))}</div>` : ''}</div>`;
   }
 
@@ -152,14 +153,16 @@ App.screen('today.html', function () {
       ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>היום המלא</span></button></div>`;
 
   h += `<div id="fullDayWrap" hidden style="margin-top:16px">
-    <div class="lbl q">כל הפעילויות היום<i></i></div>
-    <div class="steps" style="margin-top:8px">` +
+    <div class="lbl q">כל הפעילויות היום<i></i></div>` +
+    (cur.chain ? `<div class="chain">${A.txt(cur.chain)}</div>` : '') +
+    `<div class="steps" style="margin-top:8px">` +
     (acts.length ? acts.map(a => `
       <div class="card" style="padding:12px 14px">
         <div style="display:flex;align-items:baseline;gap:8px">
           <div class="t" style="flex:1">${a.ic || ''} ${A.txt(a.t)}</div>
           <i class="pip" style="background:${crowd(a.cr)}"></i>
         </div>
+        ${a.mv ? `<div class="mv">${A.txt(a.mv)}</div>` : ''}
         ${a.d ? `<div class="d" style="margin-top:5px;line-height:1.5">${A.txt(a.d)}</div>` : ''}
         ${(a.l || []).length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">` +
           a.l.map(x => `<a class="chip" href="${x.u}" target="_blank" rel="noopener" style="text-decoration:none">${A.txt(x.t)}</a>`).join('') +

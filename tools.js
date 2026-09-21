@@ -190,7 +190,7 @@ App.screen('tools.html', function () {
       const note = document.getElementById('fxNote');
       if (note && rec.live) {
         const d = String(rec.asOf).split('-');
-        note.textContent = `שער ${d[2] ? +d[2] + '.' + +d[1] : 'היום'} · מתעדכן יומית. כרטיס אשראי מוסיף כ-2%.`;
+        note.textContent = `שער לאיה ${d[2] ? +d[2] + '.' + +d[1] : 'היום'} · מתעדכן יומית (שער שוק + מרווח). כרטיס אשראי גובה בנפרד.`;
       }
       const n = num(j.value);
       if (n !== null) s.value = fmt(n * JPY);

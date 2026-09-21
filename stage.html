@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png?v=2026091901">
+<link rel="apple-touch-icon" href="icon-192.png?v=2026092101">
 <meta name="theme-color" content="#0b0e14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>שלב · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=2026091901">
+<link rel="stylesheet" href="styles.css?v=2026092101">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -43,6 +43,8 @@
   .act-links a { font-size:0.76rem; color:var(--blue); border:1px solid var(--border); background:var(--bg); padding:3px 9px; border-radius:7px; }
   .day-flag { background:rgba(242,183,5,0.12); border:1px solid rgba(242,183,5,0.35); color:var(--gold); border-radius:8px; padding:8px 11px; font-size:0.82rem; margin:10px 0 2px; }
   .legend2 { color:var(--muted); font-size:0.82rem; margin:2px 0 8px; }
+  .act-mv { font-size:0.78rem; color:var(--muted); margin-top:3px; opacity:.9; }
+  .day-chain { border:1px solid var(--border); background:var(--bg); border-radius:8px; padding:7px 11px; font-size:0.8rem; color:var(--muted); margin:10px 0 2px; }
   .nodays { color:var(--muted); font-size:0.9rem; background:var(--panel-2); border:1px dashed var(--border); border-radius:10px; padding:14px; text-align:center; }
   .act-note { margin-top:8px; font-size:0.82rem; padding:7px 10px; }
   .act-note.has-val { border-style:solid; border-color:var(--gold); }
@@ -90,8 +92,8 @@
 <div class="toast" id="toast">הועתק ✓</div>
 
 <footer>🍁 NIPON26 · שלב במסע 🍁</footer>
-<script src="data.js?v=2026091901"></script>
-<script src="basemap.js?v=2026091901"></script>
+<script src="data.js?v=2026092101"></script>
+<script src="basemap.js?v=2026092101"></script>
 <script>
   const PHASE_COLORS=['#e94560','#f2b705','#4a9eda','#c084fc','#3ddc84','#ff8c42'];
   const s = parseInt(new URLSearchParams(location.search).get('s'));
@@ -166,7 +168,7 @@
     if(!days.length){
       content.innerHTML = '<div class="sec2">📆 יום-ביום</div><div class="nodays">היום-ביום המפורט לשלב הזה יתווסף בהמשך. בינתיים — המפה והתיאור למעלה.</div>';
     } else {
-      let html = '<div class="sec2">📆 יום-ביום</div><div class="legend2">עומק קהל: 🟢 מקומי · 🟡 מעורב · 🔴 תיירותי</div>'
+      let html = '<div class="sec2">📆 יום-ביום</div><div class="legend2">🟢🟡🔴 = כמה המקום מקומי מול תיירותי (לא כמה עמוס בו עכשיו): 🟢 מקומי · 🟡 מעורב · 🔴 תיירותי<br>צורת היום: 🔗 קו ישר, אפשר לקצר בכל נקודה · 🧩 מקבץ · ⛓️ הכל-או-כלום · ⚠️ זיגזג · 🟢 פתוח<br>מתחת לכל עצירה: המרחק מהקודמת ואיך עוברים — 🚶 הליכה · 🚃 רכבת · 🚌 אוטובוס · 🚋 חשמלית · 🥾 מסלול</div>'
         + '<div class="note-hint">📝 ליד כל פריט יש מקום להערה — כתבו מה שתרצו ולחצו למטה "העתק הערות לקלוד".</div><div id="days"></div>';
       content.innerHTML = html;
       const wrap = document.getElementById('days');
@@ -175,16 +177,18 @@
         if(day.st !== lastReg){ const h=document.createElement('div'); h.className='reg-h'; h.textContent=day.st; wrap.appendChild(h); lastReg=day.st; }
         const el = document.createElement('div'); el.className='day';
         const flag = day.flag ? `<div class="day-flag">${day.flag}</div>` : '';
+        const chain = day.chain ? `<div class="day-chain">${day.chain}</div>` : '';
         const acts = (day.acts||[]).map((a,ai)=>{
           const links = (a.l&&a.l.length) ? `<div class="act-links">${a.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
           const d = a.d ? `<div class="act-d">${a.d}</div>` : '';
+          const mvl = a.mv ? `<div class="act-mv">${a.mv}</div>` : '';
           const cr = a.cr ? `<span class="act-cr">${a.cr}</span>` : '';
           const nk = day.st+'|'+day.n+'|'+ai;
           const ph = ('📝 הערה / שאלה על '+(a.t||'')+' (תיווסף להעתקה)').replace(/"/g,'&quot;');
           const note = `<textarea class="note-in act-note" data-key="${nk}" rows="1" placeholder="${ph}"></textarea>`;
-          return `<div class="act"><span class="act-ic">${a.ic||'•'}</span><div class="act-main"><div class="act-t">${a.t}</div>${d}${links}${note}</div>${cr}</div>`;
+          return `<div class="act"><span class="act-ic">${a.ic||'•'}</span><div class="act-main"><div class="act-t">${a.t}</div>${mvl}${d}${links}${note}</div>${cr}</div>`;
         }).join('');
-        el.innerHTML = `<div class="day-head"><span class="day-num">${day.n}</span><span class="day-title">${day.t}</span><span class="day-chev">▾</span></div><div class="day-body">${flag}${acts}</div>`;
+        el.innerHTML = `<div class="day-head"><span class="day-num">${day.n}</span><span class="day-title">${day.t}</span><span class="day-chev">▾</span></div><div class="day-body">${chain}${flag}${acts}</div>`;
         el.querySelector('.day-head').addEventListener('click', ()=> el.classList.toggle('open'));
         wrap.appendChild(el);
       });
@@ -208,7 +212,7 @@
     }
   }
 </script>
-<script src="delight.js?v=2026091901"></script>
-<script src="pwa.js?v=2026091901"></script>
+<script src="delight.js?v=2026092101"></script>
+<script src="pwa.js?v=2026092101"></script>
 </body>
 </html>

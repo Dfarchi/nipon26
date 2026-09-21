@@ -326,11 +326,15 @@ window.App = (function () {
     const done = rec => { const q = fxWait; fxWait = null; q.forEach(f => f(rec)); };
     // ILS כבסיס ולא JPY: קריאה אחת מחזירה את שני השערים שהאפליקציה
     // מכירה, וההיפוך נותן "כמה שקלים שווה ין אחד" — היחידה של data.js.
+    // ‎Frankfurter מחזיר שער שוק, ואנחנו קונים ין דרך לאיה שגובה מרווח.
+    // ‎FX0.spread נמדד מול העברה אמיתית (21.9: ¥55,000 = ₪1,077.41), ובלי
+    // להכפיל בו המחשבון היה מציג שער שאף פעם לא מקבלים. העוגן ב-data.js
+    // כבר כולל אותו, ולכן שניהם על אותו קנה מידה.
     fetch('https://api.frankfurter.app/latest?from=ILS&to=JPY,USD')
       .then(r => r.json())
       .then(j => {
         const r = (j && j.rates) || {};
-        const jpy = 1 / r.JPY, usd = 1 / r.USD;
+        const jpy = (1 / r.JPY) * (1 + (FX0.spread || 0)), usd = 1 / r.USD;
         if (!sane(jpy, .008, .05) || !sane(usd, 2, 6)) throw 0;
         const rec = { jpy, usd, asOf: j.date || '', at: Date.now(), live: true };
         try { localStorage.setItem(FKEY, JSON.stringify(rec)); } catch (e) {}

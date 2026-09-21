@@ -890,3 +890,12 @@ a.step{min-height:44px}
 .jump button.on{color:var(--onHot);background:var(--hot);border-color:var(--hot)}
 .jump button:active{transform:scale(.96)}
 @media (prefers-reduced-motion:reduce){.jump button{transition:none}}
+
+
+/* מרחק בין עצירות וצורת היום — נוספו 21.9.
+   .mv יושב מתחת לכותרת הפעילות: כמה דקות מהעצירה הקודמת ואיך עוברים.
+   .chain הוא שורה אחת בראש רשימת היום: קו ישר / מקבץ / הכל-או-כלום / זיגזג. */
+.mv { font-size:.78rem; color:var(--muted); margin-top:3px; opacity:.92; }
+.chain { font-size:.8rem; color:var(--muted); border:1px solid var(--line);
+  border-radius:10px; padding:7px 11px; margin-top:8px; line-height:1.5; }
+.pk.chain span { font-size:.76rem; opacity:.85; }

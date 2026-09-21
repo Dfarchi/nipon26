@@ -108,6 +108,7 @@ App.screen('itinerary.html', function () {
   function peekFor(di) {
     const d = T.days[di], acts = d.acts || [], stay = stayOn(d.t);
     let h = '<div class="peek-in">';
+    if (d.chain) h += `<div class="pk chain"><span>${A.txt(d.chain)}</span></div>`;
     if (d.flag) h += `<div class="pk flag"><span>${A.txt(String(d.flag).replace(/<[^>]+>/g, '')).slice(0, 150)}…</span></div>`;
     h += acts.length
       ? acts.slice(0, 6).map(a => `<div class="pk"><b>${a.ic || '·'}</b>
