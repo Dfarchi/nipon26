@@ -1,6 +1,6 @@
 // שער ין חי — מרענן את TRIP.budget.fx.jpy מ-API ציבורי, פעם ביום.
 // למה: שער מוקלד מתיישן בשקט ומטה את כל התקציב. השער הקשיח נשאר כרשת ביטחון.
-// המספר שמוצג הוא שער שוק + עמלת המרה (B.fx.fee) — כלומר מה שבאמת יוצא מהחשבון.
+// המוצג הוא השער של לאיה: שער שוק חי × (1 + spread). ה-spread נמדד מהעברה אמיתית.
 (function (global) {
   const KEY = 'nipon26.fx.jpy';
   const DAY = 864e5;
@@ -9,10 +9,10 @@
     { u: 'https://open.er-api.com/v6/latest/JPY',              pick: j => j && j.rates && j.rates.ILS }
   ];
 
-  const fee = () => (TRIP.budget.fx.fee != null ? TRIP.budget.fx.fee : 0);
+  const spread = () => (TRIP.budget.fx.spread != null ? TRIP.budget.fx.spread : 0);
   const apply = (mid, asOf, live) => {
     const f = TRIP.budget.fx;
-    f.jpy = mid * (1 + fee());
+    f.jpy = mid * (1 + spread());
     f.asOf = asOf;
     f.live = live;
   };
