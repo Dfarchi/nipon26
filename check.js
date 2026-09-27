@@ -80,6 +80,16 @@ live.forEach((p, i) => /^שלב \d+ /.test(p.h) && +p.h.match(/\d+/)[0] === i + 
   ? null : fail(`"${p.h}": מספור השלב לא תואם את מקומו ברשימה (${i + 1})`));
 if (!bad) ok('מספור השלבים רציף');
 
+console.log('=== הכנות: מזהים ייחודיים והפניות קיימות ===');
+{
+  const items = (T.prep || []).flatMap(g => g.items);
+  const ns = new Set(T.decisions.flatMap(g => g.items.map(i => i.n)));
+  const ids = items.map(i => i.id);
+  ids.length !== new Set(ids).size ? fail('יש id כפול ב-prep — סימונים יתערבבו') : ok(`${ids.length} פריטים, id ייחודי`);
+  items.filter(i => i.ref && !ns.has(i.ref)).forEach(i => fail(`prep ${i.id}: הפניה ל-${i.ref} שלא קיים בהחלטות`));
+  items.filter(i => i.due && isNaN(new Date(i.due))).forEach(i => fail(`prep ${i.id}: תאריך לא תקין ${i.due}`));
+}
+
 console.log('=== מחרוזת מטמון (?v=) זהה בכל ה-HTML ===');
 const fs = require('fs');
 const vers = new Set();

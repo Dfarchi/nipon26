@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הכנות · יפן 2026</title>
+<link rel="stylesheet" href="styles.css?v=20260927a">
+<style>
+  .pnums { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+  .pnum { flex:1 1 130px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 16px; }
+  .pnum .v { font-size:1.7rem; font-weight:800; font-variant-numeric:tabular-nums; }
+  .pnum .k { color:var(--dim); font-size:0.78rem; letter-spacing:1px; margin-top:2px; }
+  .pnum.bad .v { color:var(--accent); } .pnum.warn .v { color:var(--gold); } .pnum.good .v { color:var(--green); }
+  .pbar { height:10px; border-radius:99px; background:var(--border); overflow:hidden; margin:4px 0 18px; }
+  .pbar i { display:block; height:100%; background:var(--green); transition:width .3s; }
+  .ctl { display:flex; justify-content:flex-end; margin-bottom:6px; }
+  .ctl label { color:var(--muted); font-size:0.85rem; cursor:pointer; display:inline-flex; gap:6px; align-items:center; }
+
+  .sec-h { margin:24px 0 4px; font-size:1.05rem; font-weight:700; color:var(--gold); display:flex; justify-content:space-between; gap:10px; }
+  .sec-h .c { color:var(--dim); font-weight:500; font-size:0.82rem; font-variant-numeric:tabular-nums; }
+  .sec-s { color:var(--muted); font-size:0.84rem; margin-bottom:8px; line-height:1.6; }
+
+  .it { display:flex; gap:12px; align-items:flex-start; background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; padding:12px 14px; margin-bottom:8px; cursor:pointer; }
+  .it input { width:20px; height:20px; margin-top:2px; flex:0 0 auto; accent-color:var(--green); cursor:pointer; }
+  .it .b { flex:1; min-width:0; }
+  .it .t { font-weight:600; line-height:1.5; }
+  .it .d { color:var(--muted); font-size:0.84rem; margin-top:3px; line-height:1.6; }
+  .it .m { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .it.done { opacity:.45; }
+  .it.done .t { text-decoration:line-through; }
+  .it.late { border-color:rgba(233,69,96,.55); }
+  .it.soon { border-color:rgba(242,183,5,.45); }
+  .chip { font-size:0.72rem; padding:1px 8px; border-radius:99px; border:1px solid var(--border); color:var(--dim);
+    text-decoration:none; white-space:nowrap; }
+  .chip.late { color:var(--accent); border-color:rgba(233,69,96,.4); background:rgba(233,69,96,.1); }
+  .chip.soon { color:var(--gold); border-color:rgba(242,183,5,.35); background:rgba(242,183,5,.1); }
+  a.chip { color:var(--blue); }
+  .hide-done .it.done { display:none; }
+  .foot { color:var(--dim); font-size:0.8rem; margin-top:14px; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="tab" href="index.html">🏠 שער</a>
+  <a class="tab" href="decisions.html">🧭 החלטות</a>
+  <a class="tab" href="itinerary.html">🗓️ מסלול</a>
+  <a class="tab" href="budget.html">💴 תקציב</a>
+  <a class="tab" href="transit.html">🚇 תחבורה</a>
+  <a class="tab active" href="prep.html">✅ הכנות</a>
+  <a class="tab" href="documents.html">📂 מסמכים</a>
+  <span class="brand">🍁 NIPON26</span>
+</div></div>
+
+<div class="hero" style="padding-bottom:10px">
+  <h1 style="font-size:2.2rem">✅ הכנות לטיסה</h1>
+  <div class="sub" id="sub"></div>
+</div>
+
+<div class="wrap">
+  <div class="pnums" id="nums"></div>
+  <div class="pbar"><i id="bar"></i></div>
+  <div class="ctl"><label><input type="checkbox" id="hide"> להסתיר מה שבוצע</label></div>
+  <div id="list"></div>
+  <div class="foot">הסימונים נשמרים בדפדפן של המכשיר הזה בלבד — מה שיובל סימן לא מופיע אצל שיר.
+    התגית עם המספר (I31, K19…) פותחת את המשימה המלאה בדף ההחלטות.</div>
+</div>
+
+<footer>🍁 NIPON26 · צעד אחד בכל פעם 🍁</footer>
+<script src="data.js?v=20260927a"></script>
+<script>
+const KEY = 'nipon26-prep';
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {} };
+
+const today = new Date(); today.setHours(0, 0, 0, 0);
+const DAY = 864e5;
+const start = new Date(TRIP.phases.find(p => p.start).start);      // נחיתה
+const fmt = iso => { const d = new Date(iso); return d.getDate() + '.' + (d.getMonth() + 1); };
+const daysTo = iso => Math.round((new Date(iso) - today) / DAY);
+const all = TRIP.prep.flatMap(g => g.items);
+
+document.getElementById('sub').textContent =
+  `${Math.max(0, Math.round((start - today) / DAY))} ימים לנחיתה · ${all.length} פריטים`;
+
+function state(it) {
+  if (done[it.id] || !it.due) return '';
+  const n = daysTo(it.due);
+  return n < 0 ? 'late' : n <= 3 ? 'soon' : '';
+}
+function dueChip(it) {
+  if (!it.due) return '';
+  const n = daysTo(it.due), s = state(it);
+  const lbl = done[it.id] ? `עד ${fmt(it.due)}`
+    : n < 0 ? `⚠️ באיחור · ${fmt(it.due)}` : n === 0 ? `📍 היום` : n === 1 ? `מחר · ${fmt(it.due)}` : `עד ${fmt(it.due)} · עוד ${n} ימים`;
+  return `<span class="chip ${s}">${lbl}</span>`;
+}
+
+function render() {
+  const open = all.filter(i => !done[i.id]);
+  const late = open.filter(i => state(i) === 'late').length;
+  const soon = open.filter(i => state(i) === 'soon').length;
+  document.getElementById('nums').innerHTML = `
+    <div class="pnum ${late ? 'bad' : 'good'}"><div class="v">${late}</div><div class="k">באיחור</div></div>
+    <div class="pnum ${soon ? 'warn' : 'good'}"><div class="v">${soon}</div><div class="k">ב-3 הימים הקרובים</div></div>
+    <div class="pnum"><div class="v">${open.length}</div><div class="k">פתוחים</div></div>
+    <div class="pnum good"><div class="v">${all.length - open.length}</div><div class="k">בוצעו</div></div>`;
+  document.getElementById('bar').style.width = (100 * (all.length - open.length) / all.length) + '%';
+
+  document.getElementById('list').innerHTML = TRIP.prep.map(g => {
+    const left = g.items.filter(i => !done[i.id]).length;
+    return `<div class="sec-h"><span>${g.h}</span><span class="c">${g.items.length - left}/${g.items.length}</span></div>
+      ${g.s ? `<div class="sec-s">${g.s}</div>` : ''}
+      ${g.items.map(it => `
+        <label class="it ${done[it.id] ? 'done' : ''} ${state(it)}">
+          <input type="checkbox" data-id="${it.id}" ${done[it.id] ? 'checked' : ''}>
+          <div class="b">
+            <div class="t">${it.t}</div>
+            ${it.d ? `<div class="d">${it.d}</div>` : ''}
+            <div class="m">${dueChip(it)}
+              ${it.ref ? `<a class="chip" href="decisions.html">${it.ref}</a>` : ''}
+              ${it.u ? `<a class="chip" href="${it.u}" ${it.u.startsWith('http') ? 'target="_blank" rel="noopener"' : ''}>🔗 לינק</a>` : ''}
+            </div>
+          </div>
+        </label>`).join('')}`;
+  }).join('');
+}
+
+document.getElementById('list').addEventListener('change', e => {
+  const id = e.target.dataset.id; if (!id) return;
+  if (e.target.checked) done[id] = 1; else delete done[id];
+  save(); render();
+});
+const hide = document.getElementById('hide');
+try { hide.checked = localStorage.getItem(KEY + '-hide') === '1'; } catch (e) {}
+const applyHide = () => document.getElementById('list').classList.toggle('hide-done', hide.checked);
+hide.addEventListener('change', () => { try { localStorage.setItem(KEY + '-hide', hide.checked ? '1' : '0'); } catch (e) {} applyHide(); });
+render(); applyHide();
+</script>
+</body>
+</html>
