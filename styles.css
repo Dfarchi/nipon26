@@ -58,7 +58,9 @@ a { color: inherit; text-decoration: none; }
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 16px; }
 .timeline { position: relative; padding-right: 22px; }
 .timeline::before { content:''; position:absolute; right: 7px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--accent), var(--blue), var(--purple)); border-radius: 2px; }
-.phase { position: relative; padding: 12px 0; }
+.phase { position: relative; padding: 12px 0; display: block; color: inherit; text-decoration: none; }
+a.phase:hover h3 { color: var(--gold); }
+.phase .ph-go { color: var(--blue); font-size: 0.8rem; margin-inline-start: 10px; }
 .phase::before { content:''; position:absolute; right: -19px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
 .phase .ph-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .phase h3 { font-size: 1.05rem; color: var(--ink); }

@@ -28,6 +28,43 @@ App.screen('tasks.html', function () {
     const c = s.slice(0, n); const i = c.lastIndexOf(' ');
     return (i > n * 0.6 ? c.slice(0, i) : c).replace(/[\s(\[·—-]+$/, '') + '…'; };
   const done = n => store[n] === true;
+
+  // שורה שנפתחת. קודם כל השורה הייתה פקד "בוצע" והטקסט נחתך ב-95 תווים —
+  // כלומר את המשימה עצמה אי אפשר היה לקרוא. עכשיו העיגול מסמן, והשורה
+  // פותחת במקום את הטקסט המלא, התאריכים והלינקים (אותו .peek של המסלול).
+  const PREP_KEY = 'nipon26_prep_v1';
+  let prep = {}; try { prep = JSON.parse(localStorage.getItem(PREP_KEY) || '{}'); } catch (e) {}
+  const savePrep = () => { try { localStorage.setItem(PREP_KEY, JSON.stringify(prep)); } catch (e) {} };
+  const links = l => (l || []).length ? `<div class="tlinks">` + l.map(x =>
+    `<a class="chip" href="${A.esc(x.u)}" target="_blank" rel="noopener">${A.txt(x.t)}</a>`).join('') + `</div>` : '';
+  const row = (o) => `
+    <div class="trow${o.done ? ' is-done' : ''}" ${o.attr}>
+      <button class="tick" type="button" ${o.tick} aria-label="בוצע" aria-pressed="${o.done}"><i class="pip box"></i></button>
+      <button class="step day" type="button" data-open="${A.esc(o.key)}" aria-expanded="false">
+        ${o.b ? `<b>${o.b}</b>` : ''}<span>${o.short}</span>${o.chip || ''}</button>
+    </div>
+    <div class="peek" data-peek="${A.esc(o.key)}"><div class="peek-in">${o.body}</div></div>`;
+  const taskRow = i => row({
+    key: 't:' + i.n, done: done(i.n), attr: `data-todo="${A.esc(i.n)}"`, tick: `data-tick="${A.esc(i.n)}"`,
+    b: i.n, short: clip(A.txt(i.q), 95),
+    chip: i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : '',
+    body: `<div class="tfull">${A.rich(i.q)}</div>` +
+      ((i.ds || []).length ? `<div class="tdue">` + i.ds.map(x => `<div class="pk"><b>${x.d}</b><span>${A.txt(x.t)}</span></div>`).join('') + `</div>` : '') +
+      links(i.l) + `<a class="go" href="decisions.html#d-${encodeURIComponent(i.n)}">פירוט מלא והערות</a>`
+  });
+  const pdays = iso => { const [y, m, d] = iso.split('-').map(Number);
+    return Math.round((new Date(y, m - 1, d) - new Date(new Date().setHours(0, 0, 0, 0))) / 864e5); };
+  const prepRow = it => {
+    const n = it.due ? pdays(it.due) : null, dd = it.due ? it.due.slice(8).replace(/^0/, '') + '.' + it.due.slice(5, 7).replace(/^0/, '') : '';
+    const cls = n === null || prep[it.id] ? '' : n < 0 ? 'warn' : n <= 3 ? 'hot' : '';
+    return row({
+      key: 'p:' + it.id, done: !!prep[it.id], attr: `data-prep="${A.esc(it.id)}"`, tick: `data-ptick="${A.esc(it.id)}"`,
+      b: '', short: A.txt(it.t), chip: it.due ? `<span class="chip ${cls}">${n < 0 && !prep[it.id] ? 'עבר · ' : ''}${dd}</span>` : '',
+      body: (it.d ? `<div class="tfull">${A.rich(it.d)}</div>` : '') +
+        links(it.u ? [{ t: '🔗 לינק', u: it.u }] : []) +
+        (it.ref ? `<a class="go" href="decisions.html#d-${encodeURIComponent(it.ref)}">משימה ${A.esc(it.ref)} — פירוט מלא</a>` : '')
+    });
+  };
   const chosen = n => Array.isArray(store[n]) ? store[n] : (store[n] !== undefined ? [store[n]] : []);
 
   function render() {
@@ -44,22 +81,17 @@ App.screen('tasks.html', function () {
       // מהם הוא לא התשובה ל"מה לעשות עכשיו" — עוצמה קיימת רק מול שקט.
       const lead = urgent[0], near = urgent.slice(1);
       const cls = lead.dl.days <= 2 ? 'warn' : lead.dl.days <= 7 ? 'hot' : '';
+      // הכרטיס המוביל מציג את כל הטקסט — זו המשימה שעונה על "מה עכשיו".
       h += `<div class="card alert${done(lead.n) ? ' is-done' : ''}" style="margin-top:8px;padding:13px 15px" data-todo="${A.esc(lead.n)}">
-        <div style="display:flex;gap:9px;align-items:baseline">
+        <div style="display:flex;gap:9px;align-items:center">
           <span class="chip ${cls} lead">${days(lead.dl.days)}</span>
           <div class="d" style="margin:0;flex:1">${lead.n}</div>
-          <span class="chip ok flag">בוצע</span></div>
-        <div class="t" style="margin-top:6px">${clip(A.txt(lead.q), 150)}</div>
+          <button class="tick" type="button" data-tick="${A.esc(lead.n)}" aria-label="בוצע" aria-pressed="${done(lead.n)}"><i class="pip box"></i></button></div>
+        <div class="tfull" style="margin-top:6px">${A.rich(lead.q)}</div>
         <div class="steps well">` +
         lead.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.txt(x.t)}</span></div>`).join('') +
-        `</div></div>`;
-      if (near.length) {
-        h += `<div class="well" style="margin-top:8px">` + near.map(i => `
-          <a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="cursor:pointer;text-decoration:none;color:inherit">
-            <b>${i.dl.d}</b><span>${clip(A.txt(i.q), 80)}</span>
-            <span class="chip">${days(i.dl.days)}</span>
-            <span class="chip ok flag">בוצע</span></a>`).join('') + `</div>`;
-      }
+        `</div>${links(lead.l)}<a class="go" href="decisions.html#d-${encodeURIComponent(lead.n)}">פירוט מלא והערות</a></div>`;
+      if (near.length) h += `<div class="tlist">` + near.map(taskRow).join('') + `</div>`;
     }
 
     if (openDec.length) {
@@ -77,7 +109,24 @@ App.screen('tasks.html', function () {
               <i class="pip box"></i>
               <span>${A.txt(o.t)}</span>${i.rec === k ? '<span class="chip hot">מומלץ</span>' : ''}</a>`;
           }).join('') +
-          `</div></div>`;
+          `</div><a class="go" href="decisions.html#d-${encodeURIComponent(i.n)}">הסבר לכל אפשרות</a></div>`;
+      });
+    }
+
+    // לפני הטיסה — הצ׳קליסט מ-TRIP.prep. כל חלק נפתח במקום, כמו שלב במסלול.
+    // פריט עם ref הוא משימה שכבר קיימת למטה; כאן הוא בניסוח של "מה לעשות".
+    if ((T.prep || []).length) {
+      const all = T.prep.flatMap(g => g.items), left = all.filter(it => !prep[it.id]).length;
+      h += `<div class="lbl" style="margin-top:22px">לפני הטיסה<i></i><span class="d" id="prepLeft">${left}</span></div>
+        <div class="d" style="margin-top:2px">הסימון כאן נשמר בטלפון הזה.
+          <a href="https://claude.ai/artifact/RsA9yiq2iYHociH17e2w2E" target="_blank" rel="noopener" style="color:var(--hot)">לסמן ביחד ↗</a></div>`;
+      T.prep.forEach((g, gi) => {
+        const n = g.items.filter(it => !prep[it.id]).length;
+        h += `<button class="step day psec" type="button" data-open="s:${gi}" aria-expanded="false" style="margin-top:7px">
+            <span>${A.txt(g.h)}</span><span class="chip${n ? '' : ' ok'}" data-pcount="${gi}">${n ? n + ' פתוחים' : 'הכל בוצע'}</span></button>
+          <div class="peek" data-peek="s:${gi}"><div class="peek-in">
+            ${g.s ? `<div class="d" style="margin-bottom:6px">${A.txt(g.s)}</div>` : ''}
+            <div class="tlist">${g.items.map(prepRow).join('')}</div></div></div>`;
       });
     }
 
@@ -86,13 +135,7 @@ App.screen('tasks.html', function () {
     const ordered = rest.filter(i => !done(i.n)).concat(rest.filter(i => done(i.n)));
     h += `<div class="lbl q" style="margin-top:22px">משימות<i></i><span class="d">${
       rest.length - rest.filter(i => done(i.n)).length}</span></div>`;
-    ordered.forEach(i => {
-      h += `<a class="step${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}" style="margin-top:7px;align-items:flex-start;cursor:pointer;text-decoration:none;color:inherit">
-        <b style="min-width:34px">${i.n}</b>
-        <span>${clip(A.txt(i.q), 95)}</span>
-        ${i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : ''}
-        <span class="chip ok flag">בוצע</span></a>`;
-    });
+    h += `<div class="tlist">` + ordered.map(taskRow).join('') + `</div>`;
 
     h += `<div class="acts"><button class="cloud g" onclick="location.href='decisions.html'">
       ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>הערות ופירוט מלא</span></button></div>`;
@@ -108,8 +151,21 @@ App.screen('tasks.html', function () {
   // בלבד. innerHTML מלא כאן היה הורס 151 אלמנטים, מקפיץ את הגלילה, והורג
   // את האלמנט שהאצבע עליו באמצע הלחיצה.
   const sel = v => `[data-todo="${CSS.escape(v)}"]`;
-  const paintTodo = n => document.querySelectorAll(sel(n))
-    .forEach(el => el.classList.toggle('is-done', done(n)));
+  const paintTodo = n => {
+    document.querySelectorAll(sel(n)).forEach(el => el.classList.toggle('is-done', done(n)));
+    document.querySelectorAll(`[data-tick="${CSS.escape(n)}"]`).forEach(b => b.setAttribute('aria-pressed', done(n)));
+  };
+  const paintPrep = id => {
+    document.querySelectorAll(`[data-prep="${CSS.escape(id)}"]`).forEach(el => el.classList.toggle('is-done', !!prep[id]));
+    document.querySelectorAll(`[data-ptick="${CSS.escape(id)}"]`).forEach(b => b.setAttribute('aria-pressed', !!prep[id]));
+    (T.prep || []).forEach((g, gi) => {
+      const c = document.querySelector(`[data-pcount="${gi}"]`); if (!c) return;
+      const n = g.items.filter(it => !prep[it.id]).length;
+      c.textContent = n ? n + ' פתוחים' : 'הכל בוצע'; c.classList.toggle('ok', !n);
+    });
+    const pl = document.getElementById('prepLeft');
+    if (pl) pl.textContent = T.prep.flatMap(g => g.items).filter(it => !prep[it.id]).length;
+  };
   const paintDec = n => {
     const picked = chosen(n);
     document.querySelectorAll(`[data-dec="${CSS.escape(n)}"]`)
@@ -132,11 +188,26 @@ App.screen('tasks.html', function () {
       save(); paintDec(n);
       return;
     }
-    const todo = e.target.closest('[data-todo]');
-    if (todo) {
-      const n = todo.dataset.todo;
+    const tick = e.target.closest('[data-tick]');
+    if (tick) {
+      const n = tick.dataset.tick;
       if (done(n)) delete store[n]; else store[n] = true;
       save(); paintTodo(n);
+      return;
+    }
+    const pt = e.target.closest('[data-ptick]');
+    if (pt) {
+      const id = pt.dataset.ptick;
+      if (prep[id]) delete prep[id]; else prep[id] = 1;
+      savePrep(); paintPrep(id);
+      return;
+    }
+    const op = e.target.closest('[data-open]');
+    if (op) {
+      const pk = document.querySelector(`[data-peek="${CSS.escape(op.dataset.open)}"]`);
+      if (!pk) return;
+      const on = pk.classList.toggle('on');
+      op.setAttribute('aria-expanded', on);
     }
   });
 });

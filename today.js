@@ -1,4 +1,6 @@
 App.screen('today.html', function () {
+  const clip160 = t => { t = String(t); const c = t.slice(0, 160), k = c.lastIndexOf(' ');
+    return (k > 110 ? c.slice(0, k) : c).replace(/[\s(\[·—,-]+$/, '') + '…'; };
   const MON = ['ינו','פבר','מרץ','אפר','מאי','יונ','יול','אוג','ספט','אוק','נוב','דצמ'];
   const A = App, T = A.T;
   const idx = A.dayIndex(), cur = T.days[idx], dd = A.dated[idx].date;
@@ -90,10 +92,13 @@ App.screen('today.html', function () {
 
   if (acts.length) {
     const a = acts[cursor], tm = time(a.d) || time(a.t);
-    h += `<div class="card now"><div class="lbl">${lead}<i></i>${tm ? `<span class="big">${tm}</span>` : ''}</div>
+    // התיאור נחתך ב-160 תווים — ולכן הכרטיס נפתח לפעילות המלאה ביום המלא.
+    const long = a.d && String(a.d).length > 160;
+    h += `<a class="card now" data-act="${cursor}" href="#act-${cursor}" style="display:block;text-decoration:none;color:inherit"><div class="lbl">${lead}<i></i>${tm ? `<span class="big">${tm}</span>` : ''}</div>
       <div class="t">${a.ic || ''} ${A.txt(a.t)}</div>
       ${a.mv ? `<div class="mv">${A.txt(a.mv)}</div>` : ''}
-      ${a.d ? `<div class="d">${A.txt(String(a.d).slice(0, 160))}</div>` : ''}</div>`;
+      ${a.d ? `<div class="d">${A.txt(long ? clip160(a.d) : String(a.d))}</div>` : ''}
+      <div class="more-l">${long ? 'להמשך, לינקים ומפה' : (a.l || []).length ? 'לינקים ומפה' : 'ביום המלא'} ←</div></a>`;
   }
 
   // הפסקה המסבירה יורדת אל מתחת לכרטיס. היא חשובה, אבל היא 196 פיקסלים
@@ -107,8 +112,8 @@ App.screen('today.html', function () {
   }
   if (after.length) {
     h += `<div style="margin-top:16px"><div class="lbl q">אחר כך<i></i></div><div class="steps">` +
-      after.map(a => `<div class="step"><b>${time(a.d) || time(a.t) || (a.ic || '·')}</b>
-        <span>${A.txt(a.t)}</span><i class="pip" style="background:${crowd(a.cr)}"></i></div>`).join('') + `</div></div>`;
+      after.map(a => `<a class="step" data-act="${acts.indexOf(a)}" href="#act-${acts.indexOf(a)}" style="text-decoration:none;color:inherit"><b>${time(a.d) || time(a.t) || (a.ic || '·')}</b>
+        <span>${A.txt(a.t)}</span><i class="pip" style="background:${crowd(a.cr)}"></i></a>`).join('') + `</div></div>`;
   }
   // המנה של האזור. לא "מה לאכול היום" אלא מה המקום הזה עושה טוב —
   // המפתח הוא תחילת day.st, אותו שדה נקי שממנו נגזר גם הנוף.
@@ -156,8 +161,8 @@ App.screen('today.html', function () {
     <div class="lbl q">כל הפעילויות היום<i></i></div>` +
     (cur.chain ? `<div class="chain">${A.txt(cur.chain)}</div>` : '') +
     `<div class="steps" style="margin-top:8px">` +
-    (acts.length ? acts.map(a => `
-      <div class="card" style="padding:12px 14px">
+    (acts.length ? acts.map((a, ai) => `
+      <div class="card" id="act-${ai}" style="padding:12px 14px">
         <div style="display:flex;align-items:baseline;gap:8px">
           <div class="t" style="flex:1">${a.ic || ''} ${A.txt(a.t)}</div>
           <i class="pip" style="background:${crowd(a.cr)}"></i>
@@ -174,6 +179,16 @@ App.screen('today.html', function () {
   document.getElementById('main').innerHTML = h;
   A.reveal(document.getElementById('main'));
 
+
+  // לחיצה על פעילות (עכשיו / אחר כך) פותחת את היום המלא בדיוק עליה
+  document.getElementById('main').addEventListener('click', e => {
+    const el = e.target.closest('[data-act]'); if (!el) return;
+    e.preventDefault();
+    const w = document.getElementById('fullDayWrap'); w.hidden = false;
+    const card = document.getElementById('act-' + el.dataset.act); if (!card) return;
+    card.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
+  });
 
   document.getElementById('fullDayBtn').onclick = () => {
     const w = document.getElementById('fullDayWrap');

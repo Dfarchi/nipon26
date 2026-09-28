@@ -899,3 +899,30 @@ a.step{min-height:44px}
 .chain { font-size:.8rem; color:var(--muted); border:1px solid var(--line);
   border-radius:10px; padding:7px 11px; margin-top:8px; line-height:1.5; }
 .pk.chain span { font-size:.76rem; opacity:.85; }
+
+/* ===== משימה שנפתחת =====
+   העיגול הוא הפקד של "בוצע"; השורה עצמה פותחת את הטקסט המלא.
+   קודם השורה כולה סימנה בוצע — ולכן את המשימה אי אפשר היה לקרוא. */
+.tlist{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.trow{display:flex;align-items:stretch;gap:7px}
+.trow .step.day{flex:1;min-width:0;align-items:center}
+.trow .step.day > span:not(.chip){font-size:var(--fs-body)}
+.tick{flex:0 0 auto;width:38px;display:grid;place-items:center;border:0;border-radius:13px;
+  background:var(--card);cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0}
+.card .tick{width:34px;height:34px;background:var(--well)}
+.is-done .pip.box{border-color:var(--ok);background:var(--ok);transform:scale(1.18)}
+.trow.is-done .step.day > span:not(.chip),.card.is-done .tfull{text-decoration:line-through;opacity:.55}
+.tfull{font-size:var(--fs-body);line-height:var(--lh-base);color:var(--ink)}
+.peek-in .tfull{color:var(--dim)}
+.tdue{margin-top:6px}
+.tlinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.tlinks .chip{text-decoration:none}
+.step.psec > span:not(.chip){font-weight:700}
+.peek .tlist{margin-top:0}
+.tick:focus-visible,.step.day:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+
+/* פעילות בכרטיס "עכשיו" / "אחר כך" פותחת את היום המלא עליה */
+.card.now .more-l{margin-top:8px;font-size:var(--fs-meta);color:var(--hot);font-weight:700}
+.card.flash{animation:actFlash 1.8s var(--e-out)}
+@keyframes actFlash{0%,35%{box-shadow:0 0 0 3px var(--hot)}100%{box-shadow:none}}
+@media (prefers-reduced-motion:reduce){.card.flash{animation:none;outline:2px solid var(--hot)}}

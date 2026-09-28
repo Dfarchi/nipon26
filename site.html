@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png?v=2026092101">
+<link rel="apple-touch-icon" href="icon-192.png?v=2026092802">
 <meta name="theme-color" content="#0b0e14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>יפן 2026 · קלסר הטיול</title>
-<link rel="stylesheet" href="styles.css?v=2026092101">
+<link rel="stylesheet" href="styles.css?v=2026092802">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -152,8 +152,8 @@
 
 <footer>🍁 NIPON26 · הקלסר המשפחתי של יפן 2026 🍁</footer>
 
-<script src="data.js?v=2026092101"></script>
-<script src="basemap.js?v=2026092101"></script>
+<script src="data.js?v=2026092802"></script>
+<script src="basemap.js?v=2026092802"></script>
 <script>
 const FLIGHT = new Date('2026-10-13T19:45:00+03:00');
 const TRIP_START = new Date('2026-10-14T00:00:00+09:00');
@@ -218,8 +218,8 @@ setInterval(tick,1000); tick();
 
 (function(){
   const tl=document.getElementById('timeline'); if(!tl||!window.TRIP)return;
-  TRIP.phases.forEach(p=>{ const el=document.createElement('div'); el.className='phase';
-    el.innerHTML=`<div class="ph-top"><h3>${p.h}</h3><span class="when">${p.when}</span></div><p>${p.p}</p><span class="nights">${p.nights}</span>`;
+  TRIP.phases.forEach((p,i)=>{ const el=document.createElement('a'); el.className='phase'; el.href='stage.html?s='+i;
+    el.innerHTML=`<div class="ph-top"><h3>${p.h}</h3><span class="when">${p.when}</span></div><p>${p.p}</p><span class="nights">${p.nights}</span><span class="ph-go">יום-ביום ←</span>`;
     tl.appendChild(el); });
 })();
 
@@ -236,7 +236,7 @@ setInterval(tick,1000); tick();
   const latlngs=[];
   pts.forEach((pt,idx)=>{ latlngs.push([pt.lat,pt.lng]);
     L.circleMarker([pt.lat,pt.lng],{radius:7,color:'#1a1526',weight:2,fillColor:PHASE_COLORS[pt.ph%6],fillOpacity:1})
-      .addTo(map).bindPopup(`<b>${idx+1}. ${pt.n}</b>${pt.d?'<br>'+pt.d:''}`).bindTooltip(`${idx+1}. ${pt.n}`,{direction:'top'});
+      .addTo(map).bindPopup(`<b>${idx+1}. ${pt.n}</b>${pt.d?'<br>'+pt.d:''}<br><a href="${m(pt.n+' Japan')}" target="_blank" rel="noopener">🗺️ פתח במפות</a> · <a href="stage.html?s=${pt.ph}">השלב ←</a>`).bindTooltip(`${idx+1}. ${pt.n}`,{direction:'top'});
   });
   L.polyline(latlngs,{color:'#e94560',weight:3,opacity:0.8,dashArray:'4 7'}).addTo(map);
   map.fitBounds(latlngs,{padding:[30,30]});
@@ -276,8 +276,8 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   addEventListener('resize',init,{passive:true});
 })();
 </script>
-<script src="mapexport.js?v=2026092101"></script>
-<script src="delight.js?v=2026092101"></script>
-<script src="pwa.js?v=2026092101"></script>
+<script src="mapexport.js?v=2026092802"></script>
+<script src="delight.js?v=2026092802"></script>
+<script src="pwa.js?v=2026092802"></script>
 </body>
 </html>

@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png?v=2026092101">
+<link rel="apple-touch-icon" href="icon-192.png?v=2026092802">
 <meta name="theme-color" content="#0b0e14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>החלטות · יפן 2026</title>
-<link rel="stylesheet" href="styles.css?v=2026092101">
+<link rel="stylesheet" href="styles.css?v=2026092802">
 <style>
   .dec-filter{ display:flex; gap:8px; margin:0 0 14px; flex-wrap:wrap; align-items:center }
   .fbtn{ background:rgba(255,255,255,0.05); color:var(--muted,#cbb8d6); border:1px solid rgba(255,140,66,0.25);
@@ -17,6 +17,9 @@
   .fbtn.active{ background:linear-gradient(135deg,#ff8c42,#ff5e7e); color:#fff; border-color:transparent; font-weight:700 }
   .fhint{ color:var(--dim,#9a8aa6); font-size:0.82rem }
   body.mode-open .dcard.closed-dec{ display:none }
+  .dcard.flash{ animation:flash 2.2s ease-out }
+  @keyframes flash{ 0%,40%{ box-shadow:0 0 0 3px var(--gold) } 100%{ box-shadow:0 0 0 0 transparent } }
+  @media (prefers-reduced-motion: reduce){ .dcard.flash{ animation:none; outline:3px solid var(--gold) } }
   body.mode-open .bar, body.mode-open #progPct{ display:none }
   .dcard.open-dec{ border-color:rgba(90,170,255,0.55); box-shadow:0 0 0 1px rgba(90,170,255,0.25) }
   .open-tag{ display:inline-block; background:rgba(90,170,255,0.18); color:#7fc1ff;
@@ -83,7 +86,7 @@
 
 <footer>🍁 NIPON26 · ⚠️ אשכול סנדאי (6ב) ממתין לאימות מול ההערות שלכם מאתמול 🍁</footer>
 
-<script src="data.js?v=2026092101"></script>
+<script src="data.js?v=2026092802"></script>
 <script>
 const KEY = 'nipon26_choices_v1';
 const NKEY = 'nipon26_notes_v1';
@@ -123,11 +126,14 @@ Object.keys(phaseBuckets).map(Number).sort((a,b)=>a-b).forEach(ph => {
       total++; added++;
       const card = document.createElement('div');
       card.dataset.n = it.n;
+      card.id = 'd-' + it.n;
 
       if(it.todo === true){
         // משימה פתוחה: לא בחירה מתוך אופציות — מסמנים "הוחלט/בוצע" בצ'קבוקס + הערה חופשית
         card.className = 'dcard todo-dec ' + (it.open===true ? 'open-dec' : 'closed-dec');
-        card.innerHTML = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q} <span class="todo-tag">משימה פתוחה</span></div></div>`
+        const tlinks = (it.l && it.l.length)
+          ? `<div class="opt-links" style="margin-top:8px">${it.l.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join('')}</div>` : '';
+        card.innerHTML = `<div class="q"><div class="num">${it.n}</div><div class="qt">${it.q} <span class="todo-tag">משימה פתוחה</span></div></div>${tlinks}`
           + `<label class="todo-check"><input type="checkbox" class="todo-in" data-n="${it.n}"><span>✓ סומן כהוחלט / בוצע</span></label>`
           + `<textarea class="note-in" data-n="${it.n}" rows="1" placeholder="📝 הערות (למשל: שם המקום שנבחר, מס' אישור הזמנה)"></textarea>`;
         g.appendChild(card);
@@ -220,6 +226,18 @@ function applyMode() {
   updateProgress();
 }
 
+// קישור ישיר למשימה/החלטה (decisions.html#d-I31) — פותח את "הצג הכל" אם היא סגורה, גולל ומדגיש
+function jumpToHash(){
+  const id = decodeURIComponent(location.hash.slice(1));
+  const el = id && document.getElementById(id);
+  if(!el) return;
+  if(el.classList.contains('closed-dec') && mode==='open'){ mode='all'; applyMode(); }
+  el.scrollIntoView({block:'center'});
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+}
+addEventListener('hashchange', jumpToHash);
+setTimeout(jumpToHash, 0);
+
 document.getElementById('fOpen').addEventListener('click', ()=>{ mode='open'; applyMode(); });
 document.getElementById('fAll').addEventListener('click', ()=>{ mode='all'; applyMode(); });
 
@@ -302,7 +320,7 @@ document.getElementById('modalBg').addEventListener('click',e=>{ if(e.target.id=
 render();
 applyMode();
 </script>
-<script src="delight.js?v=2026092101"></script>
-<script src="pwa.js?v=2026092101"></script>
+<script src="delight.js?v=2026092802"></script>
+<script src="pwa.js?v=2026092802"></script>
 </body>
 </html>
