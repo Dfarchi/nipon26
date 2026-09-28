@@ -67,7 +67,7 @@ App.screen('tasks.html', function () {
     chip: i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : '',
     body: `<div class="tfull">${A.rich(i.q)}</div>` +
       ((i.ds || []).length ? `<div class="tdue">` + i.ds.map(x => `<div class="pk"><b>${x.d}</b><span>${A.txt(x.t)}</span></div>`).join('') + `</div>` : '') +
-      links(i.l) + `<a class="go" href="decisions.html#d-${encodeURIComponent(i.n)}">פירוט מלא והערות</a>`
+      links(i.l)
   });
   const pdays = iso => { const [y, m, d] = iso.split('-').map(Number);
     return Math.round((new Date(y, m - 1, d) - new Date(new Date().setHours(0, 0, 0, 0))) / 864e5); };
@@ -79,7 +79,7 @@ App.screen('tasks.html', function () {
       b: '', short: A.txt(it.t), chip: it.due ? `<span class="chip ${cls}">${n < 0 && !prep[it.id] ? 'עבר · ' : ''}${dd}</span>` : '',
       body: (it.d ? `<div class="tfull">${A.rich(it.d)}</div>` : '') +
         links(it.u ? [{ t: '🔗 לינק', u: it.u }] : []) +
-        (it.ref ? `<a class="go" href="decisions.html#d-${encodeURIComponent(it.ref)}">משימה ${A.esc(it.ref)} — פירוט מלא</a>` : '')
+        (it.ref ? `<div class="d" style="margin-top:8px">קשור למשימה ${A.esc(it.ref)} ברשימת המשימות</div>` : '')
     });
   };
   const chosen = n => Array.isArray(store[n]) ? store[n] : (store[n] !== undefined ? [store[n]] : []);
@@ -90,7 +90,8 @@ App.screen('tasks.html', function () {
     const doneN = openTask.filter(i => done(i.n)).length;
     let h = `<div class="head"><div class="kicker">${openDec.length} החלטות · ${
       openTask.length - doneN} משימות${doneN ? ' · ' + doneN + ' סומנו' : ''}</div>
-      <div class="h1">מה פתוח</div></div>`;
+      <div class="h1">מה פתוח</div></div>
+      <div class="card sheetc" id="sheetC"></div>`;
 
     if (urgent.length) {
       h += `<div class="lbl" style="margin-top:16px">דדליין קרוב<i></i></div>`;
@@ -107,7 +108,7 @@ App.screen('tasks.html', function () {
         <div class="tfull" style="margin-top:6px">${A.rich(lead.q)}</div>
         <div class="steps well">` +
         lead.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.txt(x.t)}</span></div>`).join('') +
-        `</div>${links(lead.l)}<a class="go" href="decisions.html#d-${encodeURIComponent(lead.n)}">פירוט מלא והערות</a></div>`;
+        `</div>${links(lead.l)}</div>`;
       if (near.length) h += `<div class="tlist">` + near.map(taskRow).join('') + `</div>`;
     }
 
@@ -126,7 +127,13 @@ App.screen('tasks.html', function () {
               <i class="pip box"></i>
               <span>${A.txt(o.t)}</span>${i.rec === k ? '<span class="chip hot">מומלץ</span>' : ''}</a>`;
           }).join('') +
-          `</div><a class="go" href="decisions.html#d-${encodeURIComponent(i.n)}">הסבר לכל אפשרות</a></div>`;
+          `</div>
+          <button class="step day" type="button" data-open="o:${A.esc(i.n)}" aria-expanded="false" style="margin-top:8px"><span>הסבר לכל אפשרות</span></button>
+          <div class="peek" data-peek="o:${A.esc(i.n)}"><div class="peek-in">` +
+          (i.o || []).map(o => `<div class="topt"><div class="t">${A.txt(o.t)}</div>
+            ${o.d ? `<div class="d">${A.rich(o.d)}</div>` : ''}
+            ${o.tp ? `<div class="d"><b>שיקול:</b> ${A.rich(o.tp)}</div>` : ''}${links(o.l)}</div>`).join('') +
+          `</div></div></div>`;
       });
     }
 
@@ -135,9 +142,7 @@ App.screen('tasks.html', function () {
     if ((T.prep || []).length) {
       const all = T.prep.flatMap(g => g.items), left = all.filter(it => !prep[it.id]).length;
       h += `<div class="lbl" style="margin-top:22px">לפני הטיסה<i></i><span class="d" id="prepLeft">${left}</span></div>
-        <div class="d" id="prepSync" style="margin-top:2px">${A.spend.url()
-          ? 'משותף דרך גיליון ההוצאות — כאן וגם במשימות: מה שאחד מסמן, השני רואה'
-          : 'נשמר בטלפון עד שמחברים את גיליון ההוצאות (ארנק ← לחבר גיליון) — ואז משותף לשניכם'}</div>`;
+`;
       T.prep.forEach((g, gi) => {
         const n = g.items.filter(it => !prep[it.id]).length;
         h += `<button class="step day psec" type="button" data-open="s:${gi}" aria-expanded="false" style="margin-top:7px">
@@ -164,19 +169,45 @@ App.screen('tasks.html', function () {
 
   render();
 
+  // החיבור לגיליון — אותו גיליון ואותה כתובת של ההוצאות בארנק. מחברים
+  // פעם אחת בכל טלפון, כאן או בארנק, וזה משרת את שניהם.
+  function paintSheet(msg) {
+    const c = document.getElementById('sheetC'); if (!c) return;
+    const on = !!A.spend.url();
+    c.innerHTML = `<div style="display:flex;gap:10px;align-items:center">
+        <i class="pip" style="background:${on ? 'var(--ok)' : 'var(--hot)'}"></i>
+        <div style="flex:1"><div class="t" style="font-size:var(--fs-body)">${on ? 'מסונכרן עם הגיליון' : 'הסימונים נשמרים רק בטלפון הזה'}</div>
+          <div class="d">${msg || (on ? 'מה שאחד מסמן כאן, השני רואה — דרך גיליון ההוצאות'
+            : 'כדי שתראו אותו דבר, מחברים את גיליון ההוצאות (אותה כתובת בשני הטלפונים)')}</div></div>
+        <button class="chip${on ? '' : ' hot'}" id="shBtn" type="button">${on ? 'שינוי' : 'לחבר'}</button></div>
+      <div id="shForm" hidden style="margin-top:10px">
+        <div class="d">כתובת ה-Apps Script של גיליון ההוצאות — אותה אחת שבארנק. מסתיימת ב-/exec.</div>
+        <input id="shUrl" type="url" inputmode="url" placeholder="https://script.google.com/…/exec" value="${A.esc(A.spend.url())}"
+          style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--well);color:var(--ink);font:inherit;font-size:var(--fs-meta)">
+        <div style="display:flex;gap:8px;margin-top:9px"><button class="chip" id="shSave" type="button">שמירה</button>
+          ${on ? '<button class="chip" id="shClr" type="button">ניתוק</button>' : ''}</div></div>`;
+    document.getElementById('shBtn').onclick = () => { const f = document.getElementById('shForm'); f.hidden = !f.hidden; };
+    document.getElementById('shSave').onclick = () => {
+      A.spend.setUrl(document.getElementById('shUrl').value);
+      paintSheet('מתחבר…'); pull(true);
+    };
+    const clr = document.getElementById('shClr');
+    if (clr) clr.onclick = () => { A.spend.setUrl(''); paintSheet(); };
+  }
+  paintSheet();
+
   // משיכה מהגיליון: מה שהטלפון השני סימן מגיע כאן. צובעים רק את מה שהשתנה.
   let pullT = 0;
-  function pull() {
+  function pull(now) {
     if (!A.spend.url()) return;
     clearTimeout(pullT);
     pullT = setTimeout(() => A.spend.sync(ok => {
+      paintSheet(ok ? 'עודכן עכשיו' : 'הגיליון לא ענה — הסימונים מחכים בטלפון וישלחו כשתחזור קליטה');
       const before = prep; prep = A.spend.marks('prep');
       new Set(Object.keys(before).concat(Object.keys(prep))).forEach(id => { if (!!before[id] !== !!prep[id]) paintPrep(id); });
       const tb = tdone; tdone = A.spend.marks('task'); mirror();
       new Set(Object.keys(tb).concat(Object.keys(tdone))).forEach(n => { if (!!tb[n] !== !!tdone[n]) paintTodo(n); });
-      const st = document.getElementById('prepSync');
-      if (st && !ok) st.textContent = 'הגיליון לא ענה — הסימונים מחכים בטלפון וישלחו כשתחזור קליטה';
-    }), 600);
+    }), now ? 0 : 600);
   }
   A.onLeave(() => clearTimeout(pullT));
   pull();

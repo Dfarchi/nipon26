@@ -926,3 +926,8 @@ a.step{min-height:44px}
 .card.flash{animation:actFlash 1.8s var(--e-out)}
 @keyframes actFlash{0%,35%{box-shadow:0 0 0 3px var(--hot)}100%{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.card.flash{animation:none;outline:2px solid var(--hot)}}
+.card.sheetc{margin-top:12px;padding:11px 14px}
+.topt{padding:8px 0;border-bottom:1px solid var(--line)}
+.topt:last-child{border-bottom:0}
+.topt .t{font-size:var(--fs-body)}
+.topt .d{margin-top:3px;line-height:var(--lh-base)}
