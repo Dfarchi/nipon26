@@ -188,11 +188,28 @@ window.App = (function () {
     },
     queue: () => lsGet(SP_Q, []),
     synced: () => lsGet(SP_ROWS, []),
-    // מה שמוצג: מה שחזר מהגיליון, ועליו מה שעוד לא נשלח.
+    // סימון ב"לפני הטיסה" נוסע באותו גיליון, כשורה של 0 ₪ שה-id שלה
+    // מתחיל ב-prep: — ככה שני הטלפונים רואים אותו בלי סקריפט חדש ובלי
+    // פריסה נוספת. הקטגוריה לא ב-CAT, ולכן הסיכום בגיליון לא סופר אותה.
+    // ביטול סימון = מחיקת השורה, באותו תור מחיקות שעובד גם אופליין.
+    isPrep: r => String((r && r.id) || '').indexOf('prep:') === 0,
+    prepDone() {
+      const out = {};
+      this.synced().concat(this.queue()).forEach(r => { if (this.isPrep(r)) out[r.id.slice(5)] = 1; });
+      return out;
+    },
+    prepToggle(id, title) {
+      const key = 'prep:' + id;
+      if (this.prepDone()[id]) return this.remove(key);
+      lsSet(SP_DEL, this.dels().filter(x => x !== key));
+      lsSet(SP_Q, this.queue().concat([{ id: key, date: '', who: '', amount: 0, currency: '', rate: 0,
+        category: '✅ הכנות', pay: '', note: String(title || id) }]));
+    },
+    // מה שמוצג: מה שחזר מהגיליון, ועליו מה שעוד לא נשלח. בלי סימוני ההכנות.
     all() {
       const seen = {}, out = [];
       this.synced().concat(this.queue()).forEach(r => {
-        if (!r || !r.id || seen[r.id]) return; seen[r.id] = 1; out.push(r);
+        if (!r || !r.id || seen[r.id] || this.isPrep(r)) return; seen[r.id] = 1; out.push(r);
       });
       return out.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     },

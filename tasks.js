@@ -32,9 +32,16 @@ App.screen('tasks.html', function () {
   // שורה שנפתחת. קודם כל השורה הייתה פקד "בוצע" והטקסט נחתך ב-95 תווים —
   // כלומר את המשימה עצמה אי אפשר היה לקרוא. עכשיו העיגול מסמן, והשורה
   // פותחת במקום את הטקסט המלא, התאריכים והלינקים (אותו .peek של המסלול).
+  // הסימונים של "לפני הטיסה" חיים בגיליון ההוצאות (A.spend.prepToggle),
+  // לא ב-localStorage נפרד — כך יובל ושיר רואים אותו דבר.
   const PREP_KEY = 'nipon26_prep_v1';
-  let prep = {}; try { prep = JSON.parse(localStorage.getItem(PREP_KEY) || '{}'); } catch (e) {}
-  const savePrep = () => { try { localStorage.setItem(PREP_KEY, JSON.stringify(prep)); } catch (e) {} };
+  try { // סימונים מהגרסה הקודמת, שנשמרו רק בטלפון — עוברים לתור פעם אחת
+    const old = JSON.parse(localStorage.getItem(PREP_KEY) || '{}');
+    Object.keys(old).forEach(id => { if (!A.spend.prepDone()[id]) A.spend.prepToggle(id, id); });
+    localStorage.removeItem(PREP_KEY);
+  } catch (e) {}
+  let prep = A.spend.prepDone();
+  const titleOf = id => ((T.prep || []).flatMap(g => g.items).find(it => it.id === id) || {}).t || id;
   const links = l => (l || []).length ? `<div class="tlinks">` + l.map(x =>
     `<a class="chip" href="${A.esc(x.u)}" target="_blank" rel="noopener">${A.txt(x.t)}</a>`).join('') + `</div>` : '';
   const row = (o) => `
@@ -118,8 +125,9 @@ App.screen('tasks.html', function () {
     if ((T.prep || []).length) {
       const all = T.prep.flatMap(g => g.items), left = all.filter(it => !prep[it.id]).length;
       h += `<div class="lbl" style="margin-top:22px">לפני הטיסה<i></i><span class="d" id="prepLeft">${left}</span></div>
-        <div class="d" style="margin-top:2px">הסימון כאן נשמר בטלפון הזה.
-          <a href="https://claude.ai/artifact/RsA9yiq2iYHociH17e2w2E" target="_blank" rel="noopener" style="color:var(--hot)">לסמן ביחד ↗</a></div>`;
+        <div class="d" id="prepSync" style="margin-top:2px">${A.spend.url()
+          ? 'משותף דרך גיליון ההוצאות — מה שאחד מסמן, השני רואה'
+          : 'נשמר בטלפון עד שמחברים את גיליון ההוצאות (ארנק ← לחבר גיליון) — ואז משותף לשניכם'}</div>`;
       T.prep.forEach((g, gi) => {
         const n = g.items.filter(it => !prep[it.id]).length;
         h += `<button class="step day psec" type="button" data-open="s:${gi}" aria-expanded="false" style="margin-top:7px">
@@ -145,6 +153,21 @@ App.screen('tasks.html', function () {
   }
 
   render();
+
+  // משיכה מהגיליון: מה שהטלפון השני סימן מגיע כאן. צובעים רק את מה שהשתנה.
+  let pullT = 0;
+  function pull() {
+    if (!A.spend.url()) return;
+    clearTimeout(pullT);
+    pullT = setTimeout(() => A.spend.sync(ok => {
+      const before = prep; prep = A.spend.prepDone();
+      new Set(Object.keys(before).concat(Object.keys(prep))).forEach(id => { if (!!before[id] !== !!prep[id]) paintPrep(id); });
+      const st = document.getElementById('prepSync');
+      if (st && !ok) st.textContent = 'הגיליון לא ענה — הסימונים מחכים בטלפון וישלחו כשתחזור קליטה';
+    }), 600);
+  }
+  A.onLeave(() => clearTimeout(pullT));
+  pull();
 
   // טיק לא בונה את המסך מחדש. בדקתי את התלות: urgent ו-rest נגזרים אך ורק
   // מ-due, ו-store לא משפיע על שום מיון או חלוקה — כלומר סימון משנה תצוגה
@@ -198,8 +221,9 @@ App.screen('tasks.html', function () {
     const pt = e.target.closest('[data-ptick]');
     if (pt) {
       const id = pt.dataset.ptick;
-      if (prep[id]) delete prep[id]; else prep[id] = 1;
-      savePrep(); paintPrep(id);
+      A.spend.prepToggle(id, titleOf(id));
+      prep = A.spend.prepDone(); paintPrep(id);
+      pull();
       return;
     }
     const op = e.target.closest('[data-open]');
