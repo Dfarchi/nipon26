@@ -194,7 +194,7 @@ App.screen('wallet.html', function () {
     if (st) {
       // "מקומי בלבד" נשמע כמו מבוי סתום. בפועל שום דבר לא הולך לאיבוד:
       // התור נשמר, ובשנייה שמחברים גיליון הוא נשלח כולו.
-      const q = A.spend.queue().filter(r => !A.spend.isPrep(r)).length;
+      const q = A.spend.queue().filter(r => !A.spend.isMark(r)).length;
       st.textContent = !A.spend.url() ? (q ? `בטלפון · ${q} יחכו לגיליון` : 'נשמר בטלפון')
         : q ? q + ' ממתינות לשליחה' : 'מסונכרן';
     }

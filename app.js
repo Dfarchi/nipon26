@@ -188,28 +188,31 @@ window.App = (function () {
     },
     queue: () => lsGet(SP_Q, []),
     synced: () => lsGet(SP_ROWS, []),
-    // סימון ב"לפני הטיסה" נוסע באותו גיליון, כשורה של 0 ₪ שה-id שלה
-    // מתחיל ב-prep: — ככה שני הטלפונים רואים אותו בלי סקריפט חדש ובלי
-    // פריסה נוספת. הקטגוריה לא ב-CAT, ולכן הסיכום בגיליון לא סופר אותה.
-    // ביטול סימון = מחיקת השורה, באותו תור מחיקות שעובד גם אופליין.
-    isPrep: r => String((r && r.id) || '').indexOf('prep:') === 0,
-    prepDone() {
-      const out = {};
-      this.synced().concat(this.queue()).forEach(r => { if (this.isPrep(r)) out[r.id.slice(5)] = 1; });
+    // סימוני "בוצע" נוסעים באותו גיליון, כשורות של 0 ₪ שה-id שלהן מתחיל
+    // בקידומת — prep: לצ׳קליסט "לפני הטיסה", task: למשימות. ככה שני
+    // הטלפונים רואים אותו דבר בלי סקריפט חדש ובלי פריסה נוספת. הקטגוריות
+    // לא ב-CAT, ולכן הסיכום בגיליון לא סופר אותן. ביטול סימון = מחיקת
+    // השורה, באותו תור מחיקות שעובד גם אופליין.
+    MARK: { prep: '✅ הכנות', task: '✅ משימות' },
+    isMark(r) { const id = String((r && r.id) || ''); return Object.keys(this.MARK).some(k => id.indexOf(k + ':') === 0); },
+    marks(kind) {
+      const out = {}, pre = kind + ':';
+      this.synced().concat(this.queue()).forEach(r => {
+        const id = String((r && r.id) || ''); if (id.indexOf(pre) === 0) out[id.slice(pre.length)] = 1; });
       return out;
     },
-    prepToggle(id, title) {
-      const key = 'prep:' + id;
-      if (this.prepDone()[id]) return this.remove(key);
+    markToggle(kind, id, title) {
+      const key = kind + ':' + id;
+      if (this.marks(kind)[id]) return this.remove(key);
       lsSet(SP_DEL, this.dels().filter(x => x !== key));
       lsSet(SP_Q, this.queue().concat([{ id: key, date: '', who: '', amount: 0, currency: '', rate: 0,
-        category: '✅ הכנות', pay: '', note: String(title || id) }]));
+        category: this.MARK[kind], pay: '', note: String(title || id) }]));
     },
     // מה שמוצג: מה שחזר מהגיליון, ועליו מה שעוד לא נשלח. בלי סימוני ההכנות.
     all() {
       const seen = {}, out = [];
       this.synced().concat(this.queue()).forEach(r => {
-        if (!r || !r.id || seen[r.id] || this.isPrep(r)) return; seen[r.id] = 1; out.push(r);
+        if (!r || !r.id || seen[r.id] || this.isMark(r)) return; seen[r.id] = 1; out.push(r);
       });
       return out.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     },

@@ -27,20 +27,30 @@ App.screen('tasks.html', function () {
   const clip = (s, n) => { s = String(s); if (s.length <= n) return s;
     const c = s.slice(0, n); const i = c.lastIndexOf(' ');
     return (i > n * 0.6 ? c.slice(0, i) : c).replace(/[\s(\[·—-]+$/, '') + '…'; };
-  const done = n => store[n] === true;
+  // "בוצע" של משימה חי בגיליון (task:<n>), כמו הצ׳קליסט. store נשאר
+  // מראה מקומית, כי דף ההחלטות המלא קורא ממנו. סימונים מקומיים ישנים
+  // עולים לגיליון פעם אחת.
+  const MIG = 'nipon26_tasks_migrated';
+  try { if (!localStorage.getItem(MIG)) {
+    openTask.forEach(i => { if (store[i.n] === true && !A.spend.marks('task')[i.n]) A.spend.markToggle('task', i.n, A.txt(i.q).slice(0, 80)); });
+    localStorage.setItem(MIG, '1'); } } catch (e) {}
+  let tdone = A.spend.marks('task');
+  const mirror = () => { openTask.forEach(i => { if (tdone[i.n]) store[i.n] = true; else if (store[i.n] === true) delete store[i.n]; }); save(); };
+  mirror();
+  const done = n => !!tdone[n];
 
   // שורה שנפתחת. קודם כל השורה הייתה פקד "בוצע" והטקסט נחתך ב-95 תווים —
   // כלומר את המשימה עצמה אי אפשר היה לקרוא. עכשיו העיגול מסמן, והשורה
   // פותחת במקום את הטקסט המלא, התאריכים והלינקים (אותו .peek של המסלול).
-  // הסימונים של "לפני הטיסה" חיים בגיליון ההוצאות (A.spend.prepToggle),
+  // הסימונים של "לפני הטיסה" חיים בגיליון ההוצאות (A.spend.markToggle),
   // לא ב-localStorage נפרד — כך יובל ושיר רואים אותו דבר.
   const PREP_KEY = 'nipon26_prep_v1';
   try { // סימונים מהגרסה הקודמת, שנשמרו רק בטלפון — עוברים לתור פעם אחת
     const old = JSON.parse(localStorage.getItem(PREP_KEY) || '{}');
-    Object.keys(old).forEach(id => { if (!A.spend.prepDone()[id]) A.spend.prepToggle(id, id); });
+    Object.keys(old).forEach(id => { if (!A.spend.marks('prep')[id]) A.spend.markToggle('prep', id, id); });
     localStorage.removeItem(PREP_KEY);
   } catch (e) {}
-  let prep = A.spend.prepDone();
+  let prep = A.spend.marks('prep');
   const titleOf = id => ((T.prep || []).flatMap(g => g.items).find(it => it.id === id) || {}).t || id;
   const links = l => (l || []).length ? `<div class="tlinks">` + l.map(x =>
     `<a class="chip" href="${A.esc(x.u)}" target="_blank" rel="noopener">${A.txt(x.t)}</a>`).join('') + `</div>` : '';
@@ -126,7 +136,7 @@ App.screen('tasks.html', function () {
       const all = T.prep.flatMap(g => g.items), left = all.filter(it => !prep[it.id]).length;
       h += `<div class="lbl" style="margin-top:22px">לפני הטיסה<i></i><span class="d" id="prepLeft">${left}</span></div>
         <div class="d" id="prepSync" style="margin-top:2px">${A.spend.url()
-          ? 'משותף דרך גיליון ההוצאות — מה שאחד מסמן, השני רואה'
+          ? 'משותף דרך גיליון ההוצאות — כאן וגם במשימות: מה שאחד מסמן, השני רואה'
           : 'נשמר בטלפון עד שמחברים את גיליון ההוצאות (ארנק ← לחבר גיליון) — ואז משותף לשניכם'}</div>`;
       T.prep.forEach((g, gi) => {
         const n = g.items.filter(it => !prep[it.id]).length;
@@ -160,8 +170,10 @@ App.screen('tasks.html', function () {
     if (!A.spend.url()) return;
     clearTimeout(pullT);
     pullT = setTimeout(() => A.spend.sync(ok => {
-      const before = prep; prep = A.spend.prepDone();
+      const before = prep; prep = A.spend.marks('prep');
       new Set(Object.keys(before).concat(Object.keys(prep))).forEach(id => { if (!!before[id] !== !!prep[id]) paintPrep(id); });
+      const tb = tdone; tdone = A.spend.marks('task'); mirror();
+      new Set(Object.keys(tb).concat(Object.keys(tdone))).forEach(n => { if (!!tb[n] !== !!tdone[n]) paintTodo(n); });
       const st = document.getElementById('prepSync');
       if (st && !ok) st.textContent = 'הגיליון לא ענה — הסימונים מחכים בטלפון וישלחו כשתחזור קליטה';
     }), 600);
@@ -213,16 +225,17 @@ App.screen('tasks.html', function () {
     }
     const tick = e.target.closest('[data-tick]');
     if (tick) {
-      const n = tick.dataset.tick;
-      if (done(n)) delete store[n]; else store[n] = true;
-      save(); paintTodo(n);
+      const n = tick.dataset.tick, it = openTask.find(i => i.n === n);
+      A.spend.markToggle('task', n, it ? A.txt(it.q).slice(0, 80) : n);
+      tdone = A.spend.marks('task'); mirror(); paintTodo(n);
+      pull();
       return;
     }
     const pt = e.target.closest('[data-ptick]');
     if (pt) {
       const id = pt.dataset.ptick;
-      A.spend.prepToggle(id, titleOf(id));
-      prep = A.spend.prepDone(); paintPrep(id);
+      A.spend.markToggle('prep', id, titleOf(id));
+      prep = A.spend.marks('prep'); paintPrep(id);
       pull();
       return;
     }
