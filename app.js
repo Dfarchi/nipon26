@@ -1238,6 +1238,35 @@ window.App = (function () {
   // מסך שמשאיר אחריו טיימר או מאזין גלובלי רושם כאן איך לנקות אותו.
   function onLeave(fn) { leavers.push(fn); }
 
+  // ===== פאנל פירוט =====
+  // פירוט ארוך נפתח כפאנל שעולה מלמטה ונגלל בתוכו — לא מעבר לאתר הישן
+  // ולא פריסה בתוך הרשימה שדוחפת את כל המסך. אחד לכל העמוד, מחוץ ל-#main,
+  // ולכן יציב בין מסכים; מעבר מסך סוגר אותו.
+  function sheet(html) {
+    let el = document.getElementById('bsheet');
+    if (!el) {
+      el = document.createElement('div'); el.id = 'bsheet'; el.className = 'bsheet'; el.hidden = true;
+      el.innerHTML = '<div class="bs-bg"></div><div class="bs-panel" role="dialog" aria-modal="true">' +
+        '<button class="bs-x" type="button" aria-label="סגירה"><i></i></button><div class="bs-body"></div></div>';
+      document.body.appendChild(el);
+      el.querySelector('.bs-bg').onclick = sheetClose;
+      el.querySelector('.bs-x').onclick = sheetClose;
+      addEventListener('keydown', e => { if (e.key === 'Escape') sheetClose(); });
+    }
+    el.querySelector('.bs-body').innerHTML = html;
+    el.querySelector('.bs-panel').scrollTop = 0;
+    el.hidden = false; document.body.classList.add('bs-open');
+    requestAnimationFrame(() => el.classList.add('on'));
+    onLeave(sheetClose);
+    return el.querySelector('.bs-body');
+  }
+  function sheetClose() {
+    const el = document.getElementById('bsheet'); if (!el || el.hidden) return;
+    el.classList.remove('on'); document.body.classList.remove('bs-open');
+    const fin = () => { el.hidden = true; };
+    matchMedia('(prefers-reduced-motion: reduce)').matches ? fin() : setTimeout(fin, 260);
+  }
+
   const pageOf = () => (location.pathname.split('/').pop() || 'today.html');
 
   function paint(page) {
@@ -1316,7 +1345,7 @@ window.App = (function () {
       // לא לחטוף מחווה מאלמנט שגולל לרוחב בעצמו (סרגל הקפיצה), ולא
       // משדה טקסט או בורר — שם החלקה היא בחירה, לא ניווט.
       const el = document.elementFromPoint(t.clientX, t.clientY);
-      if (el && el.closest('input,textarea,select,.jump,.tcard')) { live = false; return; }
+      if (el && el.closest('input,textarea,select,.jump,.tcard,.bsheet')) { live = false; return; }
       x0 = t.clientX; y0 = t.clientY; live = true;
     }, { passive: true });
 
@@ -1463,5 +1492,5 @@ window.App = (function () {
   // HTML משרת את כל החמישה ואין קובץ שקורא ל-boot בשם עצמו.
   addEventListener('DOMContentLoaded', () => { try { boot(); } catch (e) { console.error(e); } });
 
-  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, afterTrip, spend, screen, onLeave, goto, greet, factsFor, rich, dl, hello, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
+  return { T, q, theme, esc, txt, foreign, namesOn, setNames, jumpBar, fxRate, DOW, dated, dayIndex, beforeTrip, afterTrip, spend, screen, onLeave, sheet, sheetClose, goto, greet, factsFor, rich, dl, hello, who, cloudSVG, boot, today0, firstDay, particles, decorate, reveal };
 })();

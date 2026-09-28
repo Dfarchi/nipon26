@@ -931,3 +931,28 @@ a.step{min-height:44px}
 .topt:last-child{border-bottom:0}
 .topt .t{font-size:var(--fs-body)}
 .topt .d{margin-top:3px;line-height:var(--lh-base)}
+
+/* ===== פאנל פירוט — עולה מלמטה ונגלל בתוכו ===== */
+.bsheet{position:fixed;inset:0;z-index:60}
+.bs-bg{position:absolute;inset:0;background:rgba(8,12,18,.55);opacity:0;transition:opacity 240ms var(--e-out)}
+.bs-panel{position:absolute;inset-inline:0;bottom:0;max-height:86vh;max-height:86dvh;overflow-y:auto;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  background:var(--card);border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.35);
+  padding:26px 18px calc(22px + env(safe-area-inset-bottom,0px));
+  transform:translateY(100%);transition:transform 280ms var(--e-out)}
+.bsheet.on .bs-bg{opacity:1}
+.bsheet.on .bs-panel{transform:none}
+.bs-panel::before{content:'';position:absolute;top:9px;left:50%;width:38px;height:4px;margin-left:-19px;
+  border-radius:4px;background:var(--line)}
+.bs-x{position:absolute;top:12px;inset-inline-start:12px;width:34px;height:34px;border:0;border-radius:50%;
+  background:var(--well);cursor:pointer}
+.bs-x i::before,.bs-x i::after{content:'';position:absolute;left:10px;right:10px;top:16px;height:2px;border-radius:2px;background:var(--soft)}
+.bs-x i::before{transform:rotate(45deg)} .bs-x i::after{transform:rotate(-45deg)}
+.bs-body > div:first-child{min-height:30px}
+.bs-note{width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);
+  background:var(--well);color:var(--ink);font:inherit;font-size:var(--fs-body);resize:vertical}
+.topt.on .t{color:var(--ok)}
+button.go{width:100%;border:0;cursor:pointer;font-family:inherit}
+body.bs-open{overflow:hidden}
+.step.day.sh::after{transform:translateY(-50%) rotate(45deg)}
+@media (prefers-reduced-motion:reduce){.bs-bg,.bs-panel{transition:none}}

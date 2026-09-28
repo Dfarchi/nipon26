@@ -61,14 +61,40 @@ App.screen('tasks.html', function () {
         ${o.b ? `<b>${o.b}</b>` : ''}<span>${o.short}</span>${o.chip || ''}</button>
     </div>
     <div class="peek" data-peek="${A.esc(o.key)}"><div class="peek-in">${o.body}</div></div>`;
-  const taskRow = i => row({
-    key: 't:' + i.n, done: done(i.n), attr: `data-todo="${A.esc(i.n)}"`, tick: `data-tick="${A.esc(i.n)}"`,
-    b: i.n, short: clip(A.txt(i.q), 95),
-    chip: i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : '',
-    body: `<div class="tfull">${A.rich(i.q)}</div>` +
-      ((i.ds || []).length ? `<div class="tdue">` + i.ds.map(x => `<div class="pk"><b>${x.d}</b><span>${A.txt(x.t)}</span></div>`).join('') + `</div>` : '') +
-      links(i.l)
-  });
+  // משימה נפתחת בפאנל נגלל: הטקסט המלא, התאריכים, הלינקים והערה.
+  // ההערה נשמרת באותו מפתח שדף ההחלטות הישן השתמש בו, כך שכלום לא אבד.
+  const NKEY = 'nipon26_notes_v1';
+  const notes = () => { try { return JSON.parse(localStorage.getItem(NKEY) || '{}'); } catch (e) { return {}; } };
+  const taskRow = i => `
+    <div class="trow${done(i.n) ? ' is-done' : ''}" data-todo="${A.esc(i.n)}">
+      <button class="tick" type="button" data-tick="${A.esc(i.n)}" aria-label="בוצע" aria-pressed="${done(i.n)}"><i class="pip box"></i></button>
+      <button class="step day sh" type="button" data-sheet="${A.esc(i.n)}">
+        <b>${i.n}</b><span>${clip(A.txt(i.q), 95)}</span>${i.dl ? `<span class="chip ${i.dl.days <= 7 ? 'hot' : ''}">${i.dl.d}</span>` : ''}</button>
+    </div>`;
+  function showTask(n) {
+    const i = items.find(x => x.n === n); if (!i) return;
+    const ds = (i.due || []).map(x => Object.assign({}, x, A.dl(x.d) || {})).sort((a, b) => (a.days ?? 9e9) - (b.days ?? 9e9));
+    const isDec = !i.todo, picked = chosen(n);
+    const body = A.sheet(`<div style="display:flex;gap:8px;align-items:center;padding-inline-start:44px">
+        <b style="color:var(--hot);font-size:var(--fs-meta)">${A.esc(i.n)}</b><span class="kicker" style="margin:0;padding:0">${A.txt(String(i.g || '').replace(/^[A-Z]+\s*·\s*/, ''))}</span></div>
+      <div class="tfull" style="color:var(--ink);margin-top:6px">${A.rich(i.q)}</div>` +
+      (ds.length ? `<div class="lbl q" style="margin-top:14px">תאריכים<i></i></div><div class="tdue">` +
+        ds.map(x => `<div class="pk"><b>${x.d}</b><span>${A.txt(x.t)}</span>${x.days >= 0 ? `<i>${days(x.days)}</i>` : ''}</div>`).join('') + `</div>` : '') +
+      links(i.l) +
+      (isDec ? `<div class="lbl q" style="margin-top:14px">האפשרויות<i></i></div>` + (i.o || []).map((o, k) =>
+        `<div class="topt${picked.includes(k) ? ' on' : ''}"><div class="t">${picked.includes(k) ? '✓ ' : ''}${A.txt(o.t)}${i.rec === k ? ' <span class="chip hot">מומלץ</span>' : ''}</div>
+          ${o.d ? `<div class="d">${A.rich(o.d)}</div>` : ''}
+          ${o.see && o.see !== '—' ? `<div class="d"><b>לראות/לעשות:</b> ${A.rich(o.see)}</div>` : ''}
+          ${o.tp ? `<div class="d"><b>שיקול:</b> ${A.rich(o.tp)}</div>` : ''}${links(o.l)}</div>`).join('') : '') +
+      `<div class="lbl q" style="margin-top:14px">הערה<i></i></div>
+      <textarea class="bs-note" id="bsNote" rows="3" placeholder="למשל: מספר אישור, שם המקום שנבחר, שאלה לקלוד">${A.esc(notes()[n] || '')}</textarea>` +
+      (i.todo ? `<button class="go" type="button" id="bsDone">${done(n) ? 'לבטל סימון בוצע' : 'סימון בוצע'}</button>` : ''));
+    const ta = body.querySelector('#bsNote');
+    ta.oninput = () => { const all = notes(); if (ta.value.trim()) all[n] = ta.value; else delete all[n];
+      try { localStorage.setItem(NKEY, JSON.stringify(all)); } catch (e) {} };
+    const bd = body.querySelector('#bsDone');
+    if (bd) bd.onclick = () => { toggleTask(n); bd.textContent = done(n) ? 'לבטל סימון בוצע' : 'סימון בוצע'; };
+  }
   const pdays = iso => { const [y, m, d] = iso.split('-').map(Number);
     return Math.round((new Date(y, m - 1, d) - new Date(new Date().setHours(0, 0, 0, 0))) / 864e5); };
   const prepRow = it => {
@@ -108,7 +134,7 @@ App.screen('tasks.html', function () {
         <div class="tfull" style="margin-top:6px">${A.rich(lead.q)}</div>
         <div class="steps well">` +
         lead.ds.map(x => `<div class="step"><b>${x.d}</b><span>${A.txt(x.t)}</span></div>`).join('') +
-        `</div>${links(lead.l)}</div>`;
+        `</div>${links(lead.l)}<button class="go" type="button" data-sheet="${A.esc(lead.n)}">הערה ופירוט</button></div>`;
       if (near.length) h += `<div class="tlist">` + near.map(taskRow).join('') + `</div>`;
     }
 
@@ -128,12 +154,7 @@ App.screen('tasks.html', function () {
               <span>${A.txt(o.t)}</span>${i.rec === k ? '<span class="chip hot">מומלץ</span>' : ''}</a>`;
           }).join('') +
           `</div>
-          <button class="step day" type="button" data-open="o:${A.esc(i.n)}" aria-expanded="false" style="margin-top:8px"><span>הסבר לכל אפשרות</span></button>
-          <div class="peek" data-peek="o:${A.esc(i.n)}"><div class="peek-in">` +
-          (i.o || []).map(o => `<div class="topt"><div class="t">${A.txt(o.t)}</div>
-            ${o.d ? `<div class="d">${A.rich(o.d)}</div>` : ''}
-            ${o.tp ? `<div class="d"><b>שיקול:</b> ${A.rich(o.tp)}</div>` : ''}${links(o.l)}</div>`).join('') +
-          `</div></div></div>`;
+          <button class="go" type="button" data-sheet="${A.esc(i.n)}">הסבר לכל אפשרות</button></div>`;
       });
     }
 
@@ -160,8 +181,6 @@ App.screen('tasks.html', function () {
       rest.length - rest.filter(i => done(i.n)).length}</span></div>`;
     h += `<div class="tlist">` + ordered.map(taskRow).join('') + `</div>`;
 
-    h += `<div class="acts"><button class="cloud g" onclick="location.href='decisions.html'">
-      ${A.cloudSVG(A.theme === 'day' ? '#e8dcc4' : '#2b3b48')}<span>הערות ופירוט מלא</span></button></div>`;
     document.getElementById('main').innerHTML = h;
     A.reveal(document.getElementById('main'));
   A.jumpBar();
@@ -217,6 +236,12 @@ App.screen('tasks.html', function () {
   // בלבד. innerHTML מלא כאן היה הורס 151 אלמנטים, מקפיץ את הגלילה, והורג
   // את האלמנט שהאצבע עליו באמצע הלחיצה.
   const sel = v => `[data-todo="${CSS.escape(v)}"]`;
+  function toggleTask(n) {
+    const it = openTask.find(i => i.n === n);
+    A.spend.markToggle('task', n, it ? A.txt(it.q).slice(0, 80) : n);
+    tdone = A.spend.marks('task'); mirror(); paintTodo(n);
+    pull();
+  }
   const paintTodo = n => {
     document.querySelectorAll(sel(n)).forEach(el => el.classList.toggle('is-done', done(n)));
     document.querySelectorAll(`[data-tick="${CSS.escape(n)}"]`).forEach(b => b.setAttribute('aria-pressed', done(n)));
@@ -255,13 +280,9 @@ App.screen('tasks.html', function () {
       return;
     }
     const tick = e.target.closest('[data-tick]');
-    if (tick) {
-      const n = tick.dataset.tick, it = openTask.find(i => i.n === n);
-      A.spend.markToggle('task', n, it ? A.txt(it.q).slice(0, 80) : n);
-      tdone = A.spend.marks('task'); mirror(); paintTodo(n);
-      pull();
-      return;
-    }
+    if (tick) { toggleTask(tick.dataset.tick); return; }
+    const sh = e.target.closest('[data-sheet]');
+    if (sh) { showTask(sh.dataset.sheet); return; }
     const pt = e.target.closest('[data-ptick]');
     if (pt) {
       const id = pt.dataset.ptick;
