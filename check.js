@@ -90,6 +90,11 @@ console.log('=== הכנות: מזהים ייחודיים והפניות קיימ
   items.filter(i => i.due && isNaN(new Date(i.due))).forEach(i => fail(`prep ${i.id}: תאריך לא תקין ${i.due}`));
 }
 
+console.log('=== לינקים לפעילויות ===');
+(T._unmatchedLinks || []).forEach(k => fail(`לינק לפעילות שלא נמצאה: ${k} — כותרת הפעילות השתנתה?`));
+{ const none = T.days.flatMap(d => (d.acts || []).filter(a => !a.l || !a.l.length).map(a => d.st + ' | ' + a.t));
+  none.length ? none.forEach(x => console.log('  ⚠️ בלי לינק: ' + x)) : ok('לכל פעילות יש לפחות לינק אחד'); }
+
 console.log('=== מחרוזת מטמון (?v=) זהה בכל ה-HTML ===');
 const fs = require('fs');
 const vers = new Set();
